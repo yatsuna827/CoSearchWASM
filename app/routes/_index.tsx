@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { type Remote, wrap } from 'comlink'
 
 import type { WorkerAPI } from '@dotnet/main.worker'
-import tryWorker from '../../modules/dotnet/main.worker?worker'
+import SearchWorker from '../../modules/dotnet/main.worker?worker'
 
 export const meta: MetaFunction = () => {
   return [
@@ -30,16 +30,14 @@ type SearchResult = {
 
 export default function Index() {
   const [results, setResults] = useState<SearchResult[]>([])
-  const [workerIsReady, setWorkerIsReady] = useState(false)
   const seedInputRef = useRef<HTMLInputElement>(null)
 
+  //const [workerIsReady, setWorkerIsReady] = useState(false)
   const workerRef = useRef<Remote<WorkerAPI> | null>(null)
 
   useEffect(() => {
-    const worker = new tryWorker()
-    workerRef.current = wrap(worker) // worker読み込み
-
-    workerRef.current.setupDotnet().then(() => setWorkerIsReady(true))
+    const worker = new SearchWorker()
+    workerRef.current = wrap(worker)
 
     return () => {
       worker.terminate()
@@ -48,7 +46,7 @@ export default function Index() {
 
   const handleClick = async () => {
     const worker = workerRef.current
-    if (!worker || !workerIsReady) return
+    if (!worker) return
 
     if (!seedInputRef.current) return
 
@@ -77,12 +75,11 @@ export default function Index() {
       }}
     >
       <div className="sidebar">
-        <button type="button" onClick={handleClick} disabled={!workerIsReady}>
+        <button type="button" onClick={handleClick}>
           Search
         </button>
         <label htmlFor="seed-input">seed</label>
         <input id="seed-input" ref={seedInputRef} />
-        {!workerIsReady ? <div>初期化中...</div> : null}
       </div>
       <div
         className="content"
