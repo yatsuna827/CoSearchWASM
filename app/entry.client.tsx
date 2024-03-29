@@ -1,27 +1,16 @@
-import { RemixBrowser } from "@remix-run/react";
-import { startTransition, StrictMode } from "react";
-import { hydrateRoot } from "react-dom/client";
-import "./global.css";
+import { RemixBrowser } from '@remix-run/react'
+import { StrictMode, startTransition } from 'react'
+import { hydrateRoot } from 'react-dom/client'
+import './global.css'
+import { LazyLoadableWorker, SearchWorkerProvider } from './hooks/useSearchWorker'
 
 startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <RemixBrowser />
-    </StrictMode>
-  );
-});
-
-declare global {
-  // 誰が何と言おうともletやconstではなくvarを使う
-  var searchNearby:
-    | undefined
-    | ((params: {
-        name: string;
-        seedHex: string;
-        max: number;
-        ivsMin?: [number, number, number, number, number, number] | undefined;
-        ivsMax?: [number, number, number, number, number, number] | undefined;
-        nature: number;
-      }) => any);
-}
+      <SearchWorkerProvider worker={new LazyLoadableWorker()}>
+        <RemixBrowser />
+      </SearchWorkerProvider>
+    </StrictMode>,
+  )
+})
