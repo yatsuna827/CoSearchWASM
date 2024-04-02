@@ -1,3 +1,4 @@
+import type { SearchNearbyResult } from '@dotnet/main.worker'
 import type { MetaFunction } from '@remix-run/node'
 import { type ComponentProps, forwardRef, useId, useMemo, useRef, useState } from 'react'
 import { type NatureJp, natureToInt, natures, toJapanese } from '~/domain/nature'
@@ -9,16 +10,6 @@ export const meta: MetaFunction = () => {
     { title: 'New Remix SPA' },
     { name: 'description', content: 'Welcome to Remix (SPA Mode)!' },
   ]
-}
-
-type SearchResult = {
-  index: number
-  seed: string
-  ivs: [number, number, number, number, number, number]
-  pid: string
-  nature: string
-  ability: string
-  gcAbility: string
 }
 
 // #3498db
@@ -73,7 +64,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ searching, children, ...pro
 export default function Index() {
   const naturesJp = useMemo(() => natures.map(toJapanese).toSorted(), [])
 
-  const [results, setResults] = useState<SearchResult[]>([])
+  const [results, setResults] = useState<SearchNearbyResult[]>([])
   const seedInputRef = useRef<HTMLInputElement>(null)
   const maxFramesInputRef = useRef<HTMLInputElement>(null)
 

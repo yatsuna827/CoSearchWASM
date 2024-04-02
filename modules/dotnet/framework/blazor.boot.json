@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "CoSearchWASM",
   "resources": {
-    "hash": "sha256-ksJ+plC84wR3JrUFogU7UBpudwruSL7EiVhED07fPAY=",
+    "hash": "sha256-1dSc4oB5YzkkVPYDsPK5gijaOhGrRXDgZbROwY+XoJc=",
     "jsModuleNative": {
       "dotnet.native.8.0.3.9nm7bajy7e.js": "sha256-D4sYBYmDfH/YekgYRgX959/2RG6k28sJSHmcsn+iikk="
     },
@@ -190,10 +190,10 @@
       "mscorlib.wasm": "sha256-OH3kXneWqQMz6CUSo6POZqIeMqn9+5RR+IgHn5TnIwA=",
       "netstandard.wasm": "sha256-ZOswxXEbR2TmqjpbaBEdgr85Bv1NC4GwOwoJ+oxXM3M=",
       "System.Private.CoreLib.wasm": "sha256-I2w0iHf5nvSQyF1YE1VbgdTzmmz6a4OE6J7vo5wFa/4=",
-      "CoSearchWASM.wasm": "sha256-tBZrBccv9rfWaX4Og3lKfZwGiu/dR/ySxhWFg+LG/iM="
+      "CoSearchWASM.wasm": "sha256-i51HKESHTXbtjAgHBJeJn6pQkcpBm41JTK8Qqy2KTyk="
     },
     "pdb": {
-      "CoSearchWASM.pdb": "sha256-W5lnE0vXGuTYXYg5tlTg/Nq4XVHBYlHxXNtNO3IOn9E="
+      "CoSearchWASM.pdb": "sha256-q+jsdaU6LqjA8Qoic6JTJOPe03B3HN6fAXfXTC+MY4A="
     }
   },
   "cacheBootResources": true,

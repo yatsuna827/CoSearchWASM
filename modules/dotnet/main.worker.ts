@@ -12,6 +12,8 @@ type AssemblyExports = {
       ivsMax: [number, number, number, number, number, number],
       nature: number,
     ): string
+
+    BlinkTimeLine(seedHex: string, maxFrames: number): string
   }
 }
 
@@ -45,7 +47,15 @@ type SearchNearbyParams = {
   ivsMax?: [number, number, number, number, number, number]
   nature: number
 }
-
+export type SearchNearbyResult = {
+  index: number
+  seed: string
+  ivs: [number, number, number, number, number, number]
+  pid: string
+  nature: string
+  ability: string
+  gcAbility: string
+}
 const searchNearby = async ({
   name,
   seedHex,
@@ -58,11 +68,31 @@ const searchNearby = async ({
   if (!assmblyExports) return null
 
   const rawData = assmblyExports.MyClass.SearchNearBy(seedHex, max, name, ivsMin, ivsMax, nature)
-  return JSON.parse(rawData)
+  return JSON.parse(rawData) as SearchNearbyResult[]
 }
+
+type BlinkTimeLineParams = {
+  seedHex: string
+  maxFrames: number
+}
+export type BlinkTimelineResult = {
+  seed: string
+  frame: number
+  interval: number
+}
+const blinkTimeLine = async ({ seedHex, maxFrames }: BlinkTimeLineParams) => {
+  const assmblyExports = await getAssmblyExports()
+  if (!assmblyExports) return null
+
+  const rawData = assmblyExports.MyClass.BlinkTimeLine(seedHex, maxFrames)
+  return JSON.parse(rawData) as BlinkTimelineResult[]
+}
+
+// string[] SearchCurrentSeedByBlink(string seedHex, int min, int max, int[] input, int coolTime, int error)
 
 const api = {
   searchNearby,
+  blinkTimeLine,
 }
 
 export type WorkerAPI = typeof api
