@@ -52,7 +52,7 @@ const SearchButton: React.FC<SearchButtonProps> = ({ searching, children, ...pro
   )
 }
 
-export default function Index() {
+const Page = () => {
   const [results, setResults] = useState<BlinkTimelineResult[]>([])
   const seedInputRef = useRef<HTMLInputElement>(null)
   const maxFramesInputRef = useRef<HTMLInputElement>(null)
@@ -79,6 +79,52 @@ export default function Index() {
     else alert('計算中にエラーが発生しました;;')
     setLoading(false)
   }
+  const search = async (input: number[]) => {
+    if (!seedInputRef.current) return
+    if (!maxFramesInputRef.current) return
+
+    const seedHex = seedInputRef.current.value
+    const max = Number(maxFramesInputRef.current.value)
+
+    if (!/^[0-9a-fA-F]{1,8}$/.test(seedHex)) return
+    if (!Number.isInteger(max) || max < 0) return
+
+    const result = await worker.searchCurrentSeedByBlink({
+      seedHex,
+      min: 0,
+      max: 100000,
+      input,
+    })
+
+    alert(`result: ${result}`)
+  }
+
+  const [prevBlinked, setPrevBlinked] = useState<number | undefined>(undefined)
+  const [blinkHistory, setBlinkHistory] = useState<number[]>([])
+  const [showBlinkButton, setShowBlinkButton] = useState(false)
+  const handleStart = async () => {
+    const loaded = await worker.load()
+    if (!loaded) return alert('Workerのロードに失敗しました')
+
+    setBlinkHistory([])
+    setPrevBlinked(undefined)
+    setShowBlinkButton(true)
+  }
+
+  const handleEnter = () => {
+    const current = Date.now()
+    if (prevBlinked) {
+      const next = [...blinkHistory, current - prevBlinked]
+      setBlinkHistory(next)
+      if (next.length === 10) {
+        console.log('search', next)
+        setShowBlinkButton(false)
+        search(next.map((interval) => Math.floor((interval / 1000) * 30)))
+      }
+    }
+
+    setPrevBlinked(current)
+  }
 
   return (
     <div className="font-[system-ui,sans-serif] leading-8 flex h-full">
@@ -86,7 +132,12 @@ export default function Index() {
         <SearchButton onClick={handleClick} searching={loading}>
           Search
         </SearchButton>
-        <LabeledInput ref={seedInputRef} label="seed" placeholder="1234ABCD" />
+        <LabeledInput
+          ref={seedInputRef}
+          defaultValue="EFE8975D"
+          label="seed"
+          placeholder="1234ABCD"
+        />
         <LabeledInput
           ref={maxFramesInputRef}
           label="max"
@@ -94,6 +145,50 @@ export default function Index() {
           defaultValue={10000}
           placeholder="1234ABCD"
         />
+
+        <button
+          type="button"
+          className="block border border-black rounded px-4 hover:opacity-60"
+          onClick={handleStart}
+        >
+          Start / Restart
+        </button>
+
+        {showBlinkButton ? (
+          <button
+            type="button"
+            className="block border border-black rounded px-4 hover:opacity-60"
+            onClick={handleEnter}
+          >
+            Blink
+          </button>
+        ) : null}
+
+        <button
+          type="button"
+          className="block border border-black rounded px-4 hover:opacity-60"
+          onClick={() => {
+            search(blinkHistory.map((interval) => Math.floor((interval / 1000) * 30)))
+          }}
+        >
+          debug
+        </button>
+
+        <div>
+          {prevBlinked != null ? (
+            <div className="flex gap-2">
+              <span>0</span>
+              <span>---</span>
+            </div>
+          ) : null}
+          {blinkHistory.map((interval, i) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+            <div key={i} className="flex gap-2">
+              <span>{i + 1}</span>
+              <span>{Math.floor((interval / 1000) * 30)}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex-auto overflow-x-hidden overflow-y-scroll px-1 bg-[#f9f9f9]">
@@ -107,7 +202,7 @@ export default function Index() {
               </tr>
             </thead>
             <tbody>
-              {results.map(({ seed, frame, interval }) => (
+              {results.map(({ frame, interval, seed }) => (
                 <tr key={seed} className="odd:bg-[#f9f9f9]">
                   <td>{frame}</td>
                   <td>{seed}</td>
@@ -121,3 +216,12 @@ export default function Index() {
     </div>
   )
 }
+
+// UIのアイデアが降ってきたぞ
+// - 別にいんたーばるは表示しなくていいじゃんかよ
+// - 準備が出来たらオーバーレイで良い感じのボタン的なのを出す
+// - クリック or エンターキーで受け付ける
+// - 受け付けるたびに波紋か何かのエフェクトを出す
+// - エントロピーを計算して、円ゲージで表現する
+
+export default Page

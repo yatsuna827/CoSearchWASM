@@ -1,7 +1,5 @@
 import { expose } from 'comlink'
 
-import { dotnet } from './framework/dotnet.js'
-
 type AssemblyExports = {
   MyClass: {
     SearchNearBy(
@@ -14,6 +12,15 @@ type AssemblyExports = {
     ): string
 
     BlinkTimeLine(seedHex: string, maxFrames: number): string
+
+    SearchCurrentSeedByBlink(
+      seedHex: string,
+      min: number,
+      max: number,
+      input: number[],
+      cooltTime: number,
+      error: number,
+    ): string[]
   }
 }
 
@@ -23,6 +30,8 @@ const getAssmblyExports = async () => {
 
   _promise = (async () => {
     try {
+      const { dotnet } = await import(/* @vite-ignore */ './framework/dotnet.js')
+
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       const { getAssemblyExports, getConfig } = (await dotnet.create()) as any
 
@@ -90,9 +99,34 @@ const blinkTimeLine = async ({ seedHex, maxFrames }: BlinkTimeLineParams) => {
 
 // string[] SearchCurrentSeedByBlink(string seedHex, int min, int max, int[] input, int coolTime, int error)
 
+export type SearchCurrentSeedByBlinkParams = {
+  seedHex: string
+  min: number
+  max: number
+  input: number[]
+}
+const searchCurrentSeedByBlink = async ({
+  seedHex,
+  min,
+  max,
+  input,
+}: SearchCurrentSeedByBlinkParams) => {
+  const assmblyExports = await getAssmblyExports()
+  if (!assmblyExports) return null
+
+  return assmblyExports.MyClass.SearchCurrentSeedByBlink(seedHex, min, max, input, 4, 10)
+}
+
+const load = async () => {
+  const assmblyExports = await getAssmblyExports()
+  return assmblyExports != null
+}
+
 const api = {
   searchNearby,
   blinkTimeLine,
+  searchCurrentSeedByBlink,
+  load,
 }
 
 export type WorkerAPI = typeof api
