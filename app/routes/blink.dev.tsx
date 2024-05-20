@@ -3,6 +3,8 @@ import { PokeBall } from '~/components/PokeBall'
 
 const Page: React.FC = () => {
   const [progress, setProgress] = useState(0)
+  const [isFull, setIsFull] = useState(false)
+
   return (
     <div className="flex justify-center items-center gap-4 flex-col w-full h-full">
       <div className="size-52 relative">
@@ -17,13 +19,16 @@ const Page: React.FC = () => {
                 transitionDelay: '.2s',
               }}
               fill="none"
-              stroke="#00CCFF"
+              stroke={isFull ? '#22C55E' : '#00CCFF'}
               cx="50"
               cy="50"
               r="45"
               transform="rotate(-90 50 50)"
               strokeDasharray={Math.PI * 2 * 45}
               strokeDashoffset={(Math.PI * 2 * 45 * (100 - progress)) / 100}
+              onTransitionEnd={() => {
+                setIsFull(progress >= 100)
+              }}
             />
           </svg>
         </div>
