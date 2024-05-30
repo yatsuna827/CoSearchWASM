@@ -27,7 +27,7 @@ export default {
       animation: {
         appear: 'appear 1.5s ease 2s 1 forwards',
         disappear: 'disappear 3s ease 0s 1 forwards',
-        pulsate: 'pulsate .5s linear forwards',
+        pulsate: 'pulsate .35s ease forwards',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
