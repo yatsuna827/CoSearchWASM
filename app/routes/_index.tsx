@@ -5,6 +5,30 @@ const to30fps = (ms: number) => Math.floor((ms / 1000) * 30)
 
 const theoreticalBlanks = [22, 94, 65, 52, 22, 25, 18, 20, 77, 94, 94, 94, 43, 87]
 
+const hyouka = (gosa: number) => {
+  if (gosa === 0) return '今日から君はCoReaderだ'
+  if (gosa <= 3) return 'その反射神経 誉れ高い'
+  if (gosa <= 5) return 'やるな笑笑'
+  if (gosa <= 10) return 'まだ頑張れる'
+  return gosa < 827 ? 'そんなんじゃ検索結果出ないよ？' : 'あほしね'
+}
+
+const resultMessage = (score: number[]) => {
+  const errors = score.map((interval, i) => interval - theoreticalBlanks[i])
+  const maxError = errors.map((_) => Math.abs(_)).reduce((prev, cur) => Math.max(prev, cur), 0)
+
+  return `ムウマの瞬きを観測しーたよ・。・
+
+  観測値：${score.join(',')}
+  誤差：${errors.join(',')}
+  最大誤差：${maxError}
+  評価：${hyouka(maxError)}
+  
+  https://yatsuna827.github.io/CoSearchWASM/
+  
+  #ムウマの瞬きを見るゲーム`
+}
+
 const Page: React.FC = () => {
   const [isFull, setIsFull] = useState(false)
 
@@ -56,6 +80,26 @@ const Page: React.FC = () => {
             ))}
           </tbody>
         </table>
+
+        {blinkHistory.length === 14 ? (
+          <button
+            type="button"
+            className="border p-2 bg-white font-bold mt-4"
+            onClick={async () => {
+              navigator.clipboard
+                .writeText(resultMessage(blinkHistory))
+                .then(() => {
+                  alert('結果をクリップボードにコピーしました')
+                })
+                .catch((e) => {
+                  alert('なんかエラーが出ました')
+                  console.error(e)
+                })
+            }}
+          >
+            結果をコピー
+          </button>
+        ) : null}
       </div>
 
       <div className="flex justify-center items-center gap-4 flex-col w-full h-full">
