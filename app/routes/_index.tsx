@@ -19,14 +19,14 @@ const resultMessage = (score: number[]) => {
 
   return `ムウマの瞬きを観測しーたよ・。・
 
-  観測値：${score.join(',')}
-  誤差：${errors.join(',')}
-  最大誤差：${maxError}
-  評価：${hyouka(maxError)}
-  
-  https://yatsuna827.github.io/CoSearchWASM/
-  
-  #ムウマの瞬きを見るゲーム`
+観測値：${score.join(',')}
+誤差：${errors.join(',')}
+最大誤差：${maxError}
+評価：${hyouka(maxError)}
+
+https://yatsuna827.github.io/CoSearchWASM/
+
+#ムウマの瞬きを見るゲーム`
 }
 
 const Page: React.FC = () => {
