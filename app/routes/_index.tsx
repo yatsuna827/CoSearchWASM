@@ -61,7 +61,7 @@ const Page: React.FC = () => {
       <div className="flex justify-center items-center gap-4 flex-col w-full h-full">
         <div className="size-96">
           {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
-          <video src="/video/C0FFEE.mp4" controls />
+          <video src="/CoSearchWASM/video/C0FFEE.mp4" controls />
         </div>
         <div className="size-52 relative">
           <PokeBall onPressEnter={handleRecordBlink} />
