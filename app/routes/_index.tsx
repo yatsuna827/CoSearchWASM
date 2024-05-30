@@ -1,233 +1,103 @@
-import type { SearchNearbyResult } from '@dotnet/main.worker'
-import type { MetaFunction } from '@remix-run/node'
-import { type ComponentProps, forwardRef, useId, useMemo, useRef, useState } from 'react'
-import { type NatureJp, natureToInt, natures, toJapanese } from '~/domain/nature'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { PokeBall } from '~/components/PokeBall'
 
-import { useSearchWorker } from '~/hooks/useSearchWorker'
+const to30fps = (ms: number) => Math.floor((ms / 1000) * 30)
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: 'New Remix SPA' },
-    { name: 'description', content: 'Welcome to Remix (SPA Mode)!' },
-  ]
-}
+const theoreticalBlanks = [22, 94, 65, 52, 22, 25, 18, 20, 77, 94, 94, 94, 43, 87]
 
-// #3498db
-// #e67e22
-// #f2f2f2
-// #c0392b
+const Page: React.FC = () => {
+  const [isFull, setIsFull] = useState(false)
 
-type LabeledInputProps = ComponentProps<'input'> & { label: string }
-const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(({ label, ...props }, ref) => {
-  const id = useId()
+  const [prevBlinked, setPrevBlinked] = useState<number | undefined>(undefined)
+  const [blinkHistory, setBlinkHistory] = useState<number[]>([])
 
-  return (
-    <div>
-      <label htmlFor={id} className="block">
-        {label}
-      </label>
-      <input {...props} ref={ref} id={id} />
-    </div>
-  )
-})
+  const progress = blinkHistory.length < 1 ? 0 : (blinkHistory.length / 14) * 100
 
-type IVsInputProps = Omit<LabeledInputProps, 'type' | 'min' | 'max'>
-const IVsInput = forwardRef<HTMLInputElement, IVsInputProps>((props, ref) => {
-  const id = useId()
+  const handleRecordBlink = useCallback(() => {
+    if (blinkHistory.length >= 14) return
+
+    const current = Date.now()
+    if (prevBlinked) {
+      const next = [...blinkHistory, to30fps(current - prevBlinked)]
+      setBlinkHistory(next)
+    }
+
+    setPrevBlinked(current)
+  }, [blinkHistory, prevBlinked])
+  const handleGaugeTransitionEnd = useCallback(() => {
+    setIsFull(progress >= 100)
+  }, [progress])
+  const handleResetGauge = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setBlinkHistory([])
+    setPrevBlinked(undefined)
+    e.currentTarget.blur()
+  }, [])
 
   return (
-    <LabeledInput defaultValue={0} {...props} ref={ref} type="number" min={0} max={31} id={id} />
-  )
-})
+    <div className="flex h-full">
+      <div className="w-[320px] h-full bg-blue-50 p-4">
+        <table className="[&_td]:py-1 [&_td]:px-2 [&_th]:px-2">
+          <thead>
+            <tr>
+              <th className="w-9" />
+              <th>観測値</th>
+              <th>理論値</th>
+              <th>誤差</th>
+            </tr>
+          </thead>
+          <tbody>
+            {blinkHistory.map((interval, i) => (
+              <tr key={`${i}_${interval}`}>
+                <td align="right">{i + 1}</td>
+                <td align="right">{interval}</td>
+                <td align="right">{theoreticalBlanks[i]}</td>
+                <td align="right">{interval - theoreticalBlanks[i]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-type SearchButtonProps = ComponentProps<'button'> & {
-  searching: boolean
-}
-const SearchButton: React.FC<SearchButtonProps> = ({ searching, children, ...props }) => {
-  return (
-    // hover:bg-blue-300
-    <button
-      {...props}
-      type="button"
-      disabled={searching}
-      className="flex justify-center items-center rounded bg-blue-400 w-32 h-10 text-white"
-    >
-      {searching ? (
-        <div className="animate-spin h-5 w-5 border-2 border-white rounded-full border-t-transparent" />
-      ) : (
-        <span className="font-medium">{children}</span>
-      )}
-    </button>
-  )
-}
+      <div className="flex justify-center items-center gap-4 flex-col w-full h-full">
+        <div className="size-96">
+          {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
+          <video src="/video/C0FFEE.mp4" controls />
+        </div>
+        <div className="size-52 relative">
+          <PokeBall onPressEnter={handleRecordBlink} />
+          <div className="absolute top-0 size-52">
+            {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
+            <svg className="[&>circle]:stroke-[8]" viewBox="0 0 100 100">
+              <circle fill="none" stroke="rgba(170,170,170,.3)" cx="50" cy="50" r="45" />
+              <circle
+                style={{
+                  transition: 'stroke-dashoffset .5s ease',
+                  transitionDelay: '.2s',
+                }}
+                fill="none"
+                stroke={isFull ? '#22C55E' : '#00CCFF'}
+                cx="50"
+                cy="50"
+                r="45"
+                transform="rotate(-90 50 50)"
+                strokeDasharray={Math.PI * 2 * 45}
+                strokeDashoffset={(Math.PI * 2 * 45 * (100 - progress)) / 100}
+                onTransitionEnd={handleGaugeTransitionEnd}
+              />
+            </svg>
+          </div>
+        </div>
 
-export default function Index() {
-  const naturesJp = useMemo(() => natures.map(toJapanese).toSorted(), [])
-
-  const [results, setResults] = useState<SearchNearbyResult[]>([])
-  const seedInputRef = useRef<HTMLInputElement>(null)
-  const maxFramesInputRef = useRef<HTMLInputElement>(null)
-
-  const [selectedNature, setNature] = useState<NatureJp | '---'>('---')
-
-  const hMinInputRef = useRef<HTMLInputElement>(null)
-  const hMaxInputRef = useRef<HTMLInputElement>(null)
-  const aMaxInputRef = useRef<HTMLInputElement>(null)
-  const aMinInputRef = useRef<HTMLInputElement>(null)
-  const bMinInputRef = useRef<HTMLInputElement>(null)
-  const bMaxInputRef = useRef<HTMLInputElement>(null)
-  const cMinInputRef = useRef<HTMLInputElement>(null)
-  const cMaxInputRef = useRef<HTMLInputElement>(null)
-  const dMinInputRef = useRef<HTMLInputElement>(null)
-  const dMaxInputRef = useRef<HTMLInputElement>(null)
-  const sMinInputRef = useRef<HTMLInputElement>(null)
-  const sMaxInputRef = useRef<HTMLInputElement>(null)
-
-  const worker = useSearchWorker()
-  const [loading, setLoading] = useState(false)
-
-  const handleClick = async () => {
-    if (!seedInputRef.current) return
-    if (!maxFramesInputRef.current) return
-
-    const seedHex = seedInputRef.current.value
-    const max = Number(maxFramesInputRef.current.value)
-    const ivsMin = [
-      hMinInputRef.current?.value,
-      aMinInputRef.current?.value,
-      bMinInputRef.current?.value,
-      cMinInputRef.current?.value,
-      dMinInputRef.current?.value,
-      sMinInputRef.current?.value,
-    ].map(Number) as [number, number, number, number, number, number]
-    const ivsMax = [
-      hMaxInputRef.current?.value,
-      aMaxInputRef.current?.value,
-      bMaxInputRef.current?.value,
-      cMaxInputRef.current?.value,
-      dMaxInputRef.current?.value,
-      sMaxInputRef.current?.value,
-    ].map(Number) as [number, number, number, number, number, number]
-
-    if (!/^[0-9a-fA-F]{1,8}$/.test(seedHex)) return alert('Seedの入力が不正です')
-    if (!Number.isInteger(max) || max < 0) return alert('検索範囲の入力が不正です')
-
-    setLoading(true)
-    const result = await worker.searchNearby({
-      name: 'ヌオー',
-      nature: selectedNature === '---' ? 25 : natureToInt(selectedNature),
-      max,
-      ivsMin,
-      ivsMax,
-      seedHex,
-    })
-    if (result) setResults(result)
-    else alert('計算中にエラーが発生しました;;')
-    setLoading(false)
-  }
-
-  return (
-    <div className="font-[system-ui,sans-serif] leading-8 flex h-full">
-      <div className="bg-stone-200 p-5 w-[300px] h-full min-h-[600px] space-y-4 overflow-y-scroll">
-        <SearchButton onClick={handleClick} searching={loading}>
-          Search
-        </SearchButton>
-        <LabeledInput ref={seedInputRef} label="seed" placeholder="1234ABCD" />
-        <LabeledInput
-          ref={maxFramesInputRef}
-          label="max"
-          type="number"
-          defaultValue={10000}
-          placeholder="1234ABCD"
-        />
-        <select
-          id="countries"
-          value={selectedNature}
-          onChange={(e) => setNature(e.target.value as NatureJp | '---')}
-          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        <button
+          type="button"
+          className="border border-black px-4 py-1 rounded"
+          onClick={handleResetGauge}
         >
-          <option value="---">---</option>
-          {naturesJp.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
-
-        <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
-          <span>H</span>
-          <IVsInput ref={hMinInputRef} label="min" />
-          <IVsInput ref={hMaxInputRef} label="max" defaultValue={31} />
-        </div>
-        <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
-          <span>A</span>
-          <IVsInput ref={aMinInputRef} label="min" />
-          <IVsInput ref={aMaxInputRef} label="max" defaultValue={31} />
-        </div>
-        <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
-          <span>B</span>
-          <IVsInput ref={bMinInputRef} label="min" />
-          <IVsInput ref={bMaxInputRef} label="max" defaultValue={31} />
-        </div>
-        <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
-          <span>C</span>
-          <IVsInput ref={cMinInputRef} label="min" />
-          <IVsInput ref={cMaxInputRef} label="max" defaultValue={31} />
-        </div>
-        <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
-          <span>D</span>
-          <IVsInput ref={dMinInputRef} label="min" />
-          <IVsInput ref={dMaxInputRef} label="max" defaultValue={31} />
-        </div>
-        <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
-          <span>S</span>
-          <IVsInput ref={sMinInputRef} label="min" />
-          <IVsInput ref={sMaxInputRef} label="max" defaultValue={31} />
-        </div>
-      </div>
-
-      <div className="flex-auto overflow-x-hidden overflow-y-scroll px-1 bg-[#f9f9f9]">
-        <div className="w-full overflow-x-auto">
-          <table className="w-full border-collapse border-spacing-0 bg-stone-200">
-            <thead className="bg-stone-200">
-              <tr>
-                <th scope="col" />
-                <th scope="col" />
-                <th scope="col" />
-                <th scope="col" colSpan={6}>
-                  IVs
-                </th>
-              </tr>
-              <tr>
-                <th scope="col">Index</th>
-                <th scope="col">Seed</th>
-                <th scope="col">Nature</th>
-                <th scope="col">H</th>
-                <th scope="col">A</th>
-                <th scope="col">B</th>
-                <th scope="col">C</th>
-                <th scope="col">D</th>
-                <th scope="col">S</th>
-              </tr>
-            </thead>
-            <tbody>
-              {results.map(({ index, seed, nature, ivs }) => (
-                <tr key={index} className="odd:bg-[#f9f9f9]">
-                  <td>{index}</td>
-                  <td>{seed}</td>
-                  <td>{nature}</td>
-                  <td>{ivs[0]}</td>
-                  <td>{ivs[1]}</td>
-                  <td>{ivs[2]}</td>
-                  <td>{ivs[3]}</td>
-                  <td>{ivs[4]}</td>
-                  <td>{ivs[5]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          Reset
+        </button>
       </div>
     </div>
   )
 }
+
+export default Page
