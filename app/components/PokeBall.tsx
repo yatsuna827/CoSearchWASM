@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 type Props = {
-  onPressEnter?: () => void
+  onFire?: () => void
 }
-export const PokeBall: React.FC<Props> = ({ onPressEnter }) => {
+export const PokeBall: React.FC<Props> = ({ onFire }) => {
   const pulseClass =
     'animate-pulsate absolute inline-flex size-[160px] rounded-full border border-orange-500 opacity-75 pointer-events-none'
   const pulseRef = useRef<HTMLDivElement>(null)
@@ -20,11 +20,15 @@ export const PokeBall: React.FC<Props> = ({ onPressEnter }) => {
     })
   }, [])
 
+  const handleFire = useCallback(() => {
+    animatePulse()
+    onFire?.()
+  }, [animatePulse, onFire])
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
-        animatePulse()
-        onPressEnter?.()
+        handleFire()
       }
     }
     document.addEventListener('keydown', handler)
@@ -32,11 +36,15 @@ export const PokeBall: React.FC<Props> = ({ onPressEnter }) => {
     return () => {
       document.removeEventListener('keydown', handler)
     }
-  }, [animatePulse, onPressEnter])
+  }, [handleFire])
 
   return (
     <div className="w-full h-full flex justify-center items-center relative">
-      <div className="flex justify-center items-center size-40 rounded-full bg-gradient-poke-ball">
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+      <div
+        className="flex justify-center items-center size-40 rounded-full bg-gradient-poke-ball"
+        onClick={handleFire}
+      >
         <div className="rounded-full border-[7px] border-black size-10 box-content bg-[#F5F5F5] flex items-center justify-center relative">
           <div className="rounded-full size-5 shadow-lg bg-white" />
           <div
