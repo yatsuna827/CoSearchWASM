@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { PokeBall } from '~/components/PokeBall'
 
 const to30fps = (ms: number) => Math.floor((ms / 1000) * 30)
@@ -17,16 +17,18 @@ const resultMessage = (score: number[]) => {
   const errors = score.map((interval, i) => interval - theoreticalBlanks[i])
   const maxError = errors.map((_) => Math.abs(_)).reduce((prev, cur) => Math.max(prev, cur), 0)
 
-  return `ムウマの瞬きを観測しーたよ・。・
-
-観測値：${score.join(',')}
-誤差：${errors.join(',')}
-最大誤差：${maxError}
-評価：${hyouka(maxError)}
-
-https://yatsuna827.github.io/CoSearchWASM/
-
-#ムウマの瞬きを見るゲーム`
+  return encodeURIComponent(
+    [
+      'ムウマの瞬きを観測しーたよ・。・',
+      '',
+      `観測値：${score.join(',')}`,
+      `誤差：${errors.join(',')}`,
+      `最大誤差：${maxError}`,
+      `評価：${hyouka(maxError)}`,
+      '',
+      '',
+    ].join('\n'),
+  )
 }
 
 const Page: React.FC = () => {
@@ -57,6 +59,12 @@ const Page: React.FC = () => {
     e.currentTarget.blur()
   }, [])
 
+  const shareUrl = useMemo(() => {
+    const tweet = resultMessage(blinkHistory)
+    const shareURL = `https://twitter.com/intent/tweet?url=https://yatsuna827.github.io/CoSearchWASM/&hashtags=ムウマの瞬きを見るゲーム&text=${tweet}`
+    return shareURL
+  }, [blinkHistory])
+
   return (
     <div className="flex h-full">
       <div className="w-[320px] h-full bg-blue-50 p-4">
@@ -82,23 +90,16 @@ const Page: React.FC = () => {
         </table>
 
         {blinkHistory.length === 14 ? (
-          <button
-            type="button"
-            className="border p-2 bg-white font-bold mt-4"
-            onClick={async () => {
-              navigator.clipboard
-                .writeText(resultMessage(blinkHistory))
-                .then(() => {
-                  alert('結果をクリップボードにコピーしました')
-                })
-                .catch((e) => {
-                  alert('なんかエラーが出ました')
-                  console.error(e)
-                })
-            }}
-          >
-            結果をコピー
-          </button>
+          <div className="mt-4">
+            <a
+              className="border py-2 px-3 bg-white font-bold inline-block"
+              href={shareUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              結果をツイーヨ
+            </a>
+          </div>
         ) : null}
       </div>
 
@@ -108,8 +109,8 @@ const Page: React.FC = () => {
           <video src="/CoSearchWASM/video/C0FFEE.mp4" controls />
         </div>
         <div className="size-52 relative">
-          <PokeBall onPressEnter={handleRecordBlink} />
-          <div className="absolute top-0 size-52">
+          <PokeBall onFire={handleRecordBlink} />
+          <div className="absolute top-0 size-52 pointer-events-none">
             {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
             <svg className="[&>circle]:stroke-[8]" viewBox="0 0 100 100">
               <circle fill="none" stroke="rgba(170,170,170,.3)" cx="50" cy="50" r="45" />
