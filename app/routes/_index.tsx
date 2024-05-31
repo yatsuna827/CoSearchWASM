@@ -39,6 +39,15 @@ const Page: React.FC = () => {
 
   const progress = blinkHistory.length < 1 ? 0 : (blinkHistory.length / 14) * 100
 
+  const isMobile = useMemo(() => {
+    return !matchMedia('(min-width: 768px)').matches
+  }, [])
+  const resultCN = useMemo(() => {
+    return isMobile
+      ? 'w-full min-h-[600px] bg-blue-50 p-4 flex flex-col items-center'
+      : 'w-[320px] h-full bg-blue-50 p-4'
+  }, [isMobile])
+
   const handleRecordBlink = useCallback(() => {
     if (blinkHistory.length >= 14) return
 
@@ -51,8 +60,18 @@ const Page: React.FC = () => {
     setPrevBlinked(current)
   }, [blinkHistory, prevBlinked])
   const handleGaugeTransitionEnd = useCallback(() => {
-    setIsFull(progress >= 100)
-  }, [progress])
+    const isFull = progress >= 100
+    setIsFull(isFull)
+    if (isMobile && isFull) {
+      const el = document.documentElement
+      setTimeout(() => {
+        window.scroll({
+          top: el.scrollHeight - el.clientHeight,
+          behavior: 'smooth',
+        })
+      }, 500)
+    }
+  }, [progress, isMobile])
   const handleResetGauge = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setBlinkHistory([])
     setPrevBlinked(undefined)
@@ -66,8 +85,8 @@ const Page: React.FC = () => {
   }, [blinkHistory])
 
   return (
-    <div className="flex h-full">
-      <div className="w-[320px] h-full bg-blue-50 p-4">
+    <div className="flex flex-col-reverse md:flex-row min-h-full md:h-full">
+      <div className={resultCN}>
         <table className="[&_td]:py-1 [&_td]:px-2 [&_th]:px-2">
           <thead>
             <tr>
@@ -106,7 +125,7 @@ const Page: React.FC = () => {
       <div className="flex justify-center items-center gap-4 flex-col w-full h-full">
         <div className="size-96">
           {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
-          <video src="/CoSearchWASM/video/C0FFEE.mp4" controls />
+          <video src="/CoSearchWASM/video/C0FFEE.mp4" controls playsInline />
         </div>
         <div className="size-52 relative">
           <PokeBall onFire={handleRecordBlink} />
@@ -135,7 +154,7 @@ const Page: React.FC = () => {
 
         <button
           type="button"
-          className="border border-black px-4 py-1 rounded"
+          className="border border-black px-4 py-1 rounded mb-8"
           onClick={handleResetGauge}
         >
           Reset
