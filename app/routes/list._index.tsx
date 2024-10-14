@@ -1,9 +1,9 @@
+import { type NatureJp, natureToInt, natures, toJapanese } from '@/domain/nature'
 import type { SearchNearbyResult } from '@dotnet/main.worker'
 import type { MetaFunction } from '@remix-run/node'
 import { type ComponentProps, forwardRef, useId, useMemo, useRef, useState } from 'react'
-import { type NatureJp, natureToInt, natures, toJapanese } from '~/domain/nature'
 
-import { useSearchWorker } from '~/hooks/useSearchWorker'
+import { useSearchWorker } from '@/hooks/useSearchWorker'
 
 export const meta: MetaFunction = () => {
   return [

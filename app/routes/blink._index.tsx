@@ -2,7 +2,7 @@ import type { BlinkTimelineResult } from '@dotnet/main.worker'
 import type { MetaFunction } from '@remix-run/node'
 import { type ComponentProps, forwardRef, useId, useMemo, useRef, useState } from 'react'
 
-import { useSearchWorker } from '~/hooks/useSearchWorker'
+import { useSearchWorker } from '@/hooks/useSearchWorker'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Co Blink Timeline' }, { name: 'description', content: '・。・v' }]

@@ -1,5 +1,5 @@
+import { PokeBall } from '@/components/PokeBall'
 import { useCallback, useMemo, useState } from 'react'
-import { PokeBall } from '~/components/PokeBall'
 
 const to30fps = (ms: number) => Math.floor((ms / 1000) * 30)
 
