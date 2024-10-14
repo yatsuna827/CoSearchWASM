@@ -1,5 +1,5 @@
+import { LCG, lcg } from '@/domain/lcg'
 import { useCallback, useRef, useState } from 'react'
-import { LCG, lcg } from '~/domain/lcg'
 
 const createOscilattorNode = (frequency: number) => {
   const ctx = new AudioContext()
