@@ -3,7 +3,7 @@ import { type LCG, getRand, next } from '../lcg'
 import { type IVs, generateIVs } from './ivs'
 import { generatePID } from './pid'
 
-type Individual = {
+export type Individual = {
   pid: number
   ivs: IVs
   gcAbility: number
@@ -11,9 +11,6 @@ type Individual = {
 
 export const generateIndividual = (seed: LCG): [Individual, LCG] => {
   const lcg = Ref.from(seed)
-
-  lcg.update(next)
-  lcg.update(next)
 
   lcg.update(next)
   lcg.update(next)
