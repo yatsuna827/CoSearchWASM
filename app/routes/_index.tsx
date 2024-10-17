@@ -9,7 +9,11 @@ const Page: React.FC = () => {
 
         <div className="my-4">
           <h2 className="font-bold">ツール一覧</h2>
-          <p>工事中…</p>
+          <ul>
+            <li>
+              <Link to={$path('/gc/xd/starter')}>XD ID調整</Link>
+            </li>
+          </ul>
         </div>
 
         <div className="my-4">
