@@ -2,6 +2,7 @@ export type Ref<T> = {
   unwrap: () => T
   update: <Args extends unknown[] = []>(f: (s: T, ...args: Args) => T, ...args: Args) => T
   apply: <U, Args extends unknown[] = []>(f: (s: T, ...args: Args) => [U, T], ...args: Args) => U
+  map: <U, Args extends unknown[] = []>(f: (s: T, ...args: Args) => U, ...args: Args) => U
 }
 
 export const Ref = {
@@ -20,6 +21,7 @@ export const Ref = {
 
         return v
       },
+      map: (f, ...args) => f(_state, ...args),
     }
   },
   clone: <T>(source: Ref<T>): Ref<T> => Ref.from(source.unwrap()),

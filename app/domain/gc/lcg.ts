@@ -23,7 +23,21 @@ export const LCG = {
 
     return result >> 0
   },
+  tryParse: (raw: string): LCG | null => {
+    if (!seedRegex.test(raw)) return null
+
+    try {
+      const lcg = LCG.from(Number.parseInt(raw, 16))
+      if (!Number.isInteger(lcg)) return null
+
+      return lcg
+    } catch {
+      return null
+    }
+  },
 }
+
+const seedRegex = /^[0-9a-f]{1,8}$/i
 
 const MulConst = 0x343fd
 const AddConst = 0x00269ec3
