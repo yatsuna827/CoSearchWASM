@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 
 import { LabeledInput } from '@/components/LabeledInput'
 import { LCG } from '@/domain/gc/lcg'
@@ -33,7 +33,7 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
 
   return (
     <Container>
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto px-4 py-2">
         <ResultBlock seed={targetSeed} />
 
         <div className="mb-6" />
@@ -58,6 +58,7 @@ type ResultBlockProps = {
 const ResultBlock: React.FC<ResultBlockProps> = ({ seed }) => {
   const { tid, sid, eevee } = generateStarter(seed)
   const isValid = isValidSeed(seed)
+  const isShiny = (tid ^ sid ^ (eevee.pid & 0xffff) ^ (eevee.pid >>> 16)) < 8
 
   return (
     <div className={isValid ? 'text-black' : 'text-gray-400'}>
@@ -68,7 +69,10 @@ const ResultBlock: React.FC<ResultBlockProps> = ({ seed }) => {
       </div>
       <div>
         <span className="mr-2">{toJapanese(natures[eevee.pid % 25])}</span>
-        <span>{eevee.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}</span>
+        <span className="mr-2">
+          {eevee.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}
+        </span>
+        <span>{isShiny && '☆'}</span>
       </div>
       {!isValid && <span className="text-red-600 font-semibold">到達不可能なseedです</span>}
     </div>
@@ -117,6 +121,14 @@ const DiffListBlock: React.FC<DiffListBlockProps> = ({ targetSeed, namingStart }
 
     return result
   }, [targetSeed])
+  const ref = useCallback((ref: HTMLDivElement | null) => {
+    if (!ref) return
+
+    if (ref.dataset.i === '-2') ref.scrollIntoView()
+  }, [])
+
+  const filterInputRef = useRef<HTMLInputElement>(null)
+  const [filterTid, setFilter] = useState<number | null>(null)
 
   if (namingStart == null) return null
 
@@ -125,12 +137,58 @@ const DiffListBlock: React.FC<DiffListBlockProps> = ({ targetSeed, namingStart }
       <div>
         <span>突入時のseed {namingStart.toString(16).padStart(8, '0').toUpperCase()}</span>
       </div>
-      <div>検索範囲 ±100</div>
-      <div className="h-[200px] overflow-y-scroll">
-        {searchResult.map(([i, res]) => (
-          <Row key={i} i={i} {...res} />
-        ))}
+      <div className="h-[200px] overflow-y-scroll mb-4">
+        {searchResult
+          .filter(([_, { tid }]) => filterTid == null || tid === filterTid)
+          .map(([i, { tid, sid }]) => (
+            <div key={i} data-i={i} ref={ref} className="flex items-center gap-2 border-b h-10">
+              <div className="w-16 text-center text-gray-500">{i}</div>
+              <div className="align-baseline">
+                <span className="text-lg text-[#333]">{tid.toString().padStart(5, '0')}</span>
+                <span className="text-xs text-[#333] ml-2">{sid.toString().padStart(5, '0')}</span>
+              </div>
+            </div>
+          ))}
       </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+
+          if (!filterInputRef.current) return
+
+          const tid = Number.parseInt(filterInputRef.current.value)
+          if (!Number.isInteger(tid) || tid < 0 || 0xffff < tid) return
+
+          setFilter(tid)
+        }}
+      >
+        <div className="flex items-end gap-4">
+          <LabeledInput
+            ref={filterInputRef}
+            className="w-40 px-2"
+            label="TIDフィルタ"
+            type="number"
+            min={0}
+            max={65535}
+          />
+          <button type="button" className="w-24 h-8 text-sm border font-semibold bg-white">
+            絞り込む
+          </button>
+          <button
+            type="reset"
+            className="w-24 h-8 text-sm border font-semibold bg-white"
+            onClick={() => {
+              if (!filterInputRef.current) return
+
+              filterInputRef.current.value = ''
+              setFilter(null)
+            }}
+          >
+            リセット
+          </button>
+        </div>
+      </form>
     </>
   )
 }
