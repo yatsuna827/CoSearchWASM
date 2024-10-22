@@ -12,6 +12,9 @@ import { natures, toJapanese } from '@/domain/nature'
 import { type SeedInputController, useSeedInput } from '@/hooks/useSeedInput'
 import { Ref } from '@/utilities/ref'
 
+import { ChevronLeft } from '@/components/ChevronLeft'
+import { Link } from '@remix-run/react'
+import { $path } from 'remix-routes'
 import { Container, Row } from './components'
 
 export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => {
@@ -33,20 +36,30 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
 
   return (
     <Container>
+      <div className="relative flex items-center justify-center px-4 h-10 border-b">
+        <Link className="absolute left-2" to={$path('/gc/xd/starter')}>
+          <ChevronLeft />
+        </Link>
+        <h1 className="text-lg font-semibold">PokemonXD ID調整</h1>
+      </div>
       <div className="w-full overflow-x-auto px-4 py-2">
         <ResultBlock seed={targetSeed} />
 
-        <div className="mb-6" />
+        {isValidSeed(targetSeed) && (
+          <>
+            <div className="mb-6" />
 
-        <DistanceBlock
-          seed={currentSeed}
-          controller={currentSeedController}
-          seedNamingStart={namingStart}
-        />
+            <DistanceBlock
+              seed={currentSeed}
+              controller={currentSeedController}
+              seedNamingStart={namingStart}
+            />
 
-        <div className="mb-6" />
+            <div className="mb-6" />
 
-        <DiffListBlock targetSeed={targetSeed} namingStart={namingStart} />
+            <DiffListBlock targetSeed={targetSeed} namingStart={namingStart} />
+          </>
+        )}
       </div>
     </Container>
   )
@@ -135,7 +148,7 @@ const DiffListBlock: React.FC<DiffListBlockProps> = ({ targetSeed, namingStart }
   return (
     <>
       <div>
-        <span>突入時のseed {namingStart.toString(16).padStart(8, '0').toUpperCase()}</span>
+        <span>突入時のseed: {namingStart.toString(16).padStart(8, '0').toUpperCase()}</span>
       </div>
       <div className="h-[200px] overflow-y-scroll mb-4">
         {searchResult

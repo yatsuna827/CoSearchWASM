@@ -9,6 +9,9 @@
 			"recommended": true,
 			"style": {
 				"noParameterAssign": "off"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "off"
 			}
 		}
 	},
