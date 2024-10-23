@@ -90,7 +90,11 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
         <div className="w-40 h-full bg-[#f9f9f9]">
           <div className="relative flex items-center px-4 h-10 border-b">
             <h1 className="text-lg font-semibold">設定</h1>
-            <button type="button" className="absolute right-3" onClick={handleDialogClose}>
+            <button
+              type="button"
+              className="absolute right-3 outline-none"
+              onClick={handleDialogClose}
+            >
               <Hamburger className="h-6 w-6 stroke-gray-600" />
             </button>
           </div>
