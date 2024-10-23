@@ -14,36 +14,38 @@ export const PageDefault: React.FC = () => {
   const goto = useNavigate()
 
   return (
-    <Container>
+    <>
       <div className="relative flex items-center justify-center px-4 h-10 border-b">
         <h1 className="text-lg font-semibold">PokemonXD ID調整</h1>
       </div>
-      <div className="px-4 py-2">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (seed == null) return
+      <Container>
+        <div className="px-4 py-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (seed == null) return
 
-            goto({ pathname: '.', search: `?target=${seed.toString(16)}` })
-          }}
-        >
-          <LabeledInput
-            className="px-2 mb-4"
-            label="目標seed"
-            placeholder="1234ABCD"
-            {...controller}
-          />
-          {seed != null && <ResultBlock seed={seed} />}
-          <button
-            type="submit"
-            className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
-            disabled={seed == null}
+              goto({ pathname: '.', search: `?target=${seed.toString(16)}` })
+            }}
           >
-            OK
-          </button>
-        </form>
-      </div>
-    </Container>
+            <LabeledInput
+              className="px-2 mb-4"
+              label="目標seed"
+              placeholder="1234ABCD"
+              {...controller}
+            />
+            {seed != null && <ResultBlock seed={seed} />}
+            <button
+              type="submit"
+              className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+              disabled={seed == null}
+            >
+              OK
+            </button>
+          </form>
+        </div>
+      </Container>
+    </>
   )
 }
 

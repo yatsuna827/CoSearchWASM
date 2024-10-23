@@ -13,6 +13,7 @@ import { type SeedInputController, useSeedInput } from '@/hooks/useSeedInput'
 import { Ref } from '@/utilities/ref'
 
 import { ChevronLeft } from '@/components/ChevronLeft'
+import { Hamburger } from '@/components/Hamburger'
 import { Link } from '@remix-run/react'
 import { $path } from 'remix-routes'
 import { Container, Row } from './components'
@@ -34,34 +35,72 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
     }
   }, [targetSeed, currentSeed, timerFrames, blankFrames])
 
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const handleDialogClick = useCallback((e: React.MouseEvent<HTMLDialogElement, MouseEvent>) => {
+    if (!dialogRef.current) return
+
+    if (e.currentTarget === e.target) {
+      dialogRef.current.close()
+    }
+  }, [])
+  const handleClickMenu = useCallback(() => {
+    dialogRef.current?.showModal()
+  }, [])
+  const handleDialogClose = useCallback(() => {
+    dialogRef.current?.close()
+  }, [])
+
   return (
-    <Container>
+    <>
       <div className="relative flex items-center justify-center px-4 h-10 border-b">
         <Link className="absolute left-2" to={$path('/gc/xd/starter')}>
-          <ChevronLeft />
+          <ChevronLeft className="h-6 w-6 text-gray-500" />
         </Link>
         <h1 className="text-lg font-semibold">PokemonXD ID調整</h1>
+        <button type="button" className="absolute right-3" onClick={handleClickMenu}>
+          <Hamburger className="h-6 w-6 stroke-gray-600" />
+        </button>
       </div>
-      <div className="w-full overflow-x-auto px-4 py-2">
-        <ResultBlock seed={targetSeed} />
+      <Container>
+        <div className="w-full overflow-x-auto px-4 py-2">
+          <ResultBlock seed={targetSeed} />
 
-        {isValidSeed(targetSeed) && (
-          <>
-            <div className="mb-6" />
+          {isValidSeed(targetSeed) && (
+            <>
+              <div className="mb-6" />
 
-            <DistanceBlock
-              seed={currentSeed}
-              controller={currentSeedController}
-              seedNamingStart={namingStart}
-            />
+              <DistanceBlock
+                seed={currentSeed}
+                controller={currentSeedController}
+                seedNamingStart={namingStart}
+              />
 
-            <div className="mb-6" />
+              <div className="mb-6" />
 
-            <DiffListBlock targetSeed={targetSeed} namingStart={namingStart} />
-          </>
-        )}
-      </div>
-    </Container>
+              <DiffListBlock targetSeed={targetSeed} namingStart={namingStart} />
+            </>
+          )}
+        </div>
+      </Container>
+      <dialog
+        ref={dialogRef}
+        className="p-0 m-0 h-screen max-h-screen border-l bg-[#f9f9f9] backdrop:bg-black/30 ml-auto"
+        onClick={handleDialogClick}
+      >
+        <div className="w-40">
+          <div className="relative flex items-center px-4 h-10 border-b">
+            <h1 className="text-lg font-semibold">設定</h1>
+            <button type="button" className="absolute right-3" onClick={handleDialogClose}>
+              <Hamburger className="h-6 w-6 stroke-gray-600" />
+            </button>
+          </div>
+          <div>タイマー入力</div>
+          <div>{timerFrames}フレーム</div>
+          <div>制動時間</div>
+          <div>{blankFrames}フレーム</div>
+        </div>
+      </dialog>
+    </>
   )
 }
 
