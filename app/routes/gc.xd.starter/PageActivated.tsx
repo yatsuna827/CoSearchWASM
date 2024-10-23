@@ -57,7 +57,7 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
           <ChevronLeft className="h-6 w-6 text-gray-500" />
         </Link>
         <h1 className="text-lg font-semibold">PokemonXD ID調整</h1>
-        <button type="button" className="absolute right-3" onClick={handleClickMenu}>
+        <button type="button" className="absolute right-3 outline-none" onClick={handleClickMenu}>
           <Hamburger className="h-6 w-6 stroke-gray-600" />
         </button>
       </div>
@@ -84,10 +84,10 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
       </Container>
       <dialog
         ref={dialogRef}
-        className="p-0 m-0 h-screen max-h-screen border-l bg-[#f9f9f9] backdrop:bg-black/30 ml-auto"
+        className="p-0 m-0 h-screen max-h-screen border-l backdrop:bg-black/30 ml-auto"
         onClick={handleDialogClick}
       >
-        <div className="w-40">
+        <div className="w-40 h-full bg-[#f9f9f9]">
           <div className="relative flex items-center px-4 h-10 border-b">
             <h1 className="text-lg font-semibold">設定</h1>
             <button type="button" className="absolute right-3" onClick={handleDialogClose}>
