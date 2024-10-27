@@ -14,14 +14,15 @@ import { Ref } from '@/utilities/ref'
 
 import { ChevronLeft } from '@/components/ChevronLeft'
 import { Hamburger } from '@/components/Hamburger'
+import { Prompt, usePrompt } from '@/components/Prompt'
 import { Link } from '@remix-run/react'
 import { $path } from 'remix-routes'
-import { Container, Row } from './components'
+import { Container } from './components'
 
 export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => {
   // TODO: こいつらは開閉するSettingに押し付けて、LocalStorageに保存したい
-  const [timerFrames] = useState(1000)
-  const [blankFrames] = useState(585)
+  const [timerFrames, setTimerFrames] = useState(1000)
+  const [blankFrames, setBlankFrames] = useState(585)
 
   const [currentSeed, currentSeedController] = useSeedInput('')
 
@@ -49,6 +50,28 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
   const handleDialogClose = useCallback(() => {
     dialogRef.current?.close()
   }, [])
+
+  const [showTimerFramesPrompt, timerFramesPromptController] = usePrompt()
+  const handleChangeTimerFrames = useCallback(async () => {
+    const result = await showTimerFramesPrompt()
+    if (result == null) return
+
+    const value = Number.parseInt(result)
+    if (!Number.isInteger(value) || value < 0 || 65535 < value) return
+
+    setTimerFrames(value)
+  }, [showTimerFramesPrompt])
+
+  const [showBlankFramesPrompt, blankFramesPromptController] = usePrompt()
+  const handleChangeBlankFrames = useCallback(async () => {
+    const result = await showBlankFramesPrompt()
+    if (result == null) return
+
+    const value = Number.parseInt(result)
+    if (!Number.isInteger(value) || value < 0 || 65535 < value) return
+
+    setBlankFrames(value)
+  }, [showBlankFramesPrompt])
 
   return (
     <>
@@ -98,12 +121,52 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
               <Hamburger className="h-6 w-6 stroke-gray-600" />
             </button>
           </div>
-          <div>タイマー入力</div>
-          <div>{timerFrames}フレーム</div>
-          <div>制動時間</div>
-          <div>{blankFrames}フレーム</div>
+          <button
+            type="button"
+            className="hover:bg-slate-200 w-full text-start px-2 py-1 border-b"
+            onClick={handleChangeTimerFrames}
+          >
+            <div className="text-[10px] text-gray-500">タイマー入力</div>
+            <div className="text-md">
+              <span className="mr-1">{timerFrames}</span>
+              <span className="text-xs">フレーム</span>
+            </div>
+          </button>
+          <button
+            type="button"
+            className="hover:bg-slate-200 w-full text-start px-2 py-1 border-b"
+            onClick={handleChangeBlankFrames}
+          >
+            <div className="text-[10px] text-gray-500">制動時間</div>
+            <div className="text-md">
+              <span className="mr-1">{blankFrames}</span>
+              <span className="text-xs">フレーム</span>
+            </div>
+          </button>
         </div>
       </dialog>
+      <Prompt
+        title="設定変更"
+        label="タイマー入力"
+        inputOption={{
+          type: 'number',
+          min: 0,
+          max: 65535,
+          defaultValue: timerFrames,
+        }}
+        controller={timerFramesPromptController}
+      />
+      <Prompt
+        title="設定変更"
+        label="制動時間"
+        inputOption={{
+          type: 'number',
+          min: 0,
+          max: 65535,
+          defaultValue: blankFrames,
+        }}
+        controller={blankFramesPromptController}
+      />
     </>
   )
 }
