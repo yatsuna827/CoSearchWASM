@@ -14,7 +14,7 @@ import { Ref } from '@/utilities/ref'
 
 import { ChevronLeft } from '@/components/ChevronLeft'
 import { Hamburger } from '@/components/Hamburger'
-import { Prompt, usePrompt } from '@/components/Prompt'
+import { usePrompt } from '@/components/Prompt'
 import { Link } from '@remix-run/react'
 import { $path } from 'remix-routes'
 import { Container } from './components'
@@ -51,27 +51,45 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
     dialogRef.current?.close()
   }, [])
 
-  const [showTimerFramesPrompt, timerFramesPromptController] = usePrompt()
+  const showTimerFramesPrompt = usePrompt()
   const handleChangeTimerFrames = useCallback(async () => {
-    const result = await showTimerFramesPrompt()
+    const result = await showTimerFramesPrompt({
+      title: '設定変更',
+      label: 'タイマー入力',
+      inputOption: {
+        type: 'number',
+        min: 0,
+        max: 65535,
+        defaultValue: timerFrames,
+      },
+    })
     if (result == null) return
 
     const value = Number.parseInt(result)
     if (!Number.isInteger(value) || value < 0 || 65535 < value) return
 
     setTimerFrames(value)
-  }, [showTimerFramesPrompt])
+  }, [timerFrames, showTimerFramesPrompt])
 
-  const [showBlankFramesPrompt, blankFramesPromptController] = usePrompt()
+  const showBlankFramesPrompt = usePrompt()
   const handleChangeBlankFrames = useCallback(async () => {
-    const result = await showBlankFramesPrompt()
+    const result = await showBlankFramesPrompt({
+      title: '設定変更',
+      label: '制動時間',
+      inputOption: {
+        type: 'number',
+        min: 0,
+        max: 65535,
+        defaultValue: blankFrames,
+      },
+    })
     if (result == null) return
 
     const value = Number.parseInt(result)
     if (!Number.isInteger(value) || value < 0 || 65535 < value) return
 
     setBlankFrames(value)
-  }, [showBlankFramesPrompt])
+  }, [blankFrames, showBlankFramesPrompt])
 
   return (
     <>
@@ -145,28 +163,6 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
           </button>
         </div>
       </dialog>
-      <Prompt
-        title="設定変更"
-        label="タイマー入力"
-        inputOption={{
-          type: 'number',
-          min: 0,
-          max: 65535,
-          defaultValue: timerFrames,
-        }}
-        controller={timerFramesPromptController}
-      />
-      <Prompt
-        title="設定変更"
-        label="制動時間"
-        inputOption={{
-          type: 'number',
-          min: 0,
-          max: 65535,
-          defaultValue: blankFrames,
-        }}
-        controller={blankFramesPromptController}
-      />
     </>
   )
 }

@@ -1,4 +1,5 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
+import { Prompt } from './components/Prompt'
 import './tailwind.css'
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -20,7 +21,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />
+  return (
+    <>
+      <Outlet />
+      <Prompt />
+    </>
+  )
 }
 
 export function HydrateFallback() {
