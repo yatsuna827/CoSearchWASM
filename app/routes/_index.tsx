@@ -16,6 +16,9 @@ const Page: React.FC = () => {
             <li>
               <Link to={$path('/gc/xd/togepii')}>XD トゲピー</Link>
             </li>
+            <li>
+              <Link to={$path('/dolphin')}>DolphinログViewer</Link>
+            </li>
           </ul>
         </div>
 
