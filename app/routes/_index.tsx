@@ -13,6 +13,12 @@ const Page: React.FC = () => {
             <li>
               <Link to={$path('/gc/xd/starter')}>XD ID調整</Link>
             </li>
+            <li>
+              <Link to={$path('/gc/xd/togepii')}>XD トゲピー</Link>
+            </li>
+            <li>
+              <Link to={$path('/dolphin')}>DolphinログViewer</Link>
+            </li>
           </ul>
         </div>
 

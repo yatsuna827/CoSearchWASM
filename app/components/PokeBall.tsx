@@ -40,7 +40,6 @@ export const PokeBall: React.FC<Props> = ({ onFire }) => {
 
   return (
     <div className="w-full h-full flex justify-center items-center relative">
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
       <div
         className="flex justify-center items-center size-40 rounded-full bg-gradient-poke-ball"
         onClick={handleFire}

@@ -130,7 +130,6 @@ const Page: React.FC = () => {
         <div className="size-52 relative">
           <PokeBall onFire={handleRecordBlink} />
           <div className="absolute top-0 size-52 pointer-events-none">
-            {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
             <svg className="[&>circle]:stroke-[8]" viewBox="0 0 100 100">
               <circle fill="none" stroke="rgba(170,170,170,.3)" cx="50" cy="50" r="45" />
               <circle
