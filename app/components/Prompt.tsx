@@ -1,96 +1,85 @@
-import { useCallback, useId, useRef, useState } from 'react'
+import { atom, useAtomValue, useSetAtom } from 'jotai'
+import { useAtomCallback } from 'jotai/utils'
+import { useCallback, useRef } from 'react'
 import { LabeledInput } from './LabeledInput'
-
-// FIXME: 素直にrender hooksにしたほうがいい気がする…
-export const usePrompt = (): [() => Promise<string | null>, PromptController] => {
-  const id = useId()
-  const [resolveFn, setResolverFn] = useState<((val: string | null) => void) | null>(null)
-
-  const handlePrompt = useCallback(() => {
-    const el = document.getElementById(id)
-    if (!el || el.tagName !== 'DIALOG') throw new Error(`${el?.tagName}`)
-
-    const promise = new Promise<string | null>((resolve) => {
-      setResolverFn(() => (v: string | null) => {
-        resolve(v)
-        setResolverFn(null)
-      })
-      const dialogEl = el as HTMLDialogElement
-      dialogEl.showModal()
-    })
-
-    return promise
-  }, [id])
-
-  return [handlePrompt, { id, open: !!resolveFn, onClose: resolveFn ?? (() => {}) }] as const
-}
-
-type PromptController = {
-  id: string
-
-  open: boolean
-  onClose: (value: string | null) => void
-}
 
 type PromptProps = {
   title: string
   label: string
   inputOption?: React.ComponentProps<'input'>
-  controller: PromptController
 }
-export const Prompt: React.FC<PromptProps> = ({ controller: { id, open, onClose }, ...props }) => {
-  const promptRef = useRef<HTMLDialogElement>(null)
 
-  const handleClickBackdrop = useCallback(
-    (e: React.MouseEvent<HTMLDialogElement, MouseEvent>) => {
-      if (!promptRef.current) return
+const promptPropsAtom = atom<PromptProps | null>(null)
+const promptRefAtom = atom<HTMLDialogElement | null>(null)
+const promptResolverAtom = atom<((val: string | null) => void) | null>(null)
 
+export const showPromptAtom = atom(null, (get, set, props: PromptProps): Promise<string | null> => {
+  const promptRef = get(promptRefAtom)
+  if (!promptRef) return Promise.resolve(null)
+
+  const promise = new Promise<string | null>((resolve) => {
+    set(promptPropsAtom, props)
+    set(promptResolverAtom, () => resolve)
+  })
+
+  promptRef.showModal()
+
+  return promise
+})
+export const usePrompt = (): ((props: PromptProps) => Promise<string | null>) => {
+  const showPrompt = useSetAtom(showPromptAtom)
+
+  return showPrompt
+}
+
+const closePromptAtom = atom(null, (get, set, val: string | null = null) => {
+  const promptRef = get(promptRefAtom)
+  const onClose = get(promptResolverAtom)
+
+  promptRef?.close()
+  onClose?.(val)
+  set(promptPropsAtom, null)
+})
+
+export const Prompt: React.FC = () => {
+  const props = useAtomValue(promptPropsAtom)
+  const setRef = useSetAtom(promptRefAtom)
+  const open = props != null
+
+  const handleClickBackdrop = useAtomCallback(
+    useCallback((_get, set, e: React.MouseEvent<HTMLDialogElement, MouseEvent>) => {
       if (e.currentTarget === e.target) {
-        promptRef.current.close()
-        onClose(null)
+        set(closePromptAtom)
       }
-    },
-    [onClose],
+    }, []),
   )
 
   return (
     <dialog
-      ref={promptRef}
-      id={id}
+      ref={setRef}
       className="p-0 mt-20 mx-10 w-auto max-h-screen border-l backdrop:bg-black/30"
       onClick={handleClickBackdrop}
     >
-      {open && <PromptContent promptRef={promptRef} {...props} onClose={onClose} />}
+      {/* close時にアンマウントさせないとinputの状態が初期化されない */}
+      {open && <PromptContent {...props} />}
     </dialog>
   )
 }
 
-const PromptContent: React.FC<{
-  title: string
-  label: string
-  inputOption?: React.ComponentProps<'input'>
-  onClose: PromptController['onClose']
-  promptRef: React.RefObject<HTMLDialogElement>
-}> = ({ title, label, onClose, inputOption, promptRef }) => {
+const PromptContent: React.FC<PromptProps> = ({ title, label, inputOption }) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+  const handleSubmit = useAtomCallback(
+    useCallback((_get, set, e: React.FormEvent) => {
       e.preventDefault()
 
-      if (inputRef.current) {
-        onClose(inputRef.current.value)
-      }
-
-      promptRef.current?.close()
-    },
-    [onClose, promptRef],
+      set(closePromptAtom, inputRef.current?.value ?? null)
+    }, []),
   )
-  const handleCancel = useCallback(() => {
-    if (!promptRef.current) return
-
-    promptRef.current.close()
-    onClose(null)
-  }, [onClose, promptRef])
+  const handleCancel = useAtomCallback(
+    useCallback((_get, set) => {
+      set(closePromptAtom)
+    }, []),
+  )
 
   return (
     <div className="p-4 w-full h-auto bg-[#f9f9f9]">
