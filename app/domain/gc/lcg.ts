@@ -35,6 +35,7 @@ export const LCG = {
       return null
     }
   },
+  stringify: (lcg: LCG): string => lcg.toString(16).padStart(8, '0').toUpperCase(),
 }
 
 const seedRegex = /^[0-9a-f]{1,8}$/i

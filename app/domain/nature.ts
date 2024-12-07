@@ -63,3 +63,31 @@ export type Nature = (typeof natures)[number]
 export type NatureJp = (typeof toJp)[Nature]
 export const toJapanese = <T extends Nature>(nature: T) => toJp[nature]
 export const natureToInt = (nature: NatureJp) => natures.indexOf(fromJp[nature])
+
+export const statFactors: Record<Nature, [number, number, number, number, number, number]> = {
+  hardy: [1, 1, 1, 1, 1, 1],
+  lonely: [1, 1.1, 0.9, 1, 1, 1],
+  brave: [1, 1.1, 1, 1, 1, 0.9],
+  adamant: [1, 1.1, 1, 0.9, 1, 1],
+  naughty: [1, 1.1, 1, 1, 0.9, 1],
+  bold: [1, 0.9, 1.1, 1, 1, 1],
+  docile: [1, 1, 1, 1, 1, 1],
+  relaxed: [1, 1, 1.1, 1, 1, 0.9],
+  impish: [1, 1, 1.1, 0.9, 1, 1],
+  lax: [1, 1, 1.1, 1, 0.9, 1],
+  timid: [1, 0.9, 1, 1, 1, 1.1],
+  hasty: [1, 1, 0.9, 1, 1, 1.1],
+  serious: [1, 1, 1, 1, 1, 1],
+  jolly: [1, 1, 1, 0.9, 1, 1.1],
+  naive: [1, 1, 1, 1, 0.9, 1.1],
+  modest: [1, 0.9, 1, 1.1, 1, 1],
+  mild: [1, 1, 0.9, 1.1, 1, 1],
+  quiet: [1, 1, 1, 1.1, 1, 0.9],
+  bashful: [1, 1, 1, 1, 1, 1],
+  rash: [1, 1, 1, 1.1, 0.9, 1],
+  calm: [1, 0.9, 1, 1, 1.1, 1],
+  gentle: [1, 1, 0.9, 1, 1.1, 1],
+  sassy: [1, 1, 1, 1, 1.1, 0.9],
+  careful: [1, 1, 1, 0.9, 1.1, 1],
+  quirky: [1, 1, 1, 1, 1, 1],
+}
