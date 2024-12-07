@@ -40,8 +40,7 @@ const Index: React.FC = () => {
 
   return (
     <div className="font-[system-ui,sans-serif] leading-8 h-full">
-      <div className="max-w-[900px] h-full mx-auto overflow-x-hidden overflow-y-scroll px-1 py-2 bg-[#f9f9f9]">
-        <div>raw</div>
+      <div className="max-w-[900px] h-full mx-auto px-1 py-2 bg-[#f9f9f9]">
         <textarea
           className="h-[100px] whitespace-pre bg-white w-full px-2 text-sm"
           ref={inputRef}
