@@ -42,7 +42,24 @@ type Callbacks = {
   iter_smoke: (...args: IterSmokeCallbackFnArgs) => void
 }
 
-export const loadWASM = async () => {
+export type LoadWASMReturn = Promise<{
+  searchTogepii: (
+    seed: number,
+    target: number,
+    options: {
+      blink: {
+        cooltime: number
+        intervalRange: [min: number, max: number]
+        framesRange: [min: number, max: number]
+      }
+      smoke: {
+        framesRange: [min: number, max: number]
+      }
+    },
+  ) => [number, LCG, number, LCG][]
+  iterSmoke: (seed: number, take: number) => { i: number; seed: LCG }[]
+}>
+export const loadWASM = async (): LoadWASMReturn => {
   const delegates: Callbacks = {
     search_togepii: () => {
       console.warn('コールバック関数が設定される前にWASM関数が呼び出されました')
