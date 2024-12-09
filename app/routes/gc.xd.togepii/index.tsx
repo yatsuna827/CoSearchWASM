@@ -121,122 +121,121 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <div className="relative flex items-center justify-center px-4 h-10 border-b">
+      <div className="sticky top-0 flex items-center justify-center px-4 h-10 border-b bg-white">
         <h1 className="text-lg font-semibold">PokemonXD トゲピー</h1>
       </div>
+
       <Container>
-        <div className="px-4 pt-2 pb-4">
+        <LabeledInput
+          className="px-2"
+          label="目標seed"
+          placeholder="1234ABCD"
+          {...targetSeedController}
+        />
+        {individual && (
+          <div className="px-2">
+            <span className="mr-2">{toJapanese(individual.nature)}</span>
+            <span className="mr-2">
+              {individual.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}
+            </span>
+            <span className="mr-2">({individual.stats.join('-')})</span>
+          </div>
+        )}
+
+        <section className="my-4">
+          <h2 className="font-bold mb-2">不定消費計算</h2>
+
           <LabeledInput
-            className="px-2"
-            label="目標seed"
+            className="px-2 mb-4"
+            label="現在のseed"
             placeholder="1234ABCD"
-            {...targetSeedController}
+            {...currentSeedController}
           />
-          {individual && (
-            <div className="px-2">
-              <span className="mr-2">{toJapanese(individual.nature)}</span>
-              <span className="mr-2">
-                {individual.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}
-              </span>
-              <span className="mr-2">({individual.stats.join('-')})</span>
-            </div>
-          )}
-
-          <section className="my-4">
-            <h2 className="font-bold mb-2">不定消費計算</h2>
-
+          <div className="flex gap-4 mb-2">
             <LabeledInput
-              className="px-2 mb-4"
-              label="現在のseed"
-              placeholder="1234ABCD"
-              {...currentSeedController}
-            />
-            <div className="flex gap-4 mb-2">
-              <LabeledInput
-                ref={blinkMinInputRef}
-                className="px-2"
-                label="瞬き 待機時間 (mix)"
-                type="number"
-                defaultValue={2000}
-              />
-              <LabeledInput
-                ref={blinkMaxInputRef}
-                className="px-2"
-                label="瞬き 待機時間 (max)"
-                type="number"
-                defaultValue={5000}
-              />
-            </div>
-
-            <div className="flex gap-4 mb-4">
-              <LabeledInput
-                ref={smokeMinInputRef}
-                className="px-2"
-                label="不定消費 待機時間 (mix)"
-                type="number"
-                defaultValue={300}
-              />
-              <LabeledInput
-                ref={smokeMaxInputRef}
-                className="px-2"
-                label="不定消費 待機時間 (max)"
-                type="number"
-                defaultValue={700}
-              />
-            </div>
-
-            <button
-              type="button"
-              className="w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
-              onClick={handleClick1}
-            >
-              計算
-            </button>
-
-            <div className="mt-4">
-              {result &&
-                (result.length ? `${result.length}件見つかりました` : '見つかりませんでした…')}
-            </div>
-
-            <textarea
-              className="min-w-full min-h-64 block px-4 py-2"
-              readOnly
-              value={result ? formatResult(result) : ''}
-            />
-          </section>
-
-          <section>
-            <h2 className="font-bold">ずれ確認</h2>
-
-            <LabeledInput
-              className="px-2 mb-4"
-              label="瞬き後のseed"
-              placeholder="1234ABCD"
-              {...searchGapSeedController}
-            />
-
-            <LabeledInput
-              ref={gapTargetFramesInputRef}
+              ref={blinkMinInputRef}
               className="px-2"
-              label="不定消費 待機時間"
+              label="瞬き 待機時間 (mix)"
               type="number"
+              defaultValue={2000}
             />
-
-            <button
-              type="button"
-              className="my-4 w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
-              onClick={handleClick2}
-            >
-              計算
-            </button>
-
-            <textarea
-              className="min-w-full min-h-64 block px-4 py-2"
-              readOnly
-              value={formatResult2(gapResult)}
+            <LabeledInput
+              ref={blinkMaxInputRef}
+              className="px-2"
+              label="瞬き 待機時間 (max)"
+              type="number"
+              defaultValue={5000}
             />
-          </section>
-        </div>
+          </div>
+
+          <div className="flex gap-4 mb-4">
+            <LabeledInput
+              ref={smokeMinInputRef}
+              className="px-2"
+              label="不定消費 待機時間 (mix)"
+              type="number"
+              defaultValue={300}
+            />
+            <LabeledInput
+              ref={smokeMaxInputRef}
+              className="px-2"
+              label="不定消費 待機時間 (max)"
+              type="number"
+              defaultValue={700}
+            />
+          </div>
+
+          <button
+            type="button"
+            className="w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
+            onClick={handleClick1}
+          >
+            計算
+          </button>
+
+          <div className="mt-4">
+            {result &&
+              (result.length ? `${result.length}件見つかりました` : '見つかりませんでした…')}
+          </div>
+
+          <textarea
+            className="min-w-full min-h-64 block px-4 py-2"
+            readOnly
+            value={result ? formatResult(result) : ''}
+          />
+        </section>
+
+        <section>
+          <h2 className="font-bold">ずれ確認</h2>
+
+          <LabeledInput
+            className="px-2 mb-4"
+            label="瞬き後のseed"
+            placeholder="1234ABCD"
+            {...searchGapSeedController}
+          />
+
+          <LabeledInput
+            ref={gapTargetFramesInputRef}
+            className="px-2"
+            label="不定消費 待機時間"
+            type="number"
+          />
+
+          <button
+            type="button"
+            className="my-4 w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
+            onClick={handleClick2}
+          >
+            計算
+          </button>
+
+          <textarea
+            className="min-w-full min-h-64 block px-4 py-2"
+            readOnly
+            value={formatResult2(gapResult)}
+          />
+        </section>
       </Container>
     </>
   )
