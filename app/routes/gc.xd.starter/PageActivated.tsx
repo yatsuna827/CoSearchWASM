@@ -15,8 +15,7 @@ import { Ref } from '@/utilities/ref'
 import { ChevronLeft } from '@/components/ChevronLeft'
 import { Hamburger } from '@/components/Hamburger'
 import { usePrompt } from '@/components/Prompt'
-import { Link } from '@remix-run/react'
-import { $path } from 'remix-routes'
+import { Link } from 'react-router'
 import { Container } from './components'
 
 export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => {
@@ -94,7 +93,7 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
   return (
     <>
       <div className="relative flex items-center justify-center px-4 h-10 border-b">
-        <Link className="absolute left-2" to={$path('/gc/xd/starter')}>
+        <Link className="absolute left-2" to="/gc/xd/starter">
           <ChevronLeft className="h-6 w-6 text-gray-500" />
         </Link>
         <h1 className="text-lg font-semibold">PokemonXD ID調整</h1>

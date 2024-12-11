@@ -1,5 +1,4 @@
-import { Link } from '@remix-run/react'
-import { $path } from 'remix-routes'
+import { Link, type MetaFunction } from 'react-router'
 
 const Page: React.FC = () => {
   return (
@@ -11,13 +10,13 @@ const Page: React.FC = () => {
           <h2 className="font-bold">ツール一覧</h2>
           <ul>
             <li>
-              <Link to={$path('/gc/xd/starter')}>XD ID調整</Link>
+              <Link to="/gc/xd/starter">XD ID調整</Link>
             </li>
             <li>
-              <Link to={$path('/gc/xd/togepii')}>XD トゲピー</Link>
+              <Link to="/gc/xd/togepii">XD トゲピー</Link>
             </li>
             <li>
-              <Link to={$path('/dolphin')}>DolphinログViewer</Link>
+              <Link to="/dolphin">DolphinログViewer</Link>
             </li>
           </ul>
         </div>
@@ -26,10 +25,10 @@ const Page: React.FC = () => {
           <h2 className="font-bold">ゲーム一覧</h2>
           <ul>
             <li>
-              <Link to={$path('/game/blink')}>ムウマの瞬きを見るゲーム</Link>
+              <Link to="/game/blink">ムウマの瞬きを見るゲーム</Link>
             </li>
             <li>
-              <Link to={$path('/game/chatot')}>ペラップの声を聞くゲーム</Link>
+              <Link to="/game/chatot">ペラップの声を聞くゲーム</Link>
             </li>
           </ul>
         </div>

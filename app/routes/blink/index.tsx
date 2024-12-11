@@ -1,6 +1,6 @@
 import type { BlinkTimelineResult } from '@dotnet/main.worker'
-import type { MetaFunction } from '@remix-run/node'
 import { type ComponentProps, forwardRef, useId, useMemo, useRef, useState } from 'react'
+import type { MetaFunction } from 'react-router'
 
 import { useSearchWorker } from '@/hooks/useSearchWorker'
 
@@ -190,7 +190,6 @@ const Page = () => {
           ))}
         </div>
       </div>
-
       <div className="flex-auto overflow-x-hidden overflow-y-scroll px-1 bg-[#f9f9f9]">
         <div className="w-full overflow-x-auto">
           <table className="w-full border-collapse border-spacing-0 bg-stone-200">
