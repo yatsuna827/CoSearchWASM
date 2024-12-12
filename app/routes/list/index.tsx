@@ -1,7 +1,7 @@
 import { type NatureJp, natureToInt, natures, toJapanese } from '@/domain/nature'
 import type { SearchNearbyResult } from '@dotnet/main.worker'
-import type { MetaFunction } from '@remix-run/node'
 import { type ComponentProps, forwardRef, useId, useMemo, useRef, useState } from 'react'
+import type { MetaFunction } from 'react-router'
 
 import { useSearchWorker } from '@/hooks/useSearchWorker'
 
