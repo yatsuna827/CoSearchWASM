@@ -1,0 +1,8 @@
+{
+  "import": [
+    {
+      "path": "cosearch-wasm/lib/format-hex",
+      "alias": "fmt"
+    }
+  ]
+}

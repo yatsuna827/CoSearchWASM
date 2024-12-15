@@ -1,0 +1,21 @@
+{
+  "import": [
+    {
+      "path": "cosearch-wasm/lib/lcg-gc",
+      "alias": "pk_rng"
+    },
+    {
+      "path": "cosearch-wasm/lib/xd_blink",
+      "alias": "blink"
+    },
+    {
+      "path": "cosearch-wasm/lib/xd_togepii",
+      "alias": "togepii"
+    }
+  ],
+  "link": {
+    "wasm-gc": {
+      "exports": ["search_togepii", "new_blink", "iter_smoke"]
+    }
+  }
+}

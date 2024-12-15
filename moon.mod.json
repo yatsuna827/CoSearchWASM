@@ -1,0 +1,11 @@
+{
+  "name": "cosearch-wasm",
+  "version": "0.1.0",
+  "readme": "README.md",
+  "repository": "",
+  "license": "zlib",
+  "keywords": [],
+  "description": "",
+  "source": "moonbit",
+  "exclude": ["lib/*"]
+}

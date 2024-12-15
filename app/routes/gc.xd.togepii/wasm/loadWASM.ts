@@ -1,5 +1,5 @@
 import type { LCG } from '@/domain/gc/lcg'
-import wasm from './main.wasm?url'
+import wasm from '@/wasm/xd-togepii.wasm?url'
 
 type WasmExternRef = Branded<unknown, 'WASMExternRef'>
 type BlinkObject = Branded<WasmExternRef, 'BlinkObject'>
