@@ -1,12 +1,8 @@
 import type { IVs } from './gc/generators'
 import { type Nature, statFactors } from './nature'
+import type { Attributes } from './type'
 
-export const toStats = (
-  bs: [number, number, number, number, number, number],
-  ivs: IVs,
-  lv: number,
-  nature: Nature,
-) => {
+export const toStats = (bs: Attributes, ivs: IVs, lv: number, nature: Nature) => {
   const [h_bs, ...rest_bs] = bs
   const [h_iv, ...rest_iv] = ivs
   const [_, ...fac] = statFactors[nature]

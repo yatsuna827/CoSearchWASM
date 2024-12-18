@@ -3,8 +3,12 @@ import { useNavigate } from 'react-router'
 import { LabeledInput } from '@/components/LabeledInput'
 import { useSeedInput } from '@/hooks/useSeedInput'
 
+import { IndividualPreview } from '../components/IndividualPreview'
+import { generateTogepii } from '../domain/generateTogepii'
+
 export const PageDefault: React.FC = () => {
   const [seed, controller] = useSeedInput('')
+  const individual = seed != null ? generateTogepii(seed) : null
   const goto = useNavigate()
 
   return (
@@ -21,8 +25,10 @@ export const PageDefault: React.FC = () => {
           className="px-2 mb-4"
           label="目標seed"
           placeholder="1234ABCD"
+          autoComplete="off"
           {...controller}
         />
+        {individual && <IndividualPreview individual={individual} />}
 
         <button
           type="submit"

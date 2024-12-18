@@ -1,4 +1,5 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
+import { LoadingCircle } from './components/LoadingCircle'
 import { Prompt } from './components/Prompt'
 import './tailwind.css'
 
@@ -30,5 +31,9 @@ export default function App() {
 }
 
 export function HydrateFallback() {
-  return <p>Loading...</p>
+  return (
+    <LoadingCircle.Container className="h-full">
+      <LoadingCircle.Spinner />
+    </LoadingCircle.Container>
+  )
 }

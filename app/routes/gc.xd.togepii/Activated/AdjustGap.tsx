@@ -20,7 +20,9 @@ export const AdjustGapSection = () => {
   const [searchGapSeed, searchGapSeedController] = useSeedInput('')
   const gapTargetFramesInputRef = useRef<HTMLInputElement>(null)
   const [gapResult, setGapResult] = useState<SearchGapResult[]>([])
-  const handleClick = async () => {
+  const handleList = async (e: React.FormEvent) => {
+    e.preventDefault()
+
     if (searchGapSeed == null) return
     if (!gapTargetFramesInputRef.current) return
 
@@ -43,30 +45,29 @@ export const AdjustGapSection = () => {
   }
 
   return (
-    <section>
-      <h2 className="font-bold">ずれ確認</h2>
+    <section className="my-4">
+      <form onSubmit={handleList}>
+        <LabeledInput
+          className="px-2 mb-4"
+          label="瞬き後のseed"
+          placeholder="1234ABCD"
+          {...searchGapSeedController}
+        />
 
-      <LabeledInput
-        className="px-2 mb-4"
-        label="瞬き後のseed"
-        placeholder="1234ABCD"
-        {...searchGapSeedController}
-      />
+        <LabeledInput
+          ref={gapTargetFramesInputRef}
+          className="px-2"
+          label="不定消費 待機時間"
+          type="number"
+        />
 
-      <LabeledInput
-        ref={gapTargetFramesInputRef}
-        className="px-2"
-        label="不定消費 待機時間"
-        type="number"
-      />
-
-      <button
-        type="button"
-        className="my-4 w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
-        onClick={handleClick}
-      >
-        計算
-      </button>
+        <button
+          type="submit"
+          className="my-4 w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
+        >
+          計算
+        </button>
+      </form>
 
       <textarea
         className="min-w-full min-h-64 block px-4 py-2"
