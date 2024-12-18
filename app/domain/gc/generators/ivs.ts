@@ -1,7 +1,8 @@
+import type { Attributes } from '@/domain/type'
 import { Ref } from '@util/ref'
 import { type LCG, getRand } from '../lcg'
 
-export type IVs = [number, number, number, number, number, number]
+export type IVs = Attributes
 
 export const generateIVs = (seed: LCG): [IVs, LCG] => {
   const lcg = Ref.from(seed)

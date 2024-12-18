@@ -7,7 +7,7 @@ export const LabeledInput = forwardRef<HTMLInputElement, LabeledInputProps>(
 
     return (
       <div>
-        <label htmlFor={id} className="block">
+        <label htmlFor={id} className="block text-sm text-[#333]/80 mb-1 select-none">
           {label}
         </label>
         <input {...props} ref={ref} id={id} />
