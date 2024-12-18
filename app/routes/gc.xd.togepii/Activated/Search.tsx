@@ -18,7 +18,9 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
   const smokeMinInputRef = useRef<HTMLInputElement>(null)
   const smokeMaxInputRef = useRef<HTMLInputElement>(null)
   const [result, setResult] = useState<[number, LCG, number, LCG][] | null>(null)
-  const handleClick = async () => {
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+
     if (targetSeed == null || currentSeed == null) return
     if (!blinkMinInputRef.current) return
     if (!blinkMaxInputRef.current) return
@@ -54,53 +56,54 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
     <section className="my-4">
       <h2 className="font-bold mb-2">不定消費計算</h2>
 
-      <LabeledInput
-        className="px-2 mb-4"
-        label="現在のseed"
-        placeholder="1234ABCD"
-        {...currentSeedController}
-      />
-      <div className="flex gap-4 mb-2">
+      <form onSubmit={handleSearch}>
         <LabeledInput
-          ref={blinkMinInputRef}
-          className="px-2"
-          label="瞬き 待機時間 (mix)"
-          type="number"
-          defaultValue={2000}
+          className="px-2 mb-4"
+          label="現在のseed"
+          placeholder="1234ABCD"
+          {...currentSeedController}
         />
-        <LabeledInput
-          ref={blinkMaxInputRef}
-          className="px-2"
-          label="瞬き 待機時間 (max)"
-          type="number"
-          defaultValue={5000}
-        />
-      </div>
+        <div className="flex gap-4 mb-2">
+          <LabeledInput
+            ref={blinkMinInputRef}
+            className="px-2"
+            label="瞬き 待機時間 (mix)"
+            type="number"
+            defaultValue={2000}
+          />
+          <LabeledInput
+            ref={blinkMaxInputRef}
+            className="px-2"
+            label="瞬き 待機時間 (max)"
+            type="number"
+            defaultValue={5000}
+          />
+        </div>
 
-      <div className="flex gap-4 mb-4">
-        <LabeledInput
-          ref={smokeMinInputRef}
-          className="px-2"
-          label="不定消費 待機時間 (mix)"
-          type="number"
-          defaultValue={300}
-        />
-        <LabeledInput
-          ref={smokeMaxInputRef}
-          className="px-2"
-          label="不定消費 待機時間 (max)"
-          type="number"
-          defaultValue={700}
-        />
-      </div>
+        <div className="flex gap-4 mb-4">
+          <LabeledInput
+            ref={smokeMinInputRef}
+            className="px-2"
+            label="不定消費 待機時間 (mix)"
+            type="number"
+            defaultValue={300}
+          />
+          <LabeledInput
+            ref={smokeMaxInputRef}
+            className="px-2"
+            label="不定消費 待機時間 (max)"
+            type="number"
+            defaultValue={700}
+          />
+        </div>
 
-      <button
-        type="button"
-        className="w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
-        onClick={handleClick}
-      >
-        計算
-      </button>
+        <button
+          type="submit"
+          className="w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
+        >
+          計算
+        </button>
+      </form>
 
       <div className="mt-4">
         {result && (result.length ? `${result.length}件見つかりました` : '見つかりませんでした…')}
