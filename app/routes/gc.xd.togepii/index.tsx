@@ -32,7 +32,7 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <div className="sticky top-0 flex items-center justify-center px-4 h-10 border-b bg-white">
+      <div className="sticky top-0 flex items-center justify-center px-4 h-14 border-b bg-white">
         <h1 className="text-lg font-semibold">PokemonXD トゲピー</h1>
       </div>
 
