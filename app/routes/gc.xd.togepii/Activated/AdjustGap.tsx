@@ -45,9 +45,7 @@ export const AdjustGapSection = () => {
   }
 
   return (
-    <section>
-      <h2 className="font-bold">ずれ確認</h2>
-
+    <section className="my-4">
       <form onSubmit={handleList}>
         <LabeledInput
           className="px-2 mb-4"

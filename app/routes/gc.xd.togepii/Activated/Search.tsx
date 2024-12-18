@@ -54,8 +54,6 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
 
   return (
     <section className="my-4">
-      <h2 className="font-bold mb-2">不定消費計算</h2>
-
       <form onSubmit={handleSearch}>
         <LabeledInput
           className="px-2 mb-4"
