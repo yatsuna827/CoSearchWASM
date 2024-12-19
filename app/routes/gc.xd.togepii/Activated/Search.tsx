@@ -61,7 +61,7 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
           placeholder="1234ABCD"
           {...currentSeedController}
         />
-        <div className="flex gap-4 mb-2">
+        <div className="flex gap-4 mb-4 max-sm:flex-col">
           <LabeledInput
             ref={blinkMinInputRef}
             className="px-2"
@@ -78,7 +78,7 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
           />
         </div>
 
-        <div className="flex gap-4 mb-4">
+        <div className="flex gap-4 mb-4 max-sm:flex-col">
           <LabeledInput
             ref={smokeMinInputRef}
             className="px-2"
