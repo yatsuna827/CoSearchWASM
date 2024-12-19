@@ -28,7 +28,11 @@ export const PageDefault: React.FC = () => {
           autoComplete="off"
           {...controller}
         />
-        {individual && <IndividualPreview individual={individual} />}
+        {individual && (
+          <div className="mb-4">
+            <IndividualPreview individual={individual} />
+          </div>
+        )}
 
         <button
           type="submit"
