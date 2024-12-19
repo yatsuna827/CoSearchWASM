@@ -13,7 +13,7 @@ type Props = {
   targetSeed: LCG
 }
 export const PageActivated: React.FC<Props> = ({ targetSeed }) => {
-  const individual = targetSeed != null ? generateTogepii(targetSeed) : null
+  const individual = generateTogepii(targetSeed)
 
   return (
     <>
@@ -21,11 +21,10 @@ export const PageActivated: React.FC<Props> = ({ targetSeed }) => {
         <Label className="mb-3">目標seed</Label>
         <span className="block ml-2 leading-none text-[#333]">{LCG.stringify(targetSeed)}</span>
       </div>
-      {individual && (
-        <div className="mb-2">
-          <IndividualPreview individual={individual} />
-        </div>
-      )}
+
+      <div className="mb-8">
+        <IndividualPreview individual={individual} />
+      </div>
 
       <Tabs.Root defaultValue="search">
         <Tabs.List className="h-9 w-full border-b p-0 inline-flex justify-start items-center">
