@@ -1,0 +1,8 @@
+{
+  "import": [
+    {
+      "path": "cosearch-wasm/lib/lcg-gc",
+      "alias": "lcg"
+    }
+  ]
+}

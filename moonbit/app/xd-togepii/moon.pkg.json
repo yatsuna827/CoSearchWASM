@@ -11,11 +11,15 @@
     {
       "path": "cosearch-wasm/lib/xd_togepii",
       "alias": "togepii"
+    },
+    {
+      "path": "cosearch-wasm/lib/find_seed",
+      "alias": "finder"
     }
   ],
   "link": {
     "wasm-gc": {
-      "exports": ["search_togepii", "new_blink", "iter_smoke"]
+      "exports": ["search_togepii", "new_blink", "iter_smoke", "find_seed"]
     }
   }
 }
