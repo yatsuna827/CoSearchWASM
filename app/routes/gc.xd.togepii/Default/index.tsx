@@ -109,7 +109,11 @@ export const PageDefault: React.FC = () => {
       </form>
 
       <div className="mt-6 border-t">こたいちからけんさく</div>
-      <button type="button" onClick={handleSearch}>
+      <button
+        type="button"
+        className="w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
+        onClick={handleSearch}
+      >
         けんさく
       </button>
       <>
