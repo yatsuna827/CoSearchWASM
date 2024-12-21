@@ -1,13 +1,16 @@
+///|
 pub(readonly) struct OutskirtStand {
   left : MainCounter
   right : MainCounter
   mut lazy_queue : Array[Int]
 }
 
+///|
 pub fn OutskirtStand::new() -> OutskirtStand {
   { left: MainCounter::new(), right: MainCounter::new(), lazy_queue: [] }
 }
 
+///|
 pub fn count_up(self : OutskirtStand, lcg : @lcg.Lcg32Ref) -> Unit {
   // 遅延発生するカウンタの処理
   for _ in self.lazy_queue.filter(fn(x) { x == 0 }) {
@@ -25,23 +28,28 @@ pub fn count_up(self : OutskirtStand, lcg : @lcg.Lcg32Ref) -> Unit {
   self.lazy_queue = self.lazy_queue.filter(fn(x) { x > 0 }).map(fn(x) { x - 1 })
 }
 
+///|
 pub fn to_string(self : OutskirtStand) -> String {
   "\{self.left.value}, \{self.right.value}"
 }
 
+///|
 struct MainCounter {
   mut value : Float
   mut next : SubCounter?
 }
 
+///|
 fn to_string(self : MainCounter) -> String {
   self.value.to_string()
 }
 
+///|
 fn MainCounter::new() -> MainCounter {
   { value: 0.9999999, next: None }
 }
 
+///|
 fn count_up(self : MainCounter, lcg : @lcg.Lcg32Ref) -> Bool {
   self.value = self.value + lcg.get_rand_f() * 0.01
   let carried = if self.value >= 1.0 {
@@ -60,11 +68,13 @@ fn count_up(self : MainCounter, lcg : @lcg.Lcg32Ref) -> Bool {
   carried
 }
 
+///|
 fn append(self : MainCounter, next : SubCounter) -> Unit {
   next.next = self.next
   self.next = Some(next)
 }
 
+///|
 fn remove_dead_nodes(self : MainCounter) -> Unit {
   self.next = loop self.next {
     Some(x) => if x.is_living() { break Some(x) } else { continue x.next }
@@ -72,6 +82,7 @@ fn remove_dead_nodes(self : MainCounter) -> Unit {
   }
 }
 
+///|
 struct SubCounter {
   mut value : Float
   mut next : SubCounter?
@@ -79,10 +90,12 @@ struct SubCounter {
   mut object_lifetime : Int
 }
 
+///|
 fn SubCounter::new(lcg : @lcg.Lcg32Ref) -> SubCounter {
   { value: lcg.get_rand_f(), next: None, lifetime: 50, object_lifetime: 0 }
 }
 
+///|
 fn count_up(self : SubCounter, lcg : @lcg.Lcg32Ref) -> Unit {
   if self.lifetime == 0 {
     lcg.advance()
@@ -103,15 +116,18 @@ fn count_up(self : SubCounter, lcg : @lcg.Lcg32Ref) -> Unit {
   }
 }
 
+///|
 fn append(self : SubCounter, next : SubCounter) -> Unit {
   next.next = self.next
   self.next = Some(next)
 }
 
+///|
 fn is_living(self : SubCounter) -> Bool {
   self.lifetime > 0 || self.object_lifetime > 0
 }
 
+///|
 fn remove_dead_nodes(self : SubCounter) -> Unit {
   self.next = loop self.next {
     Some(x) => if x.is_living() { break Some(x) } else { continue x.next }

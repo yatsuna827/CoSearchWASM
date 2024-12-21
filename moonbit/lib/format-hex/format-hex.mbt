@@ -1,3 +1,4 @@
+///|
 fn hex_digit(d : Int) -> Char {
   if d < 10 {
     Char::from_int('0'.to_int() + d)
@@ -6,6 +7,7 @@ fn hex_digit(d : Int) -> Char {
   }
 }
 
+///|
 pub fn to_hex(num : UInt) -> String {
   if num == 0 {
     return "0"

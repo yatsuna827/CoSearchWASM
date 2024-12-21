@@ -1,3 +1,4 @@
+///|
 pub(all) struct BlinkObject {
   cool_time : Int
   delay_at_maturity : Int
@@ -5,6 +6,7 @@ pub(all) struct BlinkObject {
   mut counter : Int
 }
 
+///|
 let thresh : Array[UInt] = [
   0x0001, 0x002C, 0x0056, 0x0080, 0x00A8, 0x00D0, 0x00F7, 0x011D, 0x0142, 0x0166,
   0x018A, 0x01AC, 0x01CE, 0x01EF, 0x020F, 0x022E, 0x024C, 0x0269, 0x0285, 0x02A1,
@@ -26,6 +28,7 @@ let thresh : Array[UInt] = [
   0x10000, 0x10000,
 ]
 
+///|
 pub fn BlinkObject::new(
   cool_time : Int,
   init_cnt~ : Int = 0,
@@ -34,6 +37,7 @@ pub fn BlinkObject::new(
   { cool_time, delay_at_maturity, remain_cool_time: 0, counter: init_cnt }
 }
 
+///|
 pub fn count_up(self : BlinkObject, lcg : @lcg.Lcg32Ref) -> Bool {
   self.remain_cool_time = self.remain_cool_time - 1
   if self.remain_cool_time >= 0 {
