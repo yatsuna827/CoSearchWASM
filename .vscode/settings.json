@@ -20,5 +20,8 @@
   },
   "files.associations": {
     "*.css": "tailwindcss"
+  },
+  "[moonbit]": {
+    "editor.defaultFormatter": "moonbit.moonbit-lang"
   }
 }
