@@ -10,6 +10,9 @@ fn cb_search_togepii(
 fn cb_iter_smoke(i : Int, seed : UInt) = "callback" "iter_smoke"
 
 ///|
+fn cb_find_seed(seed : UInt) = "callback" "find_seed"
+
+///|
 pub fn search_togepii(
   seed : UInt,
   target : UInt,
@@ -105,4 +108,18 @@ fn _iter_smoke(
       IterContinue
     }
   })
+}
+
+///|
+pub fn find_seed(
+  h : UInt,
+  a : UInt,
+  b : UInt,
+  c : UInt,
+  d : UInt,
+  s : UInt
+) -> Unit {
+  for seed in @finder.find_seed(h, a, b, c, d, s, offset=3) {
+    cb_find_seed(seed._)
+  }
 }

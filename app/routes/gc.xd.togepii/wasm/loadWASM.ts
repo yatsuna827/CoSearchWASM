@@ -1,4 +1,5 @@
 import type { LCG } from '@/domain/gc/lcg'
+import type { Attributes } from '@/domain/type'
 import wasm from '@/wasm/xd-togepii.wasm?url'
 
 type WasmExternRef = Branded<unknown, 'WASMExternRef'>
@@ -11,11 +12,7 @@ type SearchTogepiiCallbackFnArgs = [
   seed_smoke: number,
 ]
 type IterSmokeCallbackFnArgs = [i: number, seed: number]
-
-type CallbackObject = {
-  search_togepii: (...args: SearchTogepiiCallbackFnArgs) => void
-  iter_smoke: (...args: IterSmokeCallbackFnArgs) => void
-}
+type FindSeedCallbackFnArgs = Attributes
 
 type SearchTogepiiFn = (
   seed: number,
@@ -30,16 +27,19 @@ type SearchTogepiiFn = (
 ) => void
 type NewBlinkFn = (cooltime: number, delay?: number) => BlinkObject
 type IterSmokeFn = (seed: number, take: number) => void
+type FindSeedFn = (h: number, a: number, b: number, c: number, d: number, s: number) => void
 
 type ExportedFunctions = {
   search_togepii: SearchTogepiiFn
   new_blink: NewBlinkFn
   iter_smoke: IterSmokeFn
+  find_seed: FindSeedFn
 }
 
 type Callbacks = {
   search_togepii: (...args: SearchTogepiiCallbackFnArgs) => void
   iter_smoke: (...args: IterSmokeCallbackFnArgs) => void
+  find_seed: (...args: FindSeedCallbackFnArgs) => void
 }
 
 export type LoadWASMReturn = Promise<{
@@ -58,6 +58,7 @@ export type LoadWASMReturn = Promise<{
     },
   ) => [number, LCG, number, LCG][]
   iterSmoke: (seed: number, take: number) => { i: number; seed: LCG }[]
+  findSeed: (ivs: Attributes) => LCG[]
 }>
 export const loadWASM = async (): LoadWASMReturn => {
   const delegates: Callbacks = {
@@ -65,6 +66,9 @@ export const loadWASM = async (): LoadWASMReturn => {
       console.warn('コールバック関数が設定される前にWASM関数が呼び出されました')
     },
     iter_smoke: () => {
+      console.warn('コールバック関数が設定される前にWASM関数が呼び出されました')
+    },
+    find_seed: () => {
       console.warn('コールバック関数が設定される前にWASM関数が呼び出されました')
     },
   }
@@ -81,13 +85,16 @@ export const loadWASM = async (): LoadWASMReturn => {
       iter_smoke: (...args) => {
         delegates.iter_smoke(...args)
       },
-    } satisfies CallbackObject,
+      find_seed: (...args) => {
+        delegates.find_seed(...args)
+      },
+    } satisfies Callbacks,
   }
 
-  const { search_togepii, new_blink, iter_smoke } = await WebAssembly.instantiateStreaming(
-    fetch(wasm),
-    importObject,
-  ).then((_) => _.instance.exports as ExportedFunctions)
+  const { search_togepii, new_blink, iter_smoke, find_seed } =
+    await WebAssembly.instantiateStreaming(fetch(wasm), importObject).then(
+      (_) => _.instance.exports as ExportedFunctions,
+    )
 
   const searchTogepii = (
     seed: number,
@@ -132,5 +139,17 @@ export const loadWASM = async (): LoadWASMReturn => {
     return results
   }
 
-  return { searchTogepii, iterSmoke }
+  const findSeed = (ivs: Attributes) => {
+    const results: LCG[] = []
+
+    delegates.find_seed = (seed) => {
+      results.push((seed >>> 0) as LCG)
+    }
+
+    find_seed(...ivs)
+
+    return results
+  }
+
+  return { searchTogepii, iterSmoke, findSeed }
 }
