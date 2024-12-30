@@ -10,6 +10,9 @@ const Page: React.FC = () => {
           <h2 className="font-bold">ツール一覧</h2>
           <ul>
             <li>
+              <Link to="/gc/lcg">GC LCG 計算</Link>
+            </li>
+            <li>
               <Link to="/gc/xd/starter">XD ID調整</Link>
             </li>
             <li>
