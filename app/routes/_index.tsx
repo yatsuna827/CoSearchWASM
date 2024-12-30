@@ -1,4 +1,4 @@
-import { Link, type MetaFunction } from 'react-router'
+import { Link } from 'react-router'
 
 const Page: React.FC = () => {
   return (
@@ -11,6 +11,9 @@ const Page: React.FC = () => {
           <ul>
             <li>
               <Link to="/gc/lcg">GC LCG 計算</Link>
+            </li>
+            <li>
+              <Link to="/gc/lcg-list">GC LCG リスト</Link>
             </li>
             <li>
               <Link to="/gc/xd/starter">XD ID調整</Link>
