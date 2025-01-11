@@ -22,6 +22,9 @@ const Page: React.FC = () => {
               <Link to="/gc/xd/togepii">XD トゲピー</Link>
             </li>
             <li>
+              <Link to="/gc/xd/pokespot">XD ポケスポット</Link>
+            </li>
+            <li>
               <Link to="/dolphin">DolphinログViewer</Link>
             </li>
           </ul>
