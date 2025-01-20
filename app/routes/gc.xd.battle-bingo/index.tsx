@@ -8,6 +8,7 @@ import { getRand, next } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
 import { Ref } from '@/utilities/ref'
 import { type BingoPanel, data } from './bingo'
+import { simulate, solve, solveNaive } from './solver'
 
 export const meta: MetaFunction = () => {
   return [
@@ -42,6 +43,8 @@ const Page: React.FC = () => {
      p8,  p9, p10, p11,
     p12, p13, p14, p15,
   ] = bingoCard
+
+  const [result, setResult] = useState('')
 
   return (
     <>
@@ -103,6 +106,34 @@ const Page: React.FC = () => {
             </TableRow>
           </TableBody>
         </Table>
+
+        <div className="mt-4">
+          <button
+            type="button"
+            className="w-20 h-8 text-sm border font-semibold bg-white"
+            onClick={() => {
+              const patterns = solveNaive(bingoCard)
+              console.log(patterns.length)
+              if (patterns.length) {
+                for (let i = 0; i < patterns.length; i++) {
+                  const res = simulate(bingoCard, patterns[i])
+                  if (res) {
+                    console.log(res.pattern)
+                    setResult(res.history.join('\n'))
+                    return
+                  } else {
+                    setResult('無理')
+                  }
+                }
+              } else {
+                setResult('無理')
+              }
+            }}
+          >
+            SOLVE
+          </button>
+          <div className="mt-4 break-words whitespace-pre">{result}</div>
+        </div>
       </Container>
     </>
   )
