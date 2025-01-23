@@ -92,8 +92,8 @@ export const solveNaive = (sheet: BingoPanel[]) => {
           const panel = sheet[pos]
           if (panel.kind === 'bonus') {
             gotBonus += 1
-            if (panel.type === 'EP+1') totalEP += 1
-            if (panel.type === 'EP+2') totalEP += 2
+            if (panel.name === 'EP+1') totalEP += 1
+            if (panel.name === 'EP+2') totalEP += 2
           } else {
             if (['ヤドラン', 'ネンドール', 'チャーレム'].includes(panel.name) && !gotExeggutor) {
               failed = true
@@ -172,8 +172,8 @@ const toTimeline = (sheet: BingoPanel[], pattern: number[]): Timeline => {
   return Array.from({ length: 16 }, (_, i) => {
     const panel = sheet[pattern[i]]
     let epToGain = bingo[i]
-    if (panel.kind === 'bonus' && panel.type === 'EP+1') epToGain += 1
-    if (panel.kind === 'bonus' && panel.type === 'EP+2') epToGain += 2
+    if (panel.kind === 'bonus' && panel.name === 'EP+1') epToGain += 1
+    if (panel.kind === 'bonus' && panel.name === 'EP+2') epToGain += 2
 
     return { panel: sheet[pattern[i]], epToGain }
   })
@@ -261,7 +261,7 @@ export const simulate = (sheet: BingoPanel[], pattern: number[]) => {
 }
 
 const print = ({ panel, epToGain }: TurnEvent) => {
-  const event = panel.kind === 'bonus' ? panel.type : panel.name
+  const event = panel.kind === 'bonus' ? panel.name : panel.name
   return JSON.stringify({ event, epToGain })
 }
 
@@ -304,13 +304,13 @@ const makeAgent = (timeline: TurnEvent[]) => {
 
       if (ep.lunatone) {
         ep.lunatone--
-        console.log(panel.type, 'ルナトーンをエントリー', ep.lunatone)
+        console.log(panel.name, 'ルナトーンをエントリー', ep.lunatone)
       } else if (ep.houndoom) {
         ep.houndoom--
-        console.log(panel.type, 'ヘルガーをエントリー', ep.houndoom)
+        console.log(panel.name, 'ヘルガーをエントリー', ep.houndoom)
       } else if (ep.exeggutor) {
         ep.exeggutor--
-        console.log(panel.type, 'ナッシーをエントリー', ep.exeggutor)
+        console.log(panel.name, 'ナッシーをエントリー', ep.exeggutor)
       } else {
         return 'GAME_OVER'
       }
@@ -394,7 +394,7 @@ const makeAgent = (timeline: TurnEvent[]) => {
       return 'GAME_OVER'
     }
 
-    // history.push(`${panel.kind === 'bonus' ? panel.type : panel.name} --- left EP ${totalEP}`)
+    // history.push(`${panel.kind === 'bonus' ? panel.name : panel.name} --- left EP ${totalEP}`)
   }
 
   return {
