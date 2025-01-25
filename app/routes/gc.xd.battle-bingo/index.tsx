@@ -7,13 +7,20 @@ import { getRand, next } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
 import { Ref } from '@/utilities/ref'
 import { type BingoPanel, data } from './bingo'
-import { solve, solveNaive } from './solver'
+import { solve } from './solver'
 
 export const meta: MetaFunction = () => {
   return [
     { title: 'Pokemon XD BattleBingo' },
     { name: 'description', content: 'ポケモンXDのバトルDEビンゴ攻略ツールです' },
   ]
+}
+
+const pokeName = {
+  exeggutor: 'ナッシー',
+  houndoom: 'ヘルガー',
+  lunatone: 'ルナトーン',
+  anyone: '(誰でも)',
 }
 
 const Page: React.FC = () => {
@@ -35,7 +42,16 @@ const Page: React.FC = () => {
     return card
   }, [seed, openSheetCount])
 
-  const [result, setResult] = useState('')
+  const result = useMemo(() => {
+    const result = solve(bingoCard)
+    if (result.length === 0) return null
+    return result[0].strategy.map(
+      ({ panel, entry, epAllocation }) =>
+        `${panel.name} ${pokeName[entry]}をエントリー${
+          epAllocation ? ` EP配分: ${epAllocation.map((p) => pokeName[p]).join(',')}` : ''
+        }`,
+    )
+  }, [bingoCard])
 
   return (
     <>
@@ -69,25 +85,25 @@ const Page: React.FC = () => {
           </label>
         </div>
 
-        <div>
+        <div className="flex gap-12">
           <BingoSheetContainer>
             {bingoCard.map((p) => (
               <BingoSheetCell key={p.name} panel={p} />
             ))}
           </BingoSheetContainer>
-        </div>
 
-        <div className="mt-4">
-          <button
-            type="button"
-            className="w-20 h-8 text-sm border font-semibold bg-white"
-            onClick={() => {
-              // TODO: impl
-            }}
-          >
-            SOLVE
-          </button>
-          <div className="mt-4 break-words whitespace-pre">{result}</div>
+          <div>
+            {result ? (
+              <ul className="list-decimal">
+                {result.map((row, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                  <li key={i}>{row}</li>
+                ))}
+              </ul>
+            ) : (
+              'クリアできません'
+            )}
+          </div>
         </div>
       </Container>
     </>
