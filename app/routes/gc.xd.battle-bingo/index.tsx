@@ -56,7 +56,7 @@ const Page: React.FC = () => {
   return (
     <>
       <div className="sticky top-0 flex items-center justify-center px-4 h-14 border-b bg-white">
-        <h1 className="text-lg font-semibold">Pokemon GC LCG</h1>
+        <h1 className="text-lg font-semibold">バトル DE ビンゴ</h1>
       </div>
 
       <Container>
