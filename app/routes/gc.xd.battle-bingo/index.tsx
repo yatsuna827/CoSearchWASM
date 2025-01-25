@@ -7,7 +7,7 @@ import { getRand, next } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
 import { Ref } from '@/utilities/ref'
 import { type BingoPanel, data } from './bingo'
-import { simulate, solve, solveNaive } from './solver'
+import { solve, solveNaive } from './solver'
 
 export const meta: MetaFunction = () => {
   return [

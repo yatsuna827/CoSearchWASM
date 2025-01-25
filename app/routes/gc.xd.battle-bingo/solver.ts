@@ -1,4 +1,4 @@
-import type { BingoPanel } from './bingo'
+import type { BingoPanel, PokemonPanel } from './bingo'
 
 const GRID_SIZE = 4
 
@@ -134,34 +134,6 @@ export const solveNaive = (sheet: BingoPanel[]) => {
   return patterns
 }
 
-export const solve = (sheet: BingoPanel[]) => {
-  for (let x = 0; x < 4; x++) {
-    for (let y = 0; y < 4; y++) {
-      const res = findHamiltonianPaths([x, y])
-      for (const pattern of res) {
-        const timeline = toTimeline(sheet, pattern)
-
-        const agent = makeAgent(timeline)
-
-        let failed = false
-        for (let i = 0; i < 16; i++) {
-          const result = agent.onEntry(timeline[i])
-          if (result === 'GAME_OVER') {
-            failed = true
-            break
-          }
-        }
-
-        if (!failed) {
-          return { pattern, history: agent.getHistory() }
-        }
-      }
-    }
-  }
-
-  return null
-}
-
 type Timeline = TurnEvent[]
 type TurnEvent = {
   panel: BingoPanel
@@ -178,15 +150,37 @@ const toTimeline = (sheet: BingoPanel[], pattern: number[]): Timeline => {
     return { panel: sheet[pattern[i]], epToGain }
   })
 }
-const pokeName = {
-  exeggutor: 'ナッシー',
-  houndoom: 'ヘルガー',
-  lunatone: 'ルナトーン',
-} as const
-export const simulate = (sheet: BingoPanel[], pattern: number[]) => {
+
+export const solve = (sheet: BingoPanel[], pattern: number[]) => {
   const timeline = toTimeline(sheet, pattern)
 
+  {
+    const [replay, gameover] = play(timeline, false)
+    if (gameover) {
+      console.log('ゲームオーバー', gameover.reason)
+    } else {
+      return { pattern, history: replay }
+    }
+  }
+
+  {
+    const [replay, gameover] = play(timeline, true)
+    if (gameover) {
+      console.log('ゲームオーバー', gameover.reason)
+    } else {
+      return { pattern, history: replay }
+    }
+  }
+
+  return null
+}
+
+type Replay = [TurnEvent, Entry, State][]
+const play = (timeline: Timeline, useHoundoomForSlowking: boolean): Result<Replay, GameOver> => {
   const agent = makeGeniousAgent()
+
+  const history: [TurnEvent, Entry, State][] = []
+
   let state: State = {
     houndoom: 2,
     exeggutor: null,
@@ -194,212 +188,29 @@ export const simulate = (sheet: BingoPanel[], pattern: number[]) => {
     extraEP: 0,
     gotBonuses: 0,
   }
-
-  let failed = false
   for (const ev of timeline) {
-    console.log(print(ev))
-    const [entry, err] = agent.onEntry(state, ev, true)
-    if (err) {
-      failed = true
-      console.log('ゲームオーバー', err.reason)
-      break
+    const [entry, error] = agent.onEntry(state, ev, useHoundoomForSlowking)
+    if (error) {
+      return err(error)
     }
 
-    console.log(`${pokeName[entry.pokemon]}をエントリー`, entry.useExtraEP ? '(遡及)' : '')
-
-    const [next, err2] = agent.nextState(state, ev, entry)
-    if (err2) {
-      failed = true
-      console.log('ゲームオーバー', err2.reason)
-      break
+    const [next, error2] = agent.nextState(state, ev, entry)
+    if (error2) {
+      return err(error2)
     }
+
+    history.push([ev, entry, state] as const)
+
     state = next
   }
 
-  if (!failed) {
-    return { pattern, history: [] }
-  }
-
-  console.log()
-  console.log('ヤドキングにヘルガーを当てて再試行…')
-  console.log()
-
-  state = {
-    houndoom: 2,
-    exeggutor: null,
-    lunatone: null,
-    extraEP: 0,
-    gotBonuses: 0,
-  }
-
-  failed = false
-  for (const ev of timeline) {
-    console.log(print(ev))
-    const [entry, err] = agent.onEntry(state, ev, false)
-    if (err) {
-      failed = true
-      console.log('ゲームオーバー', err.reason)
-      break
-    }
-
-    console.log(`${pokeName[entry.pokemon]}をエントリー`, entry.useExtraEP ? '(遡及)' : '')
-
-    const [next, err2] = agent.nextState(state, ev, entry)
-    if (err2) {
-      failed = true
-      console.log('ゲームオーバー', err2.reason)
-      break
-    }
-    state = next
-  }
-
-  if (!failed) {
-    return { pattern, history: [] }
-  }
-
-  return null
+  return ok(history)
 }
 
-const print = ({ panel, epToGain }: TurnEvent) => {
-  const event = panel.kind === 'bonus' ? panel.name : panel.name
-  return JSON.stringify({ event, epToGain })
-}
-
-const makeAgent = (timeline: TurnEvent[]) => {
-  const ep = {
-    houndoom: 2,
-    exeggutor: null as number | null,
-    lunatone: null as number | null,
-  }
-
-  let leftHoundoomTarget = 6
-  let leftExeggutorTarget = 3
-  let gotBonuses = 0
-  const history: string[] = []
-
-  const onGetEP = (bonus: number) => {
-    let exeggutor = 0
-    while (
-      exeggutor < bonus &&
-      ep.exeggutor &&
-      (!leftHoundoomTarget ||
-        (ep.houndoom > 0 && ep.exeggutor < leftExeggutorTarget && ep.exeggutor < 1))
-    ) {
-      exeggutor++
-    }
-    if (exeggutor && ep.exeggutor) {
-      console.log(`ナッシーにEP+${exeggutor}`, ep.exeggutor)
-      ep.exeggutor += exeggutor
-      bonus -= exeggutor
-    }
-
-    if (bonus) {
-      ep.houndoom += bonus
-      console.log(`ヘルガーにEP+${bonus}`, ep.houndoom)
-    }
-  }
-  const onEntry = ({ panel, epToGain }: TurnEvent) => {
-    if (panel.kind === 'bonus') {
-      gotBonuses++
-
-      if (ep.lunatone) {
-        ep.lunatone--
-        console.log(panel.name, 'ルナトーンをエントリー', ep.lunatone)
-      } else if (ep.houndoom) {
-        ep.houndoom--
-        console.log(panel.name, 'ヘルガーをエントリー', ep.houndoom)
-      } else if (ep.exeggutor) {
-        ep.exeggutor--
-        console.log(panel.name, 'ナッシーをエントリー', ep.exeggutor)
-      } else {
-        return 'GAME_OVER'
-      }
-    } else {
-      switch (panel.name) {
-        case 'ナッシー': {
-          if (ep.lunatone) {
-            ep.lunatone--
-            console.log(panel.name, 'ルナトーンをエントリー', ep.lunatone)
-          } else if (ep.houndoom) {
-            ep.houndoom--
-            console.log(panel.name, 'ヘルガーをエントリー', ep.houndoom)
-          } else return 'GAME_OVER'
-
-          ep.exeggutor = 2
-
-          gotBonuses++
-
-          break
-        }
-        case 'ルナトーン': {
-          if (ep.houndoom) {
-            ep.houndoom--
-            console.log(panel.name, 'ヘルガーをエントリー', ep.houndoom)
-          } else if (ep.exeggutor) {
-            ep.exeggutor--
-            console.log(panel.name, 'ナッシーをエントリー', ep.exeggutor)
-          }
-
-          ep.lunatone = 2
-
-          break
-        }
-
-        case 'ヤドラン':
-        case 'ネンドール':
-        case 'チャーレム': {
-          if (!ep.exeggutor) {
-            console.log(`${panel.name}が倒せない…`)
-            return 'GAME_OVER'
-          }
-
-          console.log(panel.name, 'ナッシーをエントリー', ep.exeggutor)
-          ep.exeggutor--
-          leftExeggutorTarget--
-
-          break
-        }
-
-        default: {
-          leftHoundoomTarget--
-          if (ep.exeggutor && panel.name === 'ヤドキング') {
-            ep.exeggutor--
-            console.log(panel.name, 'ナッシーをエントリー', ep.exeggutor)
-          } else if (ep.houndoom) {
-            ep.houndoom--
-            console.log(panel.name, 'ヘルガーをエントリー', ep.houndoom)
-          } else {
-            console.log(`${panel.name}が倒せない…`, ep)
-            return 'GAME_OVER'
-          }
-
-          break
-        }
-      }
-    }
-
-    if (ep.lunatone == null && gotBonuses > 2) {
-      console.log('ルナトーンが余る', ep)
-      return 'GAME_OVER'
-    }
-
-    if (epToGain > 0) {
-      console.log(`${epToGain}EP入手`)
-      onGetEP(epToGain)
-    }
-
-    const totalEP = ep.houndoom + (ep.exeggutor ?? 0) + (ep.lunatone ?? 0)
-    if (totalEP === 0) {
-      console.log('EPが尽きた…', ep)
-      return 'GAME_OVER'
-    }
-
-    // history.push(`${panel.kind === 'bonus' ? panel.name : panel.name} --- left EP ${totalEP}`)
-  }
-
-  return {
-    onEntry,
-    getHistory: () => history,
+export const replay = (replay: Replay) => {
+  for (const [i, [event, entry, state]] of replay.entries()) {
+    console.log(i, event.panel.name, entry.pokemon, entry.useExtraEP ? '(遡及)' : '')
+    console.log(JSON.stringify(state))
   }
 }
 
@@ -423,140 +234,146 @@ type State = {
   gotBonuses: number
 }
 const makeGeniousAgent = () => {
-  const onEntry = (
+  const onBonusPanel = (state: State): Result<Entry, GameOver> => {
+    if (state.lunatone) {
+      return ok({ pokemon: 'lunatone' })
+    }
+    if (state.houndoom) {
+      return ok({ pokemon: 'houndoom' })
+    }
+    if (state.exeggutor) {
+      return ok({ pokemon: 'exeggutor' })
+    }
+    if (state.extraEP > 0) {
+      return ok({ pokemon: 'houndoom', useExtraEP: true })
+    }
+
+    return err({ reason: 'おかしいなあ…？' })
+  }
+  const onPokemonPanel = (
     state: State,
-    { panel }: TurnEvent,
-    yadoking_vs_exeggutor: boolean,
+    panel: PokemonPanel,
+    useHoundoomForSlowking: boolean,
   ): Result<Entry, GameOver> => {
-    switch (panel.kind) {
-      case 'bonus': {
-        if (state.lunatone) {
-          return ok({ pokemon: 'lunatone' })
-        }
-        if (state.houndoom) {
-          return ok({ pokemon: 'houndoom' })
-        }
-        if (state.exeggutor) {
-          return ok({ pokemon: 'exeggutor' })
-        }
-        if (state.extraEP > 0) {
-          return ok({ pokemon: 'houndoom', useExtraEP: true })
+    switch (panel.name) {
+      case 'ナッシー':
+        return onExeggutor(state)
+      case 'ルナトーン':
+        return onLunatone(state)
+
+      case 'ヤドラン':
+      case 'ネンドール':
+      case 'チャーレム': {
+        if (state.exeggutor == null || (state.exeggutor === 0 && state.extraEP === 0)) {
+          return err({ reason: `${panel.name}が倒せない` })
         }
 
-        break
+        return ok({ pokemon: 'exeggutor', useExtraEP: state.exeggutor === 0 })
       }
-      case 'pokemon': {
-        switch (panel.name) {
-          case 'ナッシー': {
-            if (state.lunatone) {
-              return ok({ pokemon: 'lunatone' })
-            }
-            if (state.houndoom) {
-              return ok({ pokemon: 'houndoom' })
-            }
-            if (state.extraEP > 0) {
-              return ok({ pokemon: 'houndoom', useExtraEP: true })
-            }
-            break
-          }
-          case 'ルナトーン': {
-            if (state.houndoom) {
-              return ok({ pokemon: 'houndoom' })
-            }
-            if (state.exeggutor) {
-              return ok({ pokemon: 'exeggutor' })
-            }
-            if (state.extraEP > 0) {
-              return ok({ pokemon: 'houndoom', useExtraEP: true })
-            }
 
-            break
-          }
-
-          case 'ヤドラン':
-          case 'ネンドール':
-          case 'チャーレム': {
-            if (state.exeggutor == null || (state.exeggutor === 0 && state.extraEP === 0)) {
-              return err({ reason: `${panel.name}が倒せない` })
-            }
-
+      default: {
+        if (!useHoundoomForSlowking && panel.name === 'ヤドキング') {
+          if (state.exeggutor != null && (state.exeggutor > 0 || state.extraEP > 0)) {
             return ok({ pokemon: 'exeggutor', useExtraEP: state.exeggutor === 0 })
           }
-
-          default: {
-            if (
-              yadoking_vs_exeggutor &&
-              panel.name === 'ヤドキング' &&
-              state.exeggutor != null &&
-              (state.exeggutor > 0 || state.extraEP > 0)
-            ) {
-              return ok({ pokemon: 'exeggutor', useExtraEP: state.exeggutor === 0 })
-            }
-
-            if (state.houndoom > 0 || state.extraEP > 0) {
-              return ok({ pokemon: 'houndoom', useExtraEP: state.houndoom === 0 })
-            }
-
-            return err({ reason: `${panel.name}が倒せない` })
-          }
         }
+
+        if (state.houndoom > 0 || state.extraEP > 0) {
+          return ok({ pokemon: 'houndoom', useExtraEP: state.houndoom === 0 })
+        }
+
+        return err({ reason: `${panel.name}が倒せない` })
       }
+    }
+  }
+  const onExeggutor = (state: State): Result<Entry, GameOver> => {
+    if (state.lunatone) {
+      return ok({ pokemon: 'lunatone' })
+    }
+    if (state.houndoom) {
+      return ok({ pokemon: 'houndoom' })
+    }
+    if (state.extraEP > 0) {
+      return ok({ pokemon: 'houndoom', useExtraEP: true })
+    }
+
+    return err({ reason: 'おかしいなあ…？' })
+  }
+  const onLunatone = (state: State): Result<Entry, GameOver> => {
+    if (state.houndoom) {
+      return ok({ pokemon: 'houndoom' })
+    }
+    if (state.exeggutor) {
+      return ok({ pokemon: 'exeggutor' })
+    }
+    if (state.extraEP > 0) {
+      return ok({ pokemon: 'houndoom', useExtraEP: true })
     }
 
     return err({ reason: 'おかしいなあ…？' })
   }
 
-  const nextState = (
-    current: State,
-    { panel, epToGain }: TurnEvent,
-    entry: Entry,
-  ): Result<State, GameOver> => {
-    const next = { ...current }
-
-    // ルナトーンの役割対象のカウント
-    if (panel.kind === 'bonus' || panel.name === 'ナッシー') {
-      next.gotBonuses++
-    }
-
-    // 捕獲したポケモンのセット
-    if (panel.kind === 'pokemon' && panel.name === 'ナッシー') {
-      next.exeggutor = 2
-    }
-    if (panel.kind === 'pokemon' && panel.name === 'ルナトーン') {
-      next.lunatone = 2
-    }
-
-    // エントリーしたポケモンのEPを消費
-    if (entry.useExtraEP) {
-      next.extraEP--
-    } else {
-      next[entry.pokemon]--
-    }
-
-    // 獲得したEPの割り振り
-    if (epToGain > 0) {
-      if (next.exeggutor != null) {
-        next.extraEP += epToGain
-      } else {
-        next.houndoom += epToGain
-      }
-    }
-
-    // ゲームオーバー判定
-    if (next.lunatone == null && next.gotBonuses > 2) {
-      return err({ reason: 'ルナトーンが余る' })
-    }
-
-    const totalEP = next.houndoom + (next.exeggutor ?? 0) + (next.lunatone ?? 0) + next.extraEP
-    if (totalEP === 0) {
-      return err({ reason: 'EPが尽きた' })
-    }
-
-    return ok(next)
-  }
-
   return {
-    onEntry,
-    nextState,
+    onEntry(
+      state: State,
+      { panel }: TurnEvent,
+      useHoundoomForSlowking = false,
+    ): Result<Entry, GameOver> {
+      switch (panel.kind) {
+        case 'bonus':
+          return onBonusPanel(state)
+        case 'pokemon': {
+          return onPokemonPanel(state, panel, useHoundoomForSlowking)
+        }
+      }
+    },
+    nextState(
+      current: State,
+      { panel, epToGain }: TurnEvent,
+      entry: Entry,
+    ): Result<State, GameOver> {
+      const next = { ...current }
+
+      // ルナトーンの役割対象のカウント
+      if (panel.kind === 'bonus' || panel.name === 'ナッシー') {
+        next.gotBonuses++
+      }
+
+      // 捕獲したポケモンのセット
+      if (panel.kind === 'pokemon' && panel.name === 'ナッシー') {
+        next.exeggutor = 2
+      }
+      if (panel.kind === 'pokemon' && panel.name === 'ルナトーン') {
+        next.lunatone = 2
+      }
+
+      // エントリーしたポケモンのEPを消費
+      if (entry.useExtraEP) {
+        next.extraEP--
+      } else {
+        next[entry.pokemon]--
+      }
+
+      // 獲得したEPの割り振り
+      if (epToGain > 0) {
+        if (next.exeggutor != null) {
+          next.extraEP += epToGain
+        } else {
+          next.houndoom += epToGain
+        }
+      }
+
+      // ゲームオーバー判定
+      if (next.lunatone == null && next.gotBonuses > 2) {
+        return err({ reason: 'ルナトーンが余る' })
+      }
+
+      const totalEP = next.houndoom + (next.exeggutor ?? 0) + (next.lunatone ?? 0) + next.extraEP
+      if (totalEP === 0) {
+        return err({ reason: 'EPが尽きた' })
+      }
+
+      return ok(next)
+    },
   }
 }
