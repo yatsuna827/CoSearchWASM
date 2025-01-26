@@ -3,9 +3,11 @@ import type { MetaFunction } from 'react-router'
 
 import { cn } from '@/cn'
 import { Container } from '@/components/Container'
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/Table'
 import { getRand, next } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
 import { Ref } from '@/utilities/ref'
+import { Masterball } from './ball'
 import { type BingoPanel, data } from './bingo'
 import { solve } from './solver'
 
@@ -45,63 +47,93 @@ const Page: React.FC = () => {
   const result = useMemo(() => {
     const result = solve(bingoCard)
     if (result.length === 0) return null
-    return result[0].strategy.map(
-      ({ panel, entry, epAllocation }) =>
-        `${panel.name} ${pokeName[entry]}をエントリー${
-          epAllocation ? ` EP配分: ${epAllocation.map((p) => pokeName[p]).join(',')}` : ''
-        }`,
-    )
+
+    return result[0].strategy
   }, [bingoCard])
+  const order = useMemo(() => {
+    if (!result) return null
+
+    const inv = new Array<number>(result.length)
+    for (const [i, { pos }] of result.entries()) {
+      inv[pos] = i + 1
+    }
+
+    return inv
+  }, [result])
 
   return (
     <>
-      <div className="sticky top-0 flex items-center justify-center px-4 h-14 border-b bg-white">
+      <div className="sticky top-0 flex items-center justify-center px-4 h-14 border-b bg-white z-50">
         <h1 className="text-lg font-semibold">バトル DE ビンゴ</h1>
       </div>
 
       <Container>
-        <div className="mb-4">
-          <label>
-            <span className="block text-sm text-[#333]/80 mb-1 select-none">受付時のseed</span>
-            <input className="px-2" placeholder="1234ABCD" {...controller} />
-          </label>
-        </div>
-
-        <div className="mb-4">
-          <label>
-            <span className="block text-sm text-[#333]/80 mb-1 select-none">
-              シートを開いた回数
-            </span>
-            <input
-              className="px-2"
-              type="number"
-              min={1}
-              value={openSheetCount}
-              onChange={(e) => {
-                const v = Number.parseInt(e.target.value)
-                setOpenSheetCount(Number.isInteger(v) && v >= 1 ? v : 1)
-              }}
-            />
-          </label>
-        </div>
-
-        <div className="flex gap-12">
-          <BingoSheetContainer>
-            {bingoCard.map((p) => (
-              <BingoSheetCell key={p.name} panel={p} />
-            ))}
-          </BingoSheetContainer>
-
+        <div className="flex gap-4 divide-x-2">
           <div>
+            <h2 className="text-lg font-semibold mb-4">ビンゴカード</h2>
+
+            <div className="mb-4">
+              <label>
+                <span className="block text-sm text-[#333]/80 mb-1 select-none">受付時のseed</span>
+                <input className="px-2" placeholder="1234ABCD" {...controller} />
+              </label>
+            </div>
+
+            <div className="mb-4">
+              <label>
+                <span className="block text-sm text-[#333]/80 mb-1 select-none">
+                  シートを開いた回数
+                </span>
+                <input
+                  className="px-2"
+                  type="number"
+                  min={1}
+                  value={openSheetCount}
+                  onChange={(e) => {
+                    const v = Number.parseInt(e.target.value)
+                    setOpenSheetCount(Number.isInteger(v) && v >= 1 ? v : 1)
+                  }}
+                />
+              </label>
+            </div>
+
+            <BingoSheetContainer>
+              {bingoCard.map((p, i) => (
+                <BingoSheetCell key={p.name} panel={p} pos={order?.[i]} />
+              ))}
+            </BingoSheetContainer>
+          </div>
+
+          <div className="pl-4">
+            <h2 className="text-lg font-semibold mb-2">クリアルート探索</h2>
             {result ? (
-              <ul className="list-decimal">
-                {result.map((row, i) => (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                  <li key={i}>{row}</li>
-                ))}
-              </ul>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead />
+                    <TableHead>Panel</TableHead>
+                    <TableHead>Entry</TableHead>
+                    <TableHead>EP</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {result.map((row, i) => (
+                    <TableRow key={row.pos}>
+                      <TableHead>{i + 1}.</TableHead>
+                      <TableHead>
+                        <div className="flex justify-start items-center gap-2">
+                          {row.panel.name}
+                          {['ナッシー', 'ルナトーン'].includes(row.panel.name) && <Masterball />}
+                        </div>
+                      </TableHead>
+                      <TableHead>{pokeName[row.entry]}</TableHead>
+                      <TableHead>{row.epAllocation?.map((_) => pokeName[_]).join(',')}</TableHead>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             ) : (
-              'クリアできません'
+              '安定するルートが見つかりませんでした'
             )}
           </div>
         </div>
@@ -123,22 +155,27 @@ const bonusName = {
   'EP+2': 'EP+2',
   マスターボール: 'マスボ',
 } as const
-const BingoSheetCell: React.FC<{ panel: BingoPanel }> = ({ panel }) => {
+const BingoSheetCell: React.FC<{ panel: BingoPanel; pos: number | undefined }> = ({
+  panel,
+  pos,
+}) => {
   const [state, setState] = useState(false)
   return (
     <div
       className={cn(
         'border-4 rounded-md',
         'size-full',
-        'grid justify-center items-start',
+        'flex flex-col justify-center items-center',
         'select-none',
         'cursor-pointer',
-        panel.kind === 'bonus' && 'font-bold',
         state && 'bg-gray-300 text-gray-400',
       )}
       onClick={() => setState((v) => !v)}
     >
-      {panel.kind === 'bonus' ? bonusName[panel.name] : panel.name}
+      <div className={cn(panel.kind === 'bonus' && 'font-bold')}>
+        {panel.kind === 'bonus' ? bonusName[panel.name] : panel.name}
+      </div>
+      <div className="flex-1">{pos}</div>
     </div>
   )
 }
