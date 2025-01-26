@@ -1,16 +1,15 @@
-import type { BingoPanel } from '../../bingo'
-import { GRID_SIZE, type PartyPokemon, type Strategy } from '../define'
+import type { PartyPokemon, Strategy } from '../define'
 import type { GameOver } from './define'
 import { type Entry, onEntry } from './entry'
 import { type Result, err, ok } from './result'
 import { getNextState, newState } from './state'
-import { type Timeline, type TurnEvent, toTimeline } from './timeline'
+import type { Timeline, TurnEvent } from './timeline'
 
 export const search = (
   timeline: Timeline,
   useHoundoomForSlowking: boolean,
 ): Result<Omit<Strategy, 'pos'>[], GameOver> => {
-  const history: [TurnEvent, Entry, gotEPs: number][] = []
+  const history: [TurnEvent, Entry, gotHoundoomEPs: number, gotExtraEPs: number][] = []
 
   let state = newState()
   for (const ev of timeline) {
@@ -24,9 +23,14 @@ export const search = (
       return err(error2)
     }
 
-    const [next, gotEPs] = pair
+    const [next, getEPCommands] = pair
 
-    history.push([ev, entry, gotEPs] as const)
+    history.push([
+      ev,
+      entry,
+      getEPCommands.filter((c) => c.for === 'houndoom').reduce((p, c) => p + c.value, 0),
+      getEPCommands.filter((c) => c.for === 'extraEP').reduce((p, c) => p + c.value, 0),
+    ] as const)
 
     state = next
   }
@@ -39,13 +43,18 @@ export const search = (
     .map(({ pokemon }) => pokemon)
 
   const result: Omit<Strategy, 'pos'>[] = []
-  for (const [i, [event, entry, gotEPs]] of history.entries()) {
+  for (const [i, [event, entry, gotHoundoomEPs, gotExtraEPs]] of history.entries()) {
     const epAllocation: (PartyPokemon | 'anyone')[] = []
     // 16手目はアガリなのでEP配分は無い
-    if (gotEPs > 0 && i !== 15) {
-      for (let i = 0; i < gotEPs; i++) {
-        const p = exEPQueue.shift()
-        epAllocation.push(p ?? 'anyone')
+    if (i !== 15) {
+      if (gotHoundoomEPs > 0) {
+        epAllocation.push(...Array<'houndoom'>(gotHoundoomEPs).fill('houndoom'))
+      }
+      if (gotExtraEPs > 0) {
+        for (let i = 0; i < gotExtraEPs; i++) {
+          const p = exEPQueue.shift()
+          epAllocation.push(p ?? 'anyone')
+        }
       }
     }
 

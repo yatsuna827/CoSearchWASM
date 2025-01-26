@@ -23,13 +23,12 @@ export const getNextState = (
   state: State,
   event: TurnEvent,
   entry: Entry,
-): Result<[State, gotEPs: number], GameOver> => {
+): Result<[State, GetEPCommand[]], GameOver> => {
   const commands = getCommands(event, entry, state.exeggutor != null)
-  const gotEPs = commands
-    .filter((c): c is GetEPCommand => c.kind === 'get-ep')
-    .reduce((p, c) => p + c.value, 0)
   const [next, error] = applyCommand(state, commands)
-  return error ? err(error) : ok([next, gotEPs])
+
+  const getEPCommands = commands.filter((c): c is GetEPCommand => c.kind === 'get-ep')
+  return error ? err(error) : ok([next, getEPCommands])
 }
 
 type Command = CatchCommand | DecrementEPCommand | GetEPCommand | IncrementLunatoneTargetCommand
