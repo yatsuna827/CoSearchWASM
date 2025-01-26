@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { MetaFunction } from 'react-router'
 
 import { cn } from '@/cn'
@@ -61,6 +61,8 @@ const Page: React.FC = () => {
     return inv
   }, [result])
 
+  const [selectedPanels, setSelectedPanels] = useState(new Set<number>())
+
   return (
     <>
       <div className="sticky top-0 flex items-center justify-center px-4 h-14 border-b bg-white z-50">
@@ -99,9 +101,35 @@ const Page: React.FC = () => {
 
             <BingoSheetContainer>
               {bingoCard.map((p, i) => (
-                <BingoSheetCell key={p.name} panel={p} pos={order?.[i]} />
+                <BingoSheetCell
+                  key={p.name}
+                  panel={p}
+                  pos={order?.[i]}
+                  selected={selectedPanels.has(i)}
+                  onClick={() => {
+                    setSelectedPanels((prev) => {
+                      const next = new Set(prev)
+                      if (next.has(i)) {
+                        next.delete(i)
+                      } else {
+                        next.add(i)
+                      }
+                      return next
+                    })
+                  }}
+                />
               ))}
             </BingoSheetContainer>
+
+            <div className="mt-4">
+              <button
+                type="button"
+                className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+                onClick={() => setSelectedPanels(new Set())}
+              >
+                選択をリセット
+              </button>
+            </div>
           </div>
 
           <div className="pl-4">
@@ -118,7 +146,10 @@ const Page: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                   {result.map((row, i) => (
-                    <TableRow key={row.pos}>
+                    <TableRow
+                      key={row.pos}
+                      className={cn(selectedPanels.has(row.pos) && 'bg-gray-300 text-gray-400')}
+                    >
                       <TableHead>{i + 1}.</TableHead>
                       <TableHead>
                         <div className="flex justify-start items-center gap-2">
@@ -155,11 +186,14 @@ const bonusName = {
   'EP+2': 'EP+2',
   マスターボール: 'マスボ',
 } as const
-const BingoSheetCell: React.FC<{ panel: BingoPanel; pos: number | undefined }> = ({
-  panel,
-  pos,
-}) => {
-  const [state, setState] = useState(false)
+
+type BingoSheetCellProps = {
+  panel: BingoPanel
+  pos: number | undefined
+  selected: boolean
+  onClick: () => void
+}
+const BingoSheetCell: React.FC<BingoSheetCellProps> = ({ panel, pos, selected, onClick }) => {
   return (
     <div
       className={cn(
@@ -168,9 +202,9 @@ const BingoSheetCell: React.FC<{ panel: BingoPanel; pos: number | undefined }> =
         'flex flex-col justify-center items-center',
         'select-none',
         'cursor-pointer',
-        state && 'bg-gray-300 text-gray-400',
+        selected && 'bg-gray-300 text-gray-400',
       )}
-      onClick={() => setState((v) => !v)}
+      onClick={onClick}
     >
       <div className={cn(panel.kind === 'bonus' && 'font-bold')}>
         {panel.kind === 'bonus' ? bonusName[panel.name] : panel.name}
