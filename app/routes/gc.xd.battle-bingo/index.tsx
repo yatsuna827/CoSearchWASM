@@ -7,6 +7,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components
 import { getRand, next } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
 import { Ref } from '@/utilities/ref'
+import { Masterball } from './ball'
 import { type BingoPanel, data } from './bingo'
 import { solve } from './solver'
 
@@ -119,7 +120,12 @@ const Page: React.FC = () => {
                   {result.map((row, i) => (
                     <TableRow key={row.pos}>
                       <TableHead>{i + 1}.</TableHead>
-                      <TableHead>{row.panel.name}</TableHead>
+                      <TableHead>
+                        <div className="flex justify-start items-center gap-2">
+                          {row.panel.name}
+                          {['ナッシー', 'ルナトーン'].includes(row.panel.name) && <Masterball />}
+                        </div>
+                      </TableHead>
                       <TableHead>{pokeName[row.entry]}</TableHead>
                       <TableHead>{row.epAllocation?.map((_) => pokeName[_]).join(',')}</TableHead>
                     </TableRow>
