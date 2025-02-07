@@ -38,7 +38,7 @@ pub fn BlinkObject::new(
 }
 
 ///|
-pub fn count_up(self : BlinkObject, lcg : @lcg.Lcg32Ref) -> Bool {
+pub fn BlinkObject::count_up(self : BlinkObject, lcg : @lcg.Lcg32Ref) -> Bool {
   self.remain_cool_time = self.remain_cool_time - 1
   if self.remain_cool_time >= 0 {
     return false

@@ -14,12 +14,12 @@ const REV_MUL_CONST : UInt = 0xB9B33155
 const REV_ADD_CONST : UInt = 0xA170F641
 
 ///|
-pub fn next(self : Lcg32) -> Lcg32 {
+pub fn Lcg32::next(self : Lcg32) -> Lcg32 {
   self._ * MUL_CONST + ADD_CONST
 }
 
 ///|
-pub fn prev(self : Lcg32) -> Lcg32 {
+pub fn Lcg32::prev(self : Lcg32) -> Lcg32 {
   self._ * REV_MUL_CONST + REV_ADD_CONST
 }
 
@@ -57,7 +57,7 @@ fn setup() -> Booster {
 }
 
 ///|
-pub fn jump(self : Lcg32, n : UInt) -> Lcg32 {
+pub fn Lcg32::jump(self : Lcg32, n : UInt) -> Lcg32 {
   let mut seed = self._
   let { a_t, b_t, .. } = cache.val.or_else(setup)
   let mut i = 0
@@ -73,7 +73,7 @@ pub fn jump(self : Lcg32, n : UInt) -> Lcg32 {
 }
 
 ///|
-pub fn jump_back(self : Lcg32, n : UInt) -> Lcg32 {
+pub fn Lcg32::jump_back(self : Lcg32, n : UInt) -> Lcg32 {
   let mut seed = self._
   let { ar_t, br_t, .. } = cache.val.or_else(setup)
   let mut i = 0
@@ -89,7 +89,7 @@ pub fn jump_back(self : Lcg32, n : UInt) -> Lcg32 {
 }
 
 ///|
-pub fn to_string(self : Lcg32) -> String {
+pub fn Lcg32::to_string(self : Lcg32) -> String {
   @fmt.to_hex(self._).pad_start(8, '0')
 }
 
@@ -134,7 +134,7 @@ fn get_index_from_base(seed : UInt, from : UInt) -> UInt {
 }
 
 ///|
-pub fn get_index(self : Lcg32, from~ : UInt = 0) -> UInt {
+pub fn Lcg32::get_index(self : Lcg32, from~ : UInt = 0) -> UInt {
   if from == 0 {
     get_index_from_zero(self._)
   } else {
