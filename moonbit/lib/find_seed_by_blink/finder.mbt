@@ -13,24 +13,19 @@ pub fn find(
     @blink.BlinkObject::new(cool_time, init_cnt=1),
     s,
   )
-  let arr = input_blank.map(fn(_) { iter.next().2 })
+  let arr = input_blank.map(fn(_) { iter.next().1 })
   let q = Queue::new(arr)
-  while iter.cur.0.get_index() < min {
-    let (_, _, b) = iter.next()
+  while iter.cur.0.get_index(from=current._) < min {
+    let (_, b) = iter.next()
     q.push(b)
   }
   let result : Array[@lcg.Lcg32] = Array::new()
-  let mut f = min
-  while f <= max {
-    let (s, f_cur, _) = iter.cur
-    f = f_cur.reinterpret_as_uint()
-    if f > max {
-      break
-    }
+  while iter.cur.0.get_index(from=current._) <= max {
+    let (s, _) = iter.cur
     if q.approx_eq(input_blank, tolerance) {
       result.push(s)
     }
-    let (_, _, b) = iter.next()
+    let (_, b) = iter.next()
     q.push(b)
   }
   return result
@@ -64,6 +59,20 @@ test "min" {
 }
 
 test "max" {
-  assert_eq!(find(@lcg.Lcg32(0), 0, 576, 4, [55, 184, 165], 0).length(), 1)
-  assert_eq!(find(@lcg.Lcg32(0), 0, 575, 4, [55, 184, 165], 0).length(), 0)
+  let max = @lcg.Lcg32(0x0266B473).get_index()
+  assert_eq!(find(@lcg.Lcg32(0), 0, max, 4, [55, 184, 165], 0).length(), 1)
+  assert_eq!(find(@lcg.Lcg32(0), 0, max - 1, 4, [55, 184, 165], 0).length(), 0)
+}
+
+test "実際に観測してみたサンプル" {
+  let res = find(
+    @lcg.Lcg32(0xC7B17A8C),
+    5000,
+    10000,
+    8,
+    [64, 38, 67, 78, 120, 45, 126, 192, 108, 95],
+    20,
+  )
+  assert_eq!(res.length(), 1)
+  assert_eq!(res[0]._, 0x02C81E51)
 }
