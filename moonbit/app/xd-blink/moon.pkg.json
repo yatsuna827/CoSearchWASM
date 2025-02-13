@@ -1,0 +1,17 @@
+{
+  "import": [
+    {
+      "path": "cosearch-wasm/lib/lcg-gc",
+      "alias": "lcg"
+    },
+    {
+      "path": "cosearch-wasm/lib/find_seed_by_blink",
+      "alias": "finder"
+    }
+  ],
+  "link": {
+    "wasm-gc": {
+      "exports": ["find_seed_by_blink", "new_array_builder", "add_value"]
+    }
+  }
+}

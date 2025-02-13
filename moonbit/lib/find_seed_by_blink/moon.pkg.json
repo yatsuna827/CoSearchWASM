@@ -1,0 +1,12 @@
+{
+  "import": [
+    {
+      "path": "cosearch-wasm/lib/lcg-gc",
+      "alias": "lcg"
+    },
+    {
+      "path": "cosearch-wasm/lib/xd_blink",
+      "alias": "blink"
+    }
+  ]
+}
