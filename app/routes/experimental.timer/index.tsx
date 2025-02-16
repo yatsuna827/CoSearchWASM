@@ -9,6 +9,7 @@ import { useSeedInput } from '@/hooks/useSeedInput'
 import { CascadeTimer, type CascadeTimerState } from '@/lib/timer/cascadeTimer'
 
 import { WASMProvider, useWASM } from './wasm/Context'
+import type { BlinkIterator } from './wasm/loadWASM'
 
 type Input = {
   searchMin: number
@@ -18,6 +19,7 @@ type Input = {
 }
 
 const to60fps = (ms: number) => Math.floor((ms / 1000) * 60)
+const from60fps = (frames: number) => Math.ceil((frames * 1000) / 60)
 
 const Index: React.FC = () => {
   const [seed, seedInputController] = useSeedInput('')
@@ -150,27 +152,39 @@ const Index: React.FC = () => {
   )
 }
 
-const useTimer = (onTick: (state: CascadeTimerState) => void) => {
-  const startRef = useRef<null | (() => void)>(null)
+const useTimer = (onTick: (timer: CascadeTimer) => void) => {
+  const timerRef = useRef<CascadeTimer | null>(null)
   useEffect(() => {
-    const timer = new CascadeTimer([1000, 1000, 1000])
+    const timer = new CascadeTimer()
     const unsubscribe = timer.addEventListener('tick', () => {
-      onTick(timer.getState())
+      onTick(timer)
     })
 
-    startRef.current = (...p) => timer.start(...p)
+    timerRef.current = timer
 
     return () => {
+      timerRef.current = null
+
       unsubscribe()
       timer.reset()
     }
   }, [onTick])
 
-  const start = useCallback(() => {
-    startRef.current?.()
+  const onStart = useCallback((lap: number[]) => {
+    timerRef.current?.start(lap)
+  }, [])
+  const onStop = useCallback(() => {
+    timerRef.current?.reset()
+  }, [])
+  const onSetOffset = useCallback((value: number) => {
+    timerRef.current?.setOffset(from60fps(value))
   }, [])
 
-  return start
+  return {
+    onStart,
+    onStop,
+    onSetOffset,
+  }
 }
 
 const useBlinkRecorder = (onFull: (history: number[], lastBlinked: number) => void) => {
@@ -259,26 +273,128 @@ const BlinkRecorder: React.FC<BlinkRecorderProps> = ({
 }
 
 const Timer: React.FC = () => {
+  const [seed, seedInputController] = useSeedInput('0')
+
+  const wasmReturn = useWASM()
+  const iterRef = useRef<BlinkIterator | null>(null)
+
+  const [yotei, setYotei] = useState<number[]>([])
   const [value, setValue] = useState(0)
-  const onTick = useCallback(({ lapRemain }: CascadeTimerState) => {
-    console.log(lapRemain)
+  const [offset, setOffset] = useState(0)
+  const onTick = useCallback((timer: CascadeTimer) => {
+    const { lapRemain, lapDurationsRemain } = timer.getState()
     setValue(lapRemain)
+    setYotei(lapDurationsRemain.slice(0, 10).map(to60fps))
+    if (iterRef.current) {
+      iterRef.current.next()
+      const [, interval] = iterRef.current.getState()
+      timer.addLap(from60fps(interval))
+    }
   }, [])
-  const start = useTimer(onTick)
+  const { onStart, onStop, onSetOffset } = useTimer(onTick)
+  const handleStart = useCallback(async () => {
+    if (seed == null) return
+
+    const { BlinkIterator } = await wasmReturn
+
+    const iter = BlinkIterator(LCG.from(seed), 8)
+    iterRef.current = iter
+
+    const lapDurations: number[] = []
+    for (let i = 0; i < 20; i++) {
+      iter.next()
+      const [, interval] = iter.getState()
+      lapDurations.push(from60fps(interval))
+    }
+    onStart(lapDurations)
+  }, [seed, onStart, wasmReturn])
 
   return (
     <>
+      <LabeledInput
+        className="px-2 mb-4"
+        label="seed"
+        placeholder="1234ABCD"
+        {...seedInputController}
+      />
       <div className="h-10 w-[300px] border border-black relative box-content">
         <div
           className="h-10 bg-blue-400 absolute left-0"
           style={{
-            width: (300 * value) / 1000,
+            width: (300 * to60fps(value)) / 188,
           }}
         />
       </div>
-      <button type="button" onClick={start}>
+      <div>{(value / 1000).toFixed(2)}sec</div>
+      <div>{yotei.join(' , ')}</div>
+      <button
+        type="button"
+        className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+        onClick={handleStart}
+      >
         START
       </button>
+      <button
+        type="button"
+        className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+        onClick={onStop}
+      >
+        STOP
+      </button>
+
+      <div className="mt-4">オフセット {offset}F</div>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+          onClick={() => {
+            setOffset(offset - 10)
+            onSetOffset(offset - 10)
+          }}
+        >
+          -10
+        </button>
+        <button
+          type="button"
+          className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+          onClick={() => {
+            setOffset(offset - 1)
+            onSetOffset(offset - 1)
+          }}
+        >
+          -1
+        </button>
+        <button
+          type="button"
+          className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+          onClick={() => {
+            setOffset(0)
+            onSetOffset(0)
+          }}
+        >
+          RESET
+        </button>
+        <button
+          type="button"
+          className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+          onClick={() => {
+            setOffset(offset + 1)
+            onSetOffset(offset + 1)
+          }}
+        >
+          +1
+        </button>
+        <button
+          type="button"
+          className="w-24 h-8 text-sm border font-semibold bg-white disabled:bg-gray-200 disabled:text-gray-400"
+          onClick={() => {
+            setOffset(offset + 10)
+            onSetOffset(offset + 10)
+          }}
+        >
+          +10
+        </button>
+      </div>
     </>
   )
 }

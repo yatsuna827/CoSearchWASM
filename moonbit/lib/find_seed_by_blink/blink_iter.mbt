@@ -1,5 +1,5 @@
 ///|
-struct BlinkIterator {
+pub struct BlinkIterator {
   blinker : @blink.BlinkObject
   lcg : @lcg.Lcg32Ref
   mut f_cur : Int
@@ -7,7 +7,7 @@ struct BlinkIterator {
 }
 
 ///|
-fn BlinkIterator::new(
+pub fn BlinkIterator::new(
   blinker : @blink.BlinkObject,
   lcg : @lcg.Lcg32
 ) -> BlinkIterator {
@@ -21,7 +21,7 @@ fn BlinkIterator::inc(self : BlinkIterator) -> Bool {
 }
 
 ///|
-fn BlinkIterator::next(self : BlinkIterator) -> (@lcg.Lcg32, Int) {
+pub fn BlinkIterator::next(self : BlinkIterator) -> (@lcg.Lcg32, Int) {
   let f_last_blinked = self.f_cur
   while self.inc() == false {
 
@@ -30,6 +30,7 @@ fn BlinkIterator::next(self : BlinkIterator) -> (@lcg.Lcg32, Int) {
   self.cur
 }
 
+///|
 test {
   let iter = BlinkIterator::new(
     @blink.BlinkObject::new(4, init_cnt=1),
