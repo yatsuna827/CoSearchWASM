@@ -16,3 +16,27 @@ pub fn find_seed_by_blink(
     cb_find_seed(s._)
   }
 }
+
+///|
+pub fn blink_iter_new(current : UInt, cool_time : Int) -> @finder.BlinkIterator {
+  @finder.BlinkIterator::new(
+    @blink.BlinkObject::new(cool_time, init_cnt=1),
+    current,
+  )
+}
+
+///|
+pub fn blink_iter_next(iter : @finder.BlinkIterator) -> Unit {
+  let _ = iter.next()
+
+}
+
+///|
+pub fn blink_iter_get_interval(iter : @finder.BlinkIterator) -> UInt {
+  iter.cur.1.reinterpret_as_uint()
+}
+
+///|
+pub fn blink_iter_get_seed(iter : @finder.BlinkIterator) -> UInt {
+  iter.cur.0._
+}

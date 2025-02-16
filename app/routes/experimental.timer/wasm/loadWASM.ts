@@ -3,11 +3,12 @@ import wasm from '@/wasm/xd-blink.wasm?url'
 
 type WasmExternRef = Branded<unknown, 'WASMExternRef'>
 type ArrayBuilder = Branded<WasmExternRef, 'ArrayBuilder'>
+type BlinkIteratorRef = Branded<WasmExternRef, 'BlinkIterator'>
 
 type OnFoundSeedCallbackFnArgs = [seed: number]
 
 type SearchFn = (
-  current: number,
+  current: LCG,
   min: number,
   max: number,
   coolTime: number,
@@ -16,20 +17,33 @@ type SearchFn = (
 ) => void
 type NewBuilderFn = (length: number) => ArrayBuilder
 type AddValueFn = (builder: ArrayBuilder, value: number) => void
+type NewBlinkIteratorFn = (current: LCG, cooltime: number) => BlinkIteratorRef
+type BlinkIteratorNextFn = (iter: BlinkIteratorRef) => void
+type BlinkIteratorGetIntervalFn = (iter: BlinkIteratorRef) => number
+type BlinkIteratorGetSeedFn = (iter: BlinkIteratorRef) => LCG
 
 type ExportedFunctions = {
   find_seed_by_blink: SearchFn
   new_array_builder: NewBuilderFn
   add_value: AddValueFn
+  blink_iter_new: NewBlinkIteratorFn
+  blink_iter_next: BlinkIteratorNextFn
+  blink_iter_get_interval: BlinkIteratorGetIntervalFn
+  blink_iter_get_seed: BlinkIteratorGetSeedFn
 }
 
 type Callbacks = {
   find_seed: (...args: OnFoundSeedCallbackFnArgs) => void
 }
 
+export type BlinkIterator = {
+  next(): void
+  getState(): [LCG, number]
+}
+
 export type LoadWASMReturn = Promise<{
   searchSeedByBlink: (
-    seed: number,
+    seed: LCG,
     framesRange: [min: number, max: number],
     blink: {
       cooltime: number
@@ -37,6 +51,7 @@ export type LoadWASMReturn = Promise<{
     },
     input: number[],
   ) => LCG[]
+  BlinkIterator: (seed: LCG, cooltime: number) => BlinkIterator
 }>
 export const loadWASM = async (): LoadWASMReturn => {
   const delegates: Callbacks = {
@@ -57,13 +72,20 @@ export const loadWASM = async (): LoadWASMReturn => {
     } satisfies Callbacks,
   }
 
-  const { add_value, find_seed_by_blink, new_array_builder } =
-    await WebAssembly.instantiateStreaming(fetch(wasm), importObject).then(
-      (_) => _.instance.exports as ExportedFunctions,
-    )
+  const {
+    add_value,
+    find_seed_by_blink,
+    new_array_builder,
+    blink_iter_new,
+    blink_iter_next,
+    blink_iter_get_seed,
+    blink_iter_get_interval,
+  } = await WebAssembly.instantiateStreaming(fetch(wasm), importObject).then(
+    (_) => _.instance.exports as ExportedFunctions,
+  )
 
   const searchSeedByBlink = (
-    seed: number,
+    seed: LCG,
     framesRange: [min: number, max: number],
     blink: {
       cooltime: number
@@ -93,5 +115,18 @@ export const loadWASM = async (): LoadWASMReturn => {
     return results
   }
 
-  return { searchSeedByBlink }
+  const BlinkIterator = (seed: LCG, cooltime: number): BlinkIterator => {
+    const iterRef = blink_iter_new(seed, cooltime)
+
+    return {
+      next() {
+        blink_iter_next(iterRef)
+      },
+      getState() {
+        return [blink_iter_get_seed(iterRef), blink_iter_get_interval(iterRef)]
+      },
+    }
+  }
+
+  return { searchSeedByBlink, BlinkIterator }
 }

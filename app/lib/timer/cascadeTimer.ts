@@ -9,8 +9,8 @@ export type CascadeTimerStatus = 'initial' | 'countdowning' | 'ended'
 export type CascadeTimerState = {
   status: CascadeTimerStatus
   lapRemain: number
-  lapIndex: number
   offset: number
+  lapDurationsRemain: number[]
 }
 
 export type UnsubscribeFn = () => void
@@ -18,21 +18,21 @@ export type UnsubscribeFn = () => void
 const createLapState = (
   lapDuration: number[],
   elapsed: number,
-): Pick<CascadeTimerState, 'lapIndex' | 'lapRemain'> => {
+): Pick<CascadeTimerState, 'lapDurationsRemain' | 'lapRemain'> => {
   let sum = 0
   for (let i = 0; i < lapDuration.length; i++) {
     sum += lapDuration[i]
 
     if (elapsed < sum) {
       return {
-        lapIndex: i,
+        lapDurationsRemain: lapDuration.slice(i),
         lapRemain: sum - elapsed,
       }
     }
   }
 
   return {
-    lapIndex: lapDuration.length - 1,
+    lapDurationsRemain: [],
     lapRemain: 0,
   }
 }
@@ -44,7 +44,7 @@ type CascadeTimerEventMap = {
 const [TimerCustomEvent, TimerEventEmitter] = createSTEventTarget<CascadeTimerEventMap>()
 
 export class CascadeTimer {
-  readonly #lapDurations: number[]
+  #lapDurations: number[]
   readonly #emitter: typeof TimerEventEmitter
   readonly #controller: TimerController
 
@@ -54,14 +54,8 @@ export class CascadeTimer {
   #offset: number
   #timerId: TimerId | null
 
-  constructor(
-    lapDuration: number[],
-    offset = 0,
-    controller: TimerController = new OptimizedTimerController(),
-  ) {
-    if (lapDuration.length === 0) throw new Error('あほしね')
-
-    this.#lapDurations = [...lapDuration]
+  constructor(offset = 0, controller: TimerController = new OptimizedTimerController()) {
+    this.#lapDurations = []
     this.#emitter = new TimerEventEmitter()
     this.#controller = controller
 
@@ -92,22 +86,22 @@ export class CascadeTimer {
     }
   }
 
-  start(startTime?: number) {
+  start(lapDurations: number[], startTime?: number) {
     if (this.#timerId !== INITIAL_TIMER_ID) {
       throw new Error('カウントダウン中は呼び出しちゃいけませんよ')
     }
 
+    this.#lapDurations = [...lapDurations]
     const now = this.#controller.getTime()
     if (startTime !== undefined && startTime > now) {
       throw new Error('タイマーの開始時間は現在時刻より前でなければなりません')
     }
 
-    const lastLapIndex = this.#lapDurations.length - 1
     const onTick = (timestamp_ms: number) => {
       const elapsed = timestamp_ms - this.#startTime + this.#offset
-      const { lapIndex, lapRemain } = createLapState(this.#lapDurations, elapsed)
+      const { lapDurationsRemain, lapRemain } = createLapState(this.#lapDurations, elapsed)
       const next: CascadeTimerStatus =
-        lapIndex === lastLapIndex && lapRemain === 0 ? 'ended' : 'countdowning'
+        lapDurationsRemain.length === 0 && lapRemain === 0 ? 'ended' : 'countdowning'
 
       if (next === 'countdowning') {
         this.#timerId = this.#controller.requestTick(onTick)
@@ -139,6 +133,10 @@ export class CascadeTimer {
 
   setOffset(offset: number) {
     this.#offset = offset
+  }
+
+  addLap(duration: number) {
+    this.#lapDurations.push(duration)
   }
 
   addEventListener<K extends keyof CascadeTimerEventMap>(

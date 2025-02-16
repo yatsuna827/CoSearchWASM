@@ -7,11 +7,23 @@
     {
       "path": "cosearch-wasm/lib/find_seed_by_blink",
       "alias": "finder"
+    },
+    {
+      "path": "cosearch-wasm/lib/xd_blink",
+      "alias": "blink"
     }
   ],
   "link": {
     "wasm-gc": {
-      "exports": ["find_seed_by_blink", "new_array_builder", "add_value"]
+      "exports": [
+        "find_seed_by_blink",
+        "new_array_builder",
+        "add_value",
+        "blink_iter_new",
+        "blink_iter_next",
+        "blink_iter_get_interval",
+        "blink_iter_get_seed"
+      ]
     }
   }
 }
