@@ -1,10 +1,14 @@
 import { TypedEventTarget } from 'typescript-event-target'
 
-import { OptimizedTimerController, type TimerController, type TimerId } from './timerController'
+import {
+  type CancelFn,
+  OptimizedTimerController,
+  type TimerController,
+  chain,
+} from './timerController'
 
 const INITIAL_START_TIME = 0
 const INITIAL_LAST_TICK_TIME = 0
-const INITIAL_TIMER_ID = null
 
 export type CascadeTimerStatus = 'initial' | 'countdowning' | 'ended'
 export type CascadeTimerState = {
@@ -52,7 +56,7 @@ export class CascadeTimer {
   #startTime: number
   #lastTickTime: number
   #offset: number
-  #timerId: TimerId | null
+  #cleanup: CancelFn | null
 
   constructor(offset = 0, controller: TimerController = new OptimizedTimerController()) {
     this.#lapDurations = []
@@ -63,7 +67,7 @@ export class CascadeTimer {
     this.#startTime = INITIAL_START_TIME
     this.#lastTickTime = INITIAL_LAST_TICK_TIME
     this.#offset = offset
-    this.#timerId = INITIAL_TIMER_ID
+    this.#cleanup = null
   }
 
   private getElapsed(): number {
@@ -87,7 +91,7 @@ export class CascadeTimer {
   }
 
   start(lapDurations: number[], startTime?: number) {
-    if (this.#timerId !== INITIAL_TIMER_ID) {
+    if (this.#cleanup !== null) {
       throw new Error('カウントダウン中は呼び出しちゃいけませんよ')
     }
 
@@ -97,38 +101,36 @@ export class CascadeTimer {
       throw new Error('タイマーの開始時間は現在時刻より前でなければなりません')
     }
 
-    const onTick = (timestamp_ms: number) => {
-      const elapsed = timestamp_ms - this.#startTime + this.#offset
-      const { lapDurationsRemain, lapRemain } = createLapState(this.#lapDurations, elapsed)
-      const next: CascadeTimerStatus =
-        lapDurationsRemain.length === 0 && lapRemain === 0 ? 'ended' : 'countdowning'
-
-      if (next === 'countdowning') {
-        this.#timerId = this.#controller.requestTick(onTick)
-      } else {
-        this.#timerId = null
-      }
-
-      this.#status = next
-      this.#lastTickTime = timestamp_ms
-      this.#emitter.dispatchTypedEvent('tick', new CustomEvent('tick'))
-    }
+    const start = chain(this.#controller)
 
     this.#status = 'countdowning'
     this.#startTime = startTime ?? now
     this.#lastTickTime = startTime ?? now
-    this.#timerId = this.#controller.requestTick(onTick)
+    this.#cleanup = start((ms) => this.onTick(ms))
+  }
+
+  private onTick(timestamp_ms: number): boolean {
+    const elapsed = timestamp_ms - this.#startTime + this.#offset
+    const { lapDurationsRemain, lapRemain } = createLapState(this.#lapDurations, elapsed)
+    const next: CascadeTimerStatus =
+      lapDurationsRemain.length === 0 && lapRemain === 0 ? 'ended' : 'countdowning'
+
+    this.#status = next
+    // console.log(timestamp_ms - this.#lastTickTime)
+    this.#lastTickTime = timestamp_ms
+
+    this.#emitter.dispatchTypedEvent('tick', new CustomEvent('tick'))
+
+    return next === 'countdowning'
   }
 
   reset() {
-    if (this.#timerId != null) {
-      this.#controller.cancelTick(this.#timerId)
-    }
+    this.#cleanup?.()
 
     this.#status = 'initial'
     this.#startTime = INITIAL_START_TIME
     this.#lastTickTime = INITIAL_LAST_TICK_TIME
-    this.#timerId = INITIAL_TIMER_ID
+    this.#cleanup = null
   }
 
   setOffset(offset: number) {
