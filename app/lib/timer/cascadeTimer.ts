@@ -1,4 +1,5 @@
-import { createSTEventTarget } from '../strictly-typed-event-target'
+import { TypedEventTarget } from 'typescript-event-target'
+
 import { OptimizedTimerController, type TimerController, type TimerId } from './timerController'
 
 const INITIAL_START_TIME = 0
@@ -39,13 +40,12 @@ const createLapState = (
 
 // [イベント名]: 渡されるオブジェクト
 type CascadeTimerEventMap = {
-  tick: undefined
+  tick: CustomEvent<undefined>
 }
-const [TimerCustomEvent, TimerEventEmitter] = createSTEventTarget<CascadeTimerEventMap>()
 
 export class CascadeTimer {
   #lapDurations: number[]
-  readonly #emitter: typeof TimerEventEmitter
+  readonly #emitter: TypedEventTarget<CascadeTimerEventMap>
   readonly #controller: TimerController
 
   #status: CascadeTimerStatus
@@ -56,7 +56,7 @@ export class CascadeTimer {
 
   constructor(offset = 0, controller: TimerController = new OptimizedTimerController()) {
     this.#lapDurations = []
-    this.#emitter = new TimerEventEmitter()
+    this.#emitter = new TypedEventTarget()
     this.#controller = controller
 
     this.#status = 'initial'
@@ -111,7 +111,7 @@ export class CascadeTimer {
 
       this.#status = next
       this.#lastTickTime = timestamp_ms
-      this.#emitter.dispatchEvent(new TimerCustomEvent('tick'))
+      this.#emitter.dispatchTypedEvent('tick', new CustomEvent('tick'))
     }
 
     this.#status = 'countdowning'
