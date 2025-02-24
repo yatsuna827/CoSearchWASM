@@ -152,23 +152,41 @@ const Index: React.FC = () => {
   )
 }
 
-const useTimer = (onTick: (timer: CascadeTimer) => void) => {
-  const timerRef = useRef<CascadeTimer | null>(null)
+type UseTimerArgs = {
+  onTick?: (timer: CascadeTimer) => void
+  onLapNext?: (timer: CascadeTimer) => void
+}
+const useTimer = ({ onTick, onLapNext }: UseTimerArgs) => {
+  const timerRef = useRef<CascadeTimer>(new CascadeTimer())
+
   useEffect(() => {
-    const timer = new CascadeTimer()
-    const unsubscribe = timer.addEventListener('tick', () => {
-      onTick(timer)
+    const timer = timerRef.current
+
+    const unsubscribe = timer.addEventListener('next-lap', () => {
+      onLapNext?.(timer)
     })
 
-    timerRef.current = timer
+    return () => {
+      unsubscribe()
+    }
+  }, [onLapNext])
+  useEffect(() => {
+    const timer = timerRef.current
+
+    const unsubscribe = timerRef.current.addEventListener('tick', () => {
+      onTick?.(timer)
+    })
 
     return () => {
-      timerRef.current = null
-
       unsubscribe()
-      timer.reset()
     }
   }, [onTick])
+
+  useEffect(() => {
+    return () => {
+      timerRef.current.cancel()
+    }
+  }, [])
 
   const onStart = useCallback((lap: number[]) => {
     timerRef.current?.start(lap)
@@ -282,16 +300,26 @@ const Timer: React.FC = () => {
   const [value, setValue] = useState(0)
   const [offset, setOffset] = useState(0)
   const onTick = useCallback((timer: CascadeTimer) => {
-    const { lapRemain, lapDurationsRemain } = timer.getState()
-    setValue(lapRemain)
-    setYotei(lapDurationsRemain.slice(0, 10).map(to60fps))
-    if (iterRef.current) {
-      iterRef.current.next()
-      const [, interval] = iterRef.current.getState()
-      timer.addLap(from60fps(interval))
+    const timerState = timer.getState()
+    setValue(timerState.status === 'countdowning' ? timerState.lapRemain : 0)
+  }, [])
+  const onLapNext = useCallback((timer: CascadeTimer) => {
+    const timerState = timer.getState()
+    setYotei(
+      timerState.status === 'countdowning'
+        ? timerState.lapDurationsRemain.slice(0, 10).map(to60fps)
+        : [],
+    )
+    if (timerState.status === 'countdowning' && timerState.lapDurationsRemain.length < 20) {
+      if (iterRef.current) {
+        iterRef.current.next()
+        const [, interval] = iterRef.current.getState()
+        timer.addLap(from60fps(interval))
+      }
     }
   }, [])
-  const { onStart, onStop, onSetOffset } = useTimer(onTick)
+
+  const { onStart, onStop, onSetOffset } = useTimer({ onTick, onLapNext })
   const handleStart = useCallback(async () => {
     if (seed == null) return
 
