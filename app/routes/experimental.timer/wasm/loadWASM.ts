@@ -60,7 +60,7 @@ export const loadWASM = async (): LoadWASMReturn => {
     },
   }
 
-  const importObject = {
+  const { instance } = await WebAssembly.instantiateStreaming(fetch(wasm), {
     // moonbitのprintlnを受けるためにデフォルトで要求される
     spectest: {
       print_char: () => {},
@@ -70,7 +70,7 @@ export const loadWASM = async (): LoadWASMReturn => {
         delegates.find_seed(...args)
       },
     } satisfies Callbacks,
-  }
+  })
 
   const {
     add_value,
@@ -80,9 +80,7 @@ export const loadWASM = async (): LoadWASMReturn => {
     blink_iter_next,
     blink_iter_get_seed,
     blink_iter_get_interval,
-  } = await WebAssembly.instantiateStreaming(fetch(wasm), importObject).then(
-    (_) => _.instance.exports as ExportedFunctions,
-  )
+  } = instance.exports as ExportedFunctions
 
   const searchSeedByBlink = (
     seed: LCG,

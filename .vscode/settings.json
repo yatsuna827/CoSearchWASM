@@ -24,5 +24,12 @@
   },
   "[moonbit]": {
     "editor.defaultFormatter": "moonbit.moonbit-lang"
+  },
+
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.*.ts",
+    "*.tsx": "${capture}.*.ts, ${capture}.*.tsx",
+    "package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, bun.lockb, bun.lock"
   }
 }
