@@ -1,10 +1,38 @@
+import { optimizedAsyncTimer } from '@/lib/timer/optimizedAsyncTimer'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 
 const Page: React.FC = () => {
+  const cancelRef = useRef<(() => void) | null>(null)
+  const [t, setT] = useState(0)
+
+  const handleClick = async () => {
+    const { run, abort } = optimizedAsyncTimer()
+
+    cancelRef.current = abort
+
+    const x = 0
+    let prev: number | null = null
+    for await (const timestamp of run()) {
+      console.log('hoge', timestamp, prev && timestamp - prev)
+      prev = timestamp
+      setT(timestamp)
+    }
+  }
+
   return (
     <main className="bg-blue-50">
       <div className="w-[1000px] m-auto p-4">
         <h1 className="font-bold">CoSearch 移植計画 候補地</h1>
+
+        <button type="button" onClick={handleClick}>
+          START
+        </button>
+        <button type="button" onClick={() => cancelRef.current?.()}>
+          STOP
+        </button>
+
+        <div>{t}</div>
 
         <div className="my-4">
           <h2 className="font-bold">ツール一覧</h2>

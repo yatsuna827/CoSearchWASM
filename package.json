@@ -31,7 +31,7 @@
     "typescript-event-target": "^1.1.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.7.1",
+    "@biomejs/biome": "^1.9.4",
     "@react-router/dev": "^7.0.0",
     "@types/bun": "latest",
     "@types/react": "^19.0.0",
