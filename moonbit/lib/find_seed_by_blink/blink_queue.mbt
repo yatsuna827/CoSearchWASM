@@ -44,6 +44,7 @@ pub fn Queue::approx_eq(
   }
 }
 
+///|
 test "push" {
   let q = Queue::new([1, 2, 3])
   assert_eq!(q.to_array(), [1, 2, 3])
@@ -51,6 +52,7 @@ test "push" {
   assert_eq!(q.to_array(), [2, 3, 4])
 }
 
+///|
 test "approx_eq" {
   let q = Queue::new([0, 100, 200])
   assert_eq!(q.approx_eq([101, 199, 300], 1), false)

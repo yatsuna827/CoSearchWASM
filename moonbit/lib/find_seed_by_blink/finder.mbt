@@ -31,12 +31,14 @@ pub fn find(
   return result
 }
 
+///|
 test {
   let res = find(@lcg.Lcg32(0), 0, 1000, 4, [55, 184, 165], 0)
   assert_eq!(res.length(), 1)
   assert_eq!(res[0]._, 0x0266B473)
 }
 
+///|
 test "tolerance" {
   // 1回目は-5F, 2回目は+6Fの入力に対して許容誤差6Fで検索
   let res = find(@lcg.Lcg32(0), 0, 1000, 4, [50, 190, 165], 6)
@@ -47,6 +49,7 @@ test "tolerance" {
   assert_eq!(find(@lcg.Lcg32(0), 0, 1000, 4, [50, 190, 165], 5).length(), 0)
 }
 
+///|
 test "min" {
   let input : FixedArray[Int] = [68, 125, 85, 184, 158]
   let res = find(@lcg.Lcg32(0), 10215, 15000, 4, input, 0)
@@ -58,12 +61,14 @@ test "min" {
   assert_eq!(res.length(), 0)
 }
 
+///|
 test "max" {
   let max = @lcg.Lcg32(0x0266B473).get_index()
   assert_eq!(find(@lcg.Lcg32(0), 0, max, 4, [55, 184, 165], 0).length(), 1)
   assert_eq!(find(@lcg.Lcg32(0), 0, max - 1, 4, [55, 184, 165], 0).length(), 0)
 }
 
+///|
 test "実際に観測してみたサンプル" {
   let res = find(
     @lcg.Lcg32(0xC7B17A8C),

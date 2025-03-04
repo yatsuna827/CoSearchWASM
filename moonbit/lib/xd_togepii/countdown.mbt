@@ -11,7 +11,10 @@ pub fn OutskirtStand::new() -> OutskirtStand {
 }
 
 ///|
-pub fn OutskirtStand::count_up(self : OutskirtStand, lcg : @lcg.Lcg32Ref) -> Unit {
+pub fn OutskirtStand::count_up(
+  self : OutskirtStand,
+  lcg : @lcg.Lcg32Ref
+) -> Unit {
   // 遅延発生するカウンタの処理
   for _ in self.lazy_queue.filter(fn(x) { x == 0 }) {
     self.left.append(SubCounter::new(lcg))
@@ -83,7 +86,7 @@ fn MainCounter::remove_dead_nodes(self : MainCounter) -> Unit {
 }
 
 ///|
-struct SubCounter {
+priv struct SubCounter {
   mut value : Float
   mut next : SubCounter?
   mut lifetime : Int
@@ -135,6 +138,7 @@ fn SubCounter::remove_dead_nodes(self : SubCounter) -> Unit {
   }
 }
 
+///|
 test "append" {
   let node1 = { value: 1.0, next: None, lifetime: 0, object_lifetime: 0 }
   let node2 = { value: 2.0, next: None, lifetime: 0, object_lifetime: 0 }
@@ -142,6 +146,7 @@ test "append" {
   assert_eq!(node1.next.unwrap().value, node2.value)
 }
 
+///|
 test "remove_dead_children" {
   let node1 = { value: 1.0, next: None, lifetime: 0, object_lifetime: 0 }
   let node2 = { value: 2.0, next: None, lifetime: 0, object_lifetime: 0 }

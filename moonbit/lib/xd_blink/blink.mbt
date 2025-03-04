@@ -61,6 +61,7 @@ pub fn BlinkObject::count_up(self : BlinkObject, lcg : @lcg.Lcg32Ref) -> Bool {
   true
 }
 
+///|
 test {
   let lcg = @lcg.Lcg32(0x002E5B77).to_ref()
   let obj = BlinkObject::new(4)

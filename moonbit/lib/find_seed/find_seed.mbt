@@ -1,5 +1,5 @@
 ///|
-type Pack Array[Array[UInt]]
+priv type Pack Array[Array[UInt]]
 
 ///|
 fn make_pack() -> Pack {
@@ -52,6 +52,7 @@ pub fn find_seed(
   result
 }
 
+///|
 test {
   let result = find_seed(31, 31, 31, 31, 31, 31).map(fn(s) { s._ })
   assert_eq!(result.length(), 6)

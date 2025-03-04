@@ -24,7 +24,7 @@ pub fn Lcg32::prev(self : Lcg32) -> Lcg32 {
 }
 
 ///|
-struct Booster {
+priv struct Booster {
   a_t : Array[UInt]
   b_t : Array[UInt]
   ar_t : Array[UInt]
@@ -142,12 +142,14 @@ pub fn Lcg32::get_index(self : Lcg32, from~ : UInt = 0) -> UInt {
   }
 }
 
+///|
 test "jump" {
   let lcg = Lcg32(0x08270827)
   assert_eq!(lcg.next().next().next()._, lcg.jump(3)._)
   assert_eq!(lcg.prev().prev().prev()._, lcg.jump_back(3)._)
 }
 
+///|
 test "prev" {
   let lcg = Lcg32(0xBEEFFACE)
   assert_eq!(lcg.next().prev()._, lcg._)
