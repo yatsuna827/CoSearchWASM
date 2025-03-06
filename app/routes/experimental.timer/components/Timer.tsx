@@ -4,7 +4,8 @@ import { LabeledInput } from '@/components/LabeledInput'
 import { LCG } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
 
-import { type CascadeTimerState, asCascadeTimerState } from '@/lib/timer/cascadeTimer'
+import { cn } from '@/cn'
+import { runCascadeTimer } from '@/lib/timer/cascadeTimer'
 import { optimizedAsyncTimer } from '@/lib/timer/optimizedAsyncTimer'
 import { useWASM } from '../wasm/Context'
 
@@ -22,6 +23,7 @@ export const Timer: React.FC<{ baseTimestamp: number }> = ({ baseTimestamp }) =>
 
   const abortRef = useRef<(() => void) | null>(null)
   const [value, setValue] = useState(0)
+  const [isInCountdown, setIsInCountdown] = useState(false)
   const handleStart = useCallback(async () => {
     if (seed == null) return
 
@@ -37,30 +39,46 @@ export const Timer: React.FC<{ baseTimestamp: number }> = ({ baseTimestamp }) =>
     const { run, abort } = optimizedAsyncTimer()
     abortRef.current = abort
 
-    const runTimer = async () => {
-      let prevState: CascadeTimerState | undefined = undefined
-      for await (const timestamp of run()) {
-        const state = asCascadeTimerState(timestamp, {
-          lapDurations,
-          offset: offsetRef.current,
-          baseTimestamp,
-        })
+    // const baseTimestamp = performance.now() - 20_000 // 10秒前から開始してたことにする
+    setIsInCountdown(false)
+    setYotei(lapDurations.slice(0, 10).map(to60fps))
 
-        // onLap
-        if (prevState && prevState.lapIndex < state.lapIndex) {
-          setYotei(lapDurations.slice(state.lapIndex, state.lapIndex + 10).map(to60fps))
+    let nextSound = 2_000
+    await runCascadeTimer(run, {
+      lapDurations,
+      getElapsed(timestamp) {
+        return timestamp - baseTimestamp + offsetRef.current
+      },
+      onUpdate(currentLapRemain, totalRemain) {
+        if (totalRemain < 2_000) {
+          if (totalRemain < nextSound) {
+            sound()
+            nextSound -= 500
+          }
+          setValue(nextSound + 500)
 
-          iter.next()
-          const [, interval] = iter.getState()
-          lapDurations.push(from60fps(interval))
+          setIsInCountdown(true)
+        } else {
+          setValue(currentLapRemain)
+        }
+      },
+      onShift(lapIndex) {
+        setYotei(lapDurations.slice(lapIndex, lapIndex + 10).map(to60fps))
+
+        const isInCountdown = nextSound < 2000
+        if (!isInCountdown) {
+          sound(0.75)
         }
 
-        setValue(state.currentLapRemain)
-        prevState = state
-      }
-    }
-
-    await runTimer().catch()
+        // iter.next()
+        // const [, interval] = iter.getState()
+        // lapDurations.push(from60fps(interval))
+      },
+      onComplete() {
+        setValue(0)
+        abort()
+      },
+    }).catch(() => abort())
 
     abortRef.current = null
   }, [seed, BlinkIterator, baseTimestamp])
@@ -73,11 +91,11 @@ export const Timer: React.FC<{ baseTimestamp: number }> = ({ baseTimestamp }) =>
         placeholder="1234ABCD"
         {...seedInputController}
       />
-      <div className="h-10 w-[300px] border border-black relative box-content">
+      <div className="h-14 w-[500px] border border-black relative box-content">
         <div
-          className="h-10 bg-blue-400 absolute left-0"
+          className={cn('h-14 bg-blue-400 absolute left-0', isInCountdown && 'bg-red-500')}
           style={{
-            width: (300 * to60fps(value)) / 188,
+            width: isInCountdown ? (500 * value) / 2_000 : (500 * to60fps(value)) / 188,
           }}
         />
       </div>
@@ -153,4 +171,16 @@ export const Timer: React.FC<{ baseTimestamp: number }> = ({ baseTimestamp }) =>
       </div>
     </>
   )
+}
+
+const sound = (f = 1) => {
+  const ctx = new AudioContext()
+  const node = new OscillatorNode(ctx, {
+    frequency: 880 * f,
+    type: 'square',
+  })
+  node.connect(ctx.destination)
+
+  node.start()
+  node.stop(0.1)
 }

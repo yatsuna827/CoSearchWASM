@@ -1,26 +1,37 @@
 import { slice } from './lapDurations'
 
-export type CascadeTimerContext = {
+type RunTimerContext = {
   lapDurations: number[]
+  getElapsed: (timestamp: number) => number
 
-  baseTimestamp: number
-  offset: number
+  onUpdate: (lapRemain: number, totalRemain: number) => void
+  onShift: (lapIndex: number) => void
+  onComplete: () => void
 }
-export type CascadeTimerState = {
-  lapIndex: number
-  currentLapRemain: number
-}
+export const runCascadeTimer = async (
+  run: () => AsyncGenerator<number, void, unknown>,
+  { lapDurations, getElapsed, onShift, onComplete, onUpdate }: RunTimerContext,
+) => {
+  const totalDurations = lapDurations.reduce((prev, cur) => prev + cur, 0)
 
-export const asCascadeTimerState = (
-  timestamp_ms: number,
-  { lapDurations, offset, baseTimestamp }: CascadeTimerContext,
-): CascadeTimerState => {
-  const elapsed = timestamp_ms - baseTimestamp + offset
+  // 初期化したい
+  let prevIndex = 0
+  for await (const timestamp of run()) {
+    const elapsed = getElapsed(timestamp)
+    const [lapIndex, currentLapRemain] = slice(lapDurations, elapsed)
 
-  const [lapIndex, remain] = slice(lapDurations, elapsed)
+    if (prevIndex < lapIndex) {
+      onShift(lapIndex)
+    }
 
-  return {
-    lapIndex: lapIndex,
-    currentLapRemain: remain,
+    const remain = totalDurations - elapsed
+    onUpdate(currentLapRemain, remain)
+
+    if (remain <= 0) {
+      onComplete()
+      break
+    }
+
+    prevIndex = lapIndex
   }
 }
