@@ -1,7 +1,7 @@
 'use client'
 
-import * as _ from '@radix-ui/react-select'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Select as _ } from 'radix-ui'
 
 import { cn } from '@/cn'
 
