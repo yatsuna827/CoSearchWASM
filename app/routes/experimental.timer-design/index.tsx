@@ -1,32 +1,66 @@
 import { cn } from '@/cn'
 import { Container } from '@/components/Container'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/Sheet'
 import { FastForwardIcon, PauseIcon, PlayIcon, RewindIcon, TriangleAlertIcon } from 'lucide-react'
 import { useState } from 'react'
+import { Timeline } from './components/Timeline'
+
+// サンプル時系列データ
+const timelineEvents = [
+  { label: '特定 @ とにかくバトル', seed: 'A1B2C3D4' },
+  { label: '再特定 @ 瞬き', seed: 'FFFFFFFF' },
+  { label: '再特定 @ 瞬き', seed: '82782782' },
+  { label: '再特定 @ 瞬き', seed: 'BEEFFACE', active: true },
+  { label: '目標', seed: '00C0FFEE' },
+]
 
 const Index: React.FC = () => {
   const [isActive, setIsActive] = useState(false)
 
   return (
-    <Container className="flex flex-col">
-      <div className="grid place-content-center h-60">
-        <Timer className="pt-10" />
-      </div>
+    <Sheet modal={false}>
+      <Container className="flex flex-col">
+        <SheetTrigger>OPEN</SheetTrigger>
+        <div className="grid place-content-center h-60">
+          <Timer className="pt-10" />
+        </div>
 
-      <TimerControl
-        className="mb-10"
-        isActive={isActive}
-        onStart={() => setIsActive(true)}
-        onCancel={() => setIsActive(false)}
-      />
+        <TimerControl
+          className="mb-10"
+          isActive={isActive}
+          onStart={() => setIsActive(true)}
+          onCancel={() => setIsActive(false)}
+        />
 
-      <DurationsContainer className="flex-1">
-        <DurationsItem frames={16} seed="41C64E6D" />
-        <DurationsItem className="opacity-55" frames={195} seed="41C64E6D" dangerous />
-        <DurationsItem className="opacity-30" frames={16} seed="41C64E6D" />
-        <DurationsItem className="opacity-30" frames={16} seed="41C64E6D" />
-        <DurationsItem className="opacity-30" frames={16} seed="41C64E6D" />
-      </DurationsContainer>
-    </Container>
+        <DurationsContainer className="flex-1">
+          <DurationsItem frames={16} seed="41C64E6D" />
+          <DurationsItem className="opacity-55" frames={195} seed="41C64E6D" dangerous />
+          <DurationsItem className="opacity-30" frames={16} seed="41C64E6D" />
+          <DurationsItem className="opacity-30" frames={16} seed="41C64E6D" />
+          <DurationsItem className="opacity-30" frames={16} seed="41C64E6D" />
+        </DurationsContainer>
+      </Container>
+
+      <SheetContent
+        side="right"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <SheetHeader>
+          <SheetTitle>Seed History</SheetTitle>
+          <SheetDescription />
+        </SheetHeader>
+
+        <Timeline events={timelineEvents} className="mb-8" />
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -101,23 +135,17 @@ const TimerControl: React.FC<TimerControlProps> = ({
   )
 }
 
-type ControlButtonProps = {
-  className?: string
-  children?: React.ReactNode
-  onClick?: () => void
-}
-const ControlButton: React.FC<ControlButtonProps> = ({ className, children, onClick }) => {
+type ControlButtonProps = React.ComponentPropsWithRef<'button'>
+const ControlButton: React.FC<ControlButtonProps> = ({ className, type = 'button', ...props }) => {
   return (
     <button
-      type="button"
+      type={type}
       className={cn(
         'grid place-items-center size-16 rounded-full bg-green-400 hover:bg-green-500 active:bg-green-600',
         className,
       )}
-      onClick={onClick}
-    >
-      {children}
-    </button>
+      {...props}
+    />
   )
 }
 
