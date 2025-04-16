@@ -1,6 +1,5 @@
 import { cn } from '@/cn'
 import { Container } from '@/components/Container'
-import { Hamburger } from '@/components/Hamburger'
 import {
   Sheet,
   SheetContent,
@@ -9,16 +8,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/Sheet'
-import {
-  FastForwardIcon,
-  History,
-  PauseIcon,
-  PlayIcon,
-  RewindIcon,
-  TriangleAlertIcon,
-} from 'lucide-react'
+import { History, TriangleAlertIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Timeline } from './components/Timeline'
+import { Timer } from './components/Timer'
+import { TimerControl } from './components/TimerControl'
 
 // サンプル時系列データ
 const timelineEvents = [
@@ -40,6 +34,7 @@ const Index: React.FC = () => {
           <History className="h-6 w-6 stroke-gray-600" />
         </SheetTrigger>
       </div>
+
       <Container className="flex flex-col">
         <div className="grid place-content-center h-60">
           <Timer className="pt-10" />
@@ -74,91 +69,6 @@ const Index: React.FC = () => {
         <Timeline events={timelineEvents} className="mb-8" />
       </SheetContent>
     </Sheet>
-  )
-}
-
-type TimerProps = {
-  className?: string
-}
-const Timer: React.FC<TimerProps> = ({ className }) => {
-  const timeRemain = '12:34'
-
-  return (
-    <div className={className}>
-      <div className="text-8xl font-semibold flex justify-center w-full">
-        <span>{timeRemain}</span>
-      </div>
-
-      <TimerBar className="mt-4" progress={72 / 188} />
-    </div>
-  )
-}
-type TimerBarProps = { className?: string; progress: number }
-const TimerBar: React.FC<TimerBarProps> = ({ className, progress }) => {
-  return (
-    <div className={cn('relative h-4 rounded-lg w-[500px] bg-blue-100', className)}>
-      <div
-        className="h-4 rounded-l-lg bg-blue-400 absolute left-0"
-        style={{ width: 500 * progress }}
-      />
-    </div>
-  )
-}
-
-type TimerControlProps = {
-  className?: string
-  isActive: boolean
-  onRewind?: (frames: number) => void
-  onStart: () => void
-  onCancel: () => void
-  onFastForward?: (frames: number) => void
-}
-const TimerControl: React.FC<TimerControlProps> = ({
-  className,
-  isActive,
-  onStart,
-  onCancel,
-  onRewind,
-  onFastForward,
-}) => {
-  return (
-    <div className={cn('flex justify-center w-full', className)}>
-      <ControlButton className="relative mt-4" onClick={() => onRewind?.(10)}>
-        <RewindIcon size={20} className="mb-[8px] mr-1" />
-        <div className="absolute bottom-[14px] text-xs pointer-events-none">10F</div>
-      </ControlButton>
-      <ControlButton className="relative mt-12" onClick={() => onRewind?.(1)}>
-        <RewindIcon size={20} className="mb-[8px] mr-1" />
-        <div className="absolute bottom-[14px] text-xs pointer-events-none">1F</div>
-      </ControlButton>
-
-      <ControlButton className="mx-4" onClick={isActive ? onCancel : onStart}>
-        {isActive ? <PauseIcon /> : <PlayIcon />}
-      </ControlButton>
-
-      <ControlButton className="relative mt-12" onClick={() => onFastForward?.(1)}>
-        <FastForwardIcon size={20} className="mb-[8px] ml-1" />
-        <div className="absolute bottom-[14px] text-xs pointer-events-none">1F</div>
-      </ControlButton>
-      <ControlButton className="relative mt-4" onClick={() => onFastForward?.(10)}>
-        <FastForwardIcon size={20} className="mb-[8px] ml-1" />
-        <div className="absolute bottom-[14px] text-xs pointer-events-none">10F</div>
-      </ControlButton>
-    </div>
-  )
-}
-
-type ControlButtonProps = React.ComponentPropsWithRef<'button'>
-const ControlButton: React.FC<ControlButtonProps> = ({ className, type = 'button', ...props }) => {
-  return (
-    <button
-      type={type}
-      className={cn(
-        'grid place-items-center size-16 rounded-full bg-green-400 hover:bg-green-500 active:bg-green-600',
-        className,
-      )}
-      {...props}
-    />
   )
 }
 
