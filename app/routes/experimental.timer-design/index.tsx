@@ -1,5 +1,6 @@
 import { cn } from '@/cn'
 import { Container } from '@/components/Container'
+import { Hamburger } from '@/components/Hamburger'
 import {
   Sheet,
   SheetContent,
@@ -8,7 +9,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/Sheet'
-import { FastForwardIcon, PauseIcon, PlayIcon, RewindIcon, TriangleAlertIcon } from 'lucide-react'
+import {
+  FastForwardIcon,
+  History,
+  PauseIcon,
+  PlayIcon,
+  RewindIcon,
+  TriangleAlertIcon,
+} from 'lucide-react'
 import { useState } from 'react'
 import { Timeline } from './components/Timeline'
 
@@ -26,8 +34,13 @@ const Index: React.FC = () => {
 
   return (
     <Sheet modal={false}>
+      <div className="relative flex items-center justify-center px-4 h-14 border-b">
+        <h1 className="text-lg font-semibold">XD 瞬きタイマー</h1>
+        <SheetTrigger className="absolute right-4">
+          <History className="h-6 w-6 stroke-gray-600" />
+        </SheetTrigger>
+      </div>
       <Container className="flex flex-col">
-        <SheetTrigger>OPEN</SheetTrigger>
         <div className="grid place-content-center h-60">
           <Timer className="pt-10" />
         </div>
