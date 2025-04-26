@@ -1,7 +1,7 @@
 import { LCG } from '@/domain/gc/lcg'
-import { type ComponentProps, useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
-export type SeedInputController = Pick<ComponentProps<'input'>, 'value' | 'onChange'>
+export type SeedInputController = Pick<React.ComponentProps<'input'>, 'value' | 'onChange'>
 export const useSeedInput = (defaultValue = '0'): [LCG | null, SeedInputController] => {
   const [seedRaw, setSeedRaw] = useState<string>(defaultValue)
   const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

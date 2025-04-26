@@ -7,7 +7,7 @@ import { Label } from '../components/Label'
 import { AdjustGapSection } from './AdjustGap'
 import { SearchSection } from './Search'
 
-import * as Tabs from '@radix-ui/react-tabs'
+import { Tabs } from 'radix-ui'
 
 type Props = {
   targetSeed: LCG

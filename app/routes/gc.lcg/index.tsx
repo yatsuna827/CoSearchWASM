@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import type { MetaFunction } from 'react-router'
 
-import * as Tabs from '@radix-ui/react-tabs'
+import { Tabs } from 'radix-ui'
 
 import { Container } from '@/components/Container'
 import { LCG, next } from '@/domain/gc/lcg'

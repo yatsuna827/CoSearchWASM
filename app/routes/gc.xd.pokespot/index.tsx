@@ -1,7 +1,7 @@
 import type { MetaFunction } from 'react-router'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/Select'
-import * as Tabs from '@radix-ui/react-tabs'
+import { Tabs } from 'radix-ui'
 
 import { Checkbox } from '@/components/CheckBox'
 import { Container } from '@/components/Container'

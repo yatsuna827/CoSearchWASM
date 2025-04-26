@@ -3,9 +3,7 @@ import type * as React from 'react'
 import { cn } from '@/cn'
 
 const Table: React.FC<React.ComponentProps<'table'>> = ({ className, ...props }) => (
-  <div className="relative w-full overflow-auto">
-    <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
-  </div>
+  <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
 )
 Table.displayName = 'Table'
 

@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 
-import dataset from './addresses.json'
+import dataset_co from './address_co.json'
+import dataset_xd from './address_xd.json'
 
 type AddressData = {
   $: string
@@ -8,7 +9,7 @@ type AddressData = {
   group?: string
 }
 
-const addressData = dataset satisfies AddressData[]
+const addressData = [...dataset_co, ...dataset_xd] satisfies AddressData[]
 const addressMap = new Map(addressData.map(({ $, use, group }) => [$, { use, group }]))
 
 type BreakLogRow = { address: string; registers: string[]; trigger: string }
