@@ -9,7 +9,7 @@ import { useSeedInput } from '@/hooks/useSeedInput'
 import { LoadingCircle } from '@/components/LoadingCircle'
 import { BlinkRecorder } from './components/BlinkRecorder'
 import { useBlinkRecorder } from './components/BlinkRecorder.hook'
-import { Timer } from './components/Timer'
+import { TimerSection } from './components/TimerSection'
 import { WASMProvider, useWASM } from './wasm/Context'
 
 type Input = {
@@ -141,7 +141,7 @@ const Index: React.FC = () => {
 
         <div className="mt-10">
           おまけ
-          <Timer baseTimestamp={result?.timestamp ?? 0} />
+          <TimerSection baseTimestamp={result?.timestamp ?? 0} />
         </div>
       </div>
     </Container>
