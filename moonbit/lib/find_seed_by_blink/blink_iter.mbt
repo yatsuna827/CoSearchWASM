@@ -50,6 +50,6 @@ test {
   ]
   for i in 0..<10 {
     let (s, interval) = iter.next()
-    assert_eq!(exp[i], (s._, interval))
+    assert_eq(exp[i], (s.inner(), interval))
   }
 }

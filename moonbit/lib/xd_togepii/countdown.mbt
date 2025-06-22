@@ -43,7 +43,7 @@ struct MainCounter {
 }
 
 ///|
-fn MainCounter::to_string(self : MainCounter) -> String {
+pub fn MainCounter::to_string(self : MainCounter) -> String {
   self.value.to_string()
 }
 
@@ -143,7 +143,7 @@ test "append" {
   let node1 = { value: 1.0, next: None, lifetime: 0, object_lifetime: 0 }
   let node2 = { value: 2.0, next: None, lifetime: 0, object_lifetime: 0 }
   node1.append(node2)
-  assert_eq!(node1.next.unwrap().value, node2.value)
+  assert_eq(node1.next.unwrap().value, node2.value)
 }
 
 ///|
@@ -155,10 +155,10 @@ test "remove_dead_children" {
   node1.append(node3)
   node1.append(node2)
   node1.remove_dead_nodes()
-  assert_eq!(node1.next.unwrap().value, node3.value)
+  assert_eq(node1.next.unwrap().value, node3.value)
   // remove dead node3
   node3.lifetime = 0
   node3.object_lifetime = 0
   node1.remove_dead_nodes()
-  assert_eq!(node1.next.is_empty(), true)
+  assert_eq(node1.next.is_empty(), true)
 }

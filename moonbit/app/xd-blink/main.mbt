@@ -13,7 +13,7 @@ pub fn find_seed_by_blink(
   let arr = input.build().unwrap()
   for
     s in @finder.find(@lcg.Lcg32(current), min, max, cool_time, arr, tolerance) {
-    cb_find_seed(s._)
+    cb_find_seed(s.inner())
   }
 }
 
@@ -38,5 +38,5 @@ pub fn blink_iter_get_interval(iter : @finder.BlinkIterator) -> UInt {
 
 ///|
 pub fn blink_iter_get_seed(iter : @finder.BlinkIterator) -> UInt {
-  iter.cur.0._
+  iter.cur.0.inner()
 }
