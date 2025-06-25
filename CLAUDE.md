@@ -6,12 +6,12 @@
 
 ### 基本コマンド
 
-- `bun dev` - ポート 8080 で開発サーバーを起動
-- `bun run build` - React Router アプリケーションのプロダクションビルドを実行
-- `bun run build:mbt` - MoonBit ソースから WASM モジュールをビルド
-- `bun run lint` - BiomeJS リンターを実行
-- `bun run typecheck` - TypeScript 型チェックと React Router 型生成を実行
-- `bun test` - Vitest テストを実行
+- `npm run dev` - ポート 8080 で開発サーバーを起動
+- `npm run build` - React Router アプリケーションのプロダクションビルドを実行
+- `npm run build:mbt` - MoonBit ソースから WASM モジュールをビルド
+- `npm run lint` - BiomeJS リンターを実行
+- `npm run typecheck` - TypeScript 型チェックと React Router 型生成を実行
+- `npm test` - Vitest テストを実行
 
 ### WASM ビルドプロセス
 

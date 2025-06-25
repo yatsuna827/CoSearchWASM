@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { iterSmoke } from '@/lib/wasm-api'
+import { iterSmoke } from '@/lib/wasmApi'
 import type { LCG } from '@/domain/gc/lcg'
 
 type SmokeResult = { i: number; seed: LCG }

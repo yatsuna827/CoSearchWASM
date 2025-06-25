@@ -7,7 +7,14 @@ const worker = new LazyLoadableWorker()
 
 // Register Service Worker for WASM API
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/CoSearchWASM/sw.js', { updateViaCache: 'none' }).then(
+  const path = import.meta.env.MODE === "production" ? "/CoSearchWASM/sw.js" : "/CoSearchWASM/dev-sw.js?dev-sw"
+  console.log(path)
+  navigator.serviceWorker.register(
+  path,
+  {
+    type: import.meta.env.MODE === "production" ? "classic" : "module",
+    updateViaCache: "none"
+  }).then(
     (registration) => {
       console.log('Service Worker registered successfully:', registration.scope)
       // Force update to get latest version
