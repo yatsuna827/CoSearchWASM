@@ -20,9 +20,9 @@ export default defineConfig({
     reactRouter(), 
     tsconfigPaths(),
     VitePWA({
-      strategies: 'injectManifest',
       srcDir: 'app',
       filename: 'sw.ts',
+      strategies: 'injectManifest',
       injectRegister: false,
       manifest: false,
       injectManifest: {
