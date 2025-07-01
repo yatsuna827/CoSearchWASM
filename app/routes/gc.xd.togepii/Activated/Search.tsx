@@ -3,15 +3,12 @@ import { useRef, useState } from 'react'
 import { LabeledInput } from '@/components/LabeledInput'
 import { LCG } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
-
-import { useWASM } from '../wasm/Context'
+import { searchTogepii } from '@/lib/wasmApi'
 
 type Props = {
   targetSeed: LCG
 }
 export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
-  const wasmReturn = useWASM()
-
   const [currentSeed, currentSeedController] = useSeedInput('')
   const blinkMinInputRef = useRef<HTMLInputElement>(null)
   const blinkMaxInputRef = useRef<HTMLInputElement>(null)
@@ -37,19 +34,20 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
     ] satisfies [number, number]
     if ([...blinkFrames, ...smokeFrames].some((_) => !Number.isInteger(_))) return
 
-    const { searchTogepii } = await wasmReturn
-    const res = searchTogepii(currentSeed, targetSeed, {
-      blink: {
-        cooltime: 4,
-        framesRange: blinkFrames,
-        intervalRange: [0, 183],
-      },
-      smoke: {
-        framesRange: smokeFrames,
-      },
-    })
+    const res = await searchTogepii(
+      currentSeed,
+      targetSeed,
+      { cooltime: 4 },
+      0,
+      183,
+      blinkFrames[0],
+      blinkFrames[1], 
+      smokeFrames[0],
+      smokeFrames[1]
+    )
 
-    setResult(res)
+    const formatted = res.map(item => [item.f_blink, item.seed_blink, item.f_smoke, item.seed_smoke] satisfies [number, LCG, number, LCG])
+    setResult(formatted)
   }
 
   return (

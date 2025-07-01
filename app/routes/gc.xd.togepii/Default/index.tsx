@@ -9,7 +9,7 @@ import { toJapanese } from '@/domain/nature'
 import { useCallback, useRef, useState } from 'react'
 import { IndividualPreview } from '../components/IndividualPreview'
 import { generateTogepii } from '../domain/generateTogepii'
-import { useWASM } from '../wasm/Context'
+import { findSeed } from '@/lib/wasmApi'
 
 type Input = {
   hMin: number
@@ -33,14 +33,11 @@ export const PageDefault: React.FC = () => {
 
   const { register, handleSubmit } = useForm<Input>()
 
-  const wasmReturn = useWASM()
   const [result, setResult] = useState<
     { seed: LCG; individual: ReturnType<typeof generateTogepii> }[]
   >([])
   const handleSearch: SubmitHandler<Input> = useCallback(
     async (data) => {
-      const { findSeed } = await wasmReturn
-
       const ivsMin = [data.hMin, data.aMin, data.bMin, data.cMin, data.dMin, data.sMin]
       const ivsMax = [data.hMax, data.aMax, data.bMax, data.cMax, data.dMax, data.sMax]
 
@@ -52,7 +49,8 @@ export const PageDefault: React.FC = () => {
             for (let c = ivsMin[3]; c <= ivsMax[3]; c++) {
               for (let d = ivsMin[4]; d <= ivsMax[4]; d++) {
                 for (let s = ivsMin[5]; s <= ivsMax[5]; s++) {
-                  res.push(...findSeed([h, a, b, c, d, s]))
+                  const seeds = await findSeed(h, a, b, c, d, s)
+                  res.push(...seeds.map(item => item.seed))
                 }
               }
             }
@@ -67,7 +65,7 @@ export const PageDefault: React.FC = () => {
         })),
       )
     },
-    [wasmReturn],
+    [],
   )
 
   return (

@@ -10,7 +10,8 @@ import { LoadingCircle } from '@/components/LoadingCircle'
 import { BlinkRecorder } from './components/BlinkRecorder'
 import { useBlinkRecorder } from './components/BlinkRecorder.hook'
 import { TimerSection } from './components/TimerSection'
-import { WASMProvider, useWASM } from './wasm/Context'
+import { findSeedByBlink } from '@/lib/wasmApi'
+import { WASMProvider } from './wasm/Context'
 
 type Input = {
   searchMin: number
@@ -23,8 +24,6 @@ const Index: React.FC = () => {
   const [seed, seedInputController] = useSeedInput('')
   const { register, getValues } = useForm<Input>()
 
-  const { searchSeedByBlink } = useWASM()
-
   const [result, setResult] = useState<{
     seed: LCG
     candidates: LCG[]
@@ -33,19 +32,21 @@ const Index: React.FC = () => {
   } | null>(null)
 
   const handleSearch = useCallback(
-    (history: number[], timestamp: number) => {
+    async (history: number[], timestamp: number) => {
       const { searchMin, searchMax, cooltime, tolerance } = getValues()
       if (seed == null) return
 
-      const result = searchSeedByBlink(
+      // Service Worker経由でfindSeedByBlinkを呼び出し
+      const results = await findSeedByBlink(
         seed,
         [searchMin, searchMax],
         { cooltime, tolerance },
         history,
       )
-      setResult({ seed, candidates: result, history, timestamp })
+      const candidates = results.map(item => item.seed)
+      setResult({ seed, candidates, history, timestamp })
     },
-    [seed, searchSeedByBlink, getValues],
+    [seed, getValues],
   )
 
   const { isFull, progress, onRecord, onReset, onGaugeTransitionEnd } =

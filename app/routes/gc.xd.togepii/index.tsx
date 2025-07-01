@@ -6,7 +6,6 @@ import { LCG } from '@/domain/gc/lcg'
 
 import { PageActivated } from './Activated'
 import { PageDefault } from './Default'
-import { WASMProvider } from './wasm/Context'
 
 export const meta: MetaFunction = () => {
   return [
@@ -37,9 +36,7 @@ const Page: React.FC = () => {
       </div>
 
       <Container>
-        <WASMProvider>
-          {targetSeed == null ? <PageDefault /> : <PageActivated targetSeed={targetSeed} />}
-        </WASMProvider>
+        {targetSeed == null ? <PageDefault /> : <PageActivated targetSeed={targetSeed} />}
       </Container>
     </>
   )

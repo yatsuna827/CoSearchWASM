@@ -20,7 +20,7 @@ export const iterSmoke = async (
   seed: number,
   take: number,
 ): Promise<IterSmokeResult[]> => {
-  const response = await fetch('/CoSearchWASM/wasm-api/iterSmoke', {
+  const response = await fetch('/CoSearchWASM/wasm-api/iter-smoke', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ seed, take }),
@@ -48,7 +48,7 @@ export const findSeed = async (
   d: number,
   s: number,
 ): Promise<FindSeedResult[]> => {
-  const response = await fetch('/CoSearchWASM/wasm-api/findSeed', {
+  const response = await fetch('/CoSearchWASM/wasm-api/find-seed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ h, a, b, c, d, s }),
@@ -78,7 +78,7 @@ export const searchTogepii = async (
   minFrames: number,
   maxFrames: number,
 ): Promise<SearchTogepiiResult[]> => {
-  const response = await fetch('/CoSearchWASM/wasm-api/searchTogepii', {
+  const response = await fetch('/CoSearchWASM/wasm-api/search-togepii', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
@@ -109,3 +109,34 @@ export const searchTogepii = async (
     seed_smoke: (item.seed_smoke >>> 0) as LCG,
   }))
 }
+
+// Blink機能のAPI追加
+type FindSeedByBlinkResult = {
+  seed: LCG
+}
+
+export const findSeedByBlink = async (
+  seed: number,
+  framesRange: [number, number],
+  blink: { cooltime: number; tolerance: number },
+  input: number[],
+): Promise<FindSeedByBlinkResult[]> => {
+  const response = await fetch('/CoSearchWASM/wasm-api/find-seed-by-blink', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ seed, framesRange, blink, input }),
+  })
+
+  if (!response.ok) {
+    const errorData = await response.json()
+    console.error('WASM API Error Details:', errorData)
+    throw new Error(`WASM call failed: ${errorData.error || response.statusText}`)
+  }
+
+  const result = await response.json()
+
+  return result.map((item: { seed: number }) => ({
+    seed: (item.seed >>> 0) as LCG,
+  }))
+}
+

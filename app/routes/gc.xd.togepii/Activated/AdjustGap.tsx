@@ -8,7 +8,7 @@ import { LCG, next, prev } from '@/domain/gc/lcg'
 import { Ref } from '@/utilities/ref'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { generateTogepii } from '../domain/generateTogepii'
-import { useWASM } from '../wasm/Context'
+import { iterSmoke } from '@/lib/wasmApi'
 
 type Stats = [number, number, number, number, number, number]
 type SearchGapResult = {
@@ -30,8 +30,6 @@ type Input = {
 }
 
 export const AdjustGapSection = () => {
-  const wasmReturn = useWASM()
-
   const { register, handleSubmit } = useForm<Input>()
 
   const [searchGapSeed, searchGapSeedController] = useSeedInput('')
@@ -44,14 +42,13 @@ export const AdjustGapSection = () => {
     const targetFrame = Number(gapTargetFramesInputRef.current.value)
     if (!Number.isInteger(targetFrame) || targetFrame <= 0) return
 
-    const { iterSmoke } = await wasmReturn
-
     const lcg = Ref.from(searchGapSeed)
     lcg.update((s) => prev(s, data.blinkErrorRange))
 
     const result: SearchGapResult[] = []
     for (let gap = -data.blinkErrorRange; gap <= data.blinkErrorRange; gap++) {
-      const res = iterSmoke(lcg.unwrap(), targetFrame + 51)
+      const smokeResults = await iterSmoke(lcg.unwrap(), targetFrame + 51)
+      const res = smokeResults
         .slice(Math.max(0, targetFrame - 50))
         .map(({ i, seed }) => {
           const { stats, ivs } = generateTogepii(seed)
