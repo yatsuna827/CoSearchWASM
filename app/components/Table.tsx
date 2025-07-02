@@ -18,19 +18,13 @@ const TableBody: React.FC<React.ComponentProps<'tbody'>> = ({ className, ...prop
 TableBody.displayName = 'TableBody'
 
 const TableFooter: React.FC<React.ComponentProps<'tfoot'>> = ({ className, ...props }) => (
-  <tfoot
-    className={cn('border-t bg-[#DDD]/50 font-medium [&>tr]:last:border-b-0', className)}
-    {...props}
-  />
+  <tfoot className={cn('border-t bg-[#DDD]/50 font-medium [&>tr]:last:border-b-0', className)} {...props} />
 )
 TableFooter.displayName = 'TableFooter'
 
 const TableRow: React.FC<React.ComponentProps<'tr'>> = ({ className, ...props }) => (
   <tr
-    className={cn(
-      'border-b transition-colors hover:bg-[#DDD]/50 data-[state=selected]:bg-[#DDD]',
-      className,
-    )}
+    className={cn('border-b transition-colors hover:bg-[#DDD]/50 data-[state=selected]:bg-[#DDD]', className)}
     {...props}
   />
 )
@@ -49,10 +43,7 @@ TableHead.displayName = 'TableHead'
 
 const TableCell: React.FC<React.ComponentProps<'td'>> = ({ className, ...props }) => (
   <td
-    className={cn(
-      'p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
-      className,
-    )}
+    className={cn('p-2 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]', className)}
     {...props}
   />
 )

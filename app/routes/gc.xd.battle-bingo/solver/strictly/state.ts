@@ -49,11 +49,7 @@ type IncrementLunatoneTargetCommand = {
   kind: 'inc-lunatone-target'
 }
 
-const getCommands = (
-  { panel, epToGain }: TurnEvent,
-  entry: Entry,
-  hasExeggutor: boolean,
-): Command[] => {
+const getCommands = ({ panel, epToGain }: TurnEvent, entry: Entry, hasExeggutor: boolean): Command[] => {
   const result: Command[] = []
 
   // ルナトーンの役割対象のカウント

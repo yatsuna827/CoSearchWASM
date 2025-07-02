@@ -24,10 +24,7 @@ type TimerBarProps = {
 const TimerBar: React.FC<TimerBarProps> = ({ className, progress }) => {
   return (
     <div className={cn('relative h-4 rounded-lg w-[500px] bg-blue-100', className)}>
-      <div
-        className="h-4 rounded-l-lg bg-blue-400 absolute left-0"
-        style={{ width: 500 * progress }}
-      />
+      <div className="h-4 rounded-l-lg bg-blue-400 absolute left-0" style={{ width: 500 * progress }} />
     </div>
   )
 }

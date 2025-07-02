@@ -15,7 +15,7 @@ const from60fps = (frames: number) => Math.ceil((frames * 1000) / 60)
 
 // タイマーに表示するのは全体の残り時間になってないといけない
 
-export const TimerSection: React.FC<{ baseTimestamp: number }> = ({ baseTimestamp }) => {
+export const TimerSection: React.FC<{ baseTimestamp: number }> = () => {
   const [seed, seedInputController] = useSeedInput('0')
 
   const { BlinkIterator } = useWASM()
@@ -93,12 +93,7 @@ export const TimerSection: React.FC<{ baseTimestamp: number }> = ({ baseTimestam
 
   return (
     <>
-      <LabeledInput
-        className="px-2 mb-4"
-        label="seed"
-        placeholder="1234ABCD"
-        {...seedInputController}
-      />
+      <LabeledInput className="px-2 mb-4" label="seed" placeholder="1234ABCD" {...seedInputController} />
 
       <div className="grid place-content-center h-60">
         <Timer progress={isInCountdown ? value / 2_000 : to60fps(value) / 188}>

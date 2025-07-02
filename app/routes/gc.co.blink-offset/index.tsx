@@ -14,8 +14,7 @@ export const meta: MetaFunction = () => {
     { title: 'Pokemon Colosseum Blink offset ' },
     {
       name: 'description',
-      content:
-        'ポケモンコロシアムで、パイラタウンのNPCの動きを利用して瞬きオフセットを特定するツールです',
+      content: 'ポケモンコロシアムで、パイラタウンのNPCの動きを利用して瞬きオフセットを特定するツールです',
     },
   ]
 }
@@ -45,12 +44,7 @@ const Page: React.FC = () => {
       </div>
 
       <Container className="flex flex-col">
-        <LabeledInput
-          className="px-2 mb-4"
-          label="目標seed"
-          placeholder="1234ABCD"
-          {...controller}
-        />
+        <LabeledInput className="px-2 mb-4" label="目標seed" placeholder="1234ABCD" {...controller} />
 
         <Table>
           <TableHeader>

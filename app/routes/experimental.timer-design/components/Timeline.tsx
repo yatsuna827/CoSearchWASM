@@ -16,9 +16,7 @@ export const Timeline: React.FC<TimelineProps> = ({ events, className }) => {
           leftContent={((1 << (idx * 7)) >>> 0) - 1}
           rightContent={
             <>
-              <div className={cn('text-sm', event.active && 'font-bold text-blue-700')}>
-                {event.seed}
-              </div>
+              <div className={cn('text-sm', event.active && 'font-bold text-blue-700')}>{event.seed}</div>
               <div className="text-xs text-[#333]">{event.label}</div>
             </>
           }
@@ -34,12 +32,7 @@ type TimelineItemProps = {
   leftContent?: React.ReactNode
   rightContent?: React.ReactNode
 }
-const TimelineItem: React.FC<TimelineItemProps> = ({
-  active,
-  lineStyle = 'solid',
-  leftContent,
-  rightContent,
-}) => {
+const TimelineItem: React.FC<TimelineItemProps> = ({ active, lineStyle = 'solid', leftContent, rightContent }) => {
   return (
     <div className="grid grid-cols-subgrid col-span-3 h-16">
       <div className="mt-[2px] justify-self-end">
@@ -48,10 +41,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 
       <div className="relative w-3">
         <div
-          className={cn(
-            'absolute left-[5px] top-[5px] w-0 border h-16',
-            lineStyle === 'dashed' && 'border-dashed',
-          )}
+          className={cn('absolute left-[5px] top-[5px] w-0 border h-16', lineStyle === 'dashed' && 'border-dashed')}
         />
         <div
           data-active={active ?? undefined}

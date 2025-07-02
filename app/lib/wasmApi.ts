@@ -16,10 +16,7 @@ type SearchTogepiiResult = {
   seed_smoke: LCG
 }
 
-export const iterSmoke = async (
-  seed: number,
-  take: number,
-): Promise<IterSmokeResult[]> => {
+export const iterSmoke = async (seed: number, take: number): Promise<IterSmokeResult[]> => {
   const response = await fetch('/CoSearchWASM/wasm-api/iter-smoke', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -42,7 +39,7 @@ export const iterSmoke = async (
 
 export const findSeed = async (
   h: number,
-  a: number, 
+  a: number,
   b: number,
   c: number,
   d: number,
@@ -81,16 +78,16 @@ export const searchTogepii = async (
   const response = await fetch('/CoSearchWASM/wasm-api/search-togepii', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      seed, 
-      target, 
-      blink, 
-      minInterval, 
-      maxInterval, 
-      minBlinkFrames, 
-      maxBlinkFrames, 
-      minFrames, 
-      maxFrames 
+    body: JSON.stringify({
+      seed,
+      target,
+      blink,
+      minInterval,
+      maxInterval,
+      minBlinkFrames,
+      maxBlinkFrames,
+      minFrames,
+      maxFrames,
     }),
   })
 
@@ -139,4 +136,3 @@ export const findSeedByBlink = async (
     seed: (item.seed >>> 0) as LCG,
   }))
 }
-

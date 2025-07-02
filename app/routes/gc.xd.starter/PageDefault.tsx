@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router'
 
 import { LabeledInput } from '@/components/LabeledInput'
 import { useSeedInput } from '@/hooks/useSeedInput'
@@ -28,12 +28,7 @@ export const PageDefault: React.FC = () => {
               goto({ pathname: '.', search: `?target=${seed.toString(16)}` })
             }}
           >
-            <LabeledInput
-              className="px-2 mb-4"
-              label="目標seed"
-              placeholder="1234ABCD"
-              {...controller}
-            />
+            <LabeledInput className="px-2 mb-4" label="目標seed" placeholder="1234ABCD" {...controller} />
             {seed != null && <ResultBlock seed={seed} />}
             <button
               type="submit"
@@ -66,9 +61,7 @@ const ResultBlock: React.FC<ResultBlockProps> = ({ seed }) => {
       </div>
       <div>
         <span className="mr-2">{toJapanese(natures[eevee.pid % 25])}</span>
-        <span className="mr-2">
-          {eevee.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}
-        </span>
+        <span className="mr-2">{eevee.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}</span>
         <span>{isShiny && '☆'}</span>
       </div>
       {!isValid && <span className="text-red-600 font-semibold">到達不可能なseedです</span>}

@@ -35,9 +35,7 @@ const Page: React.FC = () => {
         <h1 className="text-lg font-semibold">PokemonXD トゲピー</h1>
       </div>
 
-      <Container>
-        {targetSeed == null ? <PageDefault /> : <PageActivated targetSeed={targetSeed} />}
-      </Container>
+      <Container>{targetSeed == null ? <PageDefault /> : <PageActivated targetSeed={targetSeed} />}</Container>
     </>
   )
 }

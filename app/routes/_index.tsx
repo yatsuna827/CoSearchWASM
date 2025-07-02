@@ -1,5 +1,3 @@
-import { optimizedAsyncTimer } from '@/lib/timer/optimizedAsyncTimer'
-import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 
 const Page: React.FC = () => {

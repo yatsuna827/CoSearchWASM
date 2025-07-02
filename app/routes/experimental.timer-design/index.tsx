@@ -1,13 +1,6 @@
 import { cn } from '@/cn'
 import { Container } from '@/components/Container'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/Sheet'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/Sheet'
 import { History, TriangleAlertIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Timeline } from './components/Timeline'

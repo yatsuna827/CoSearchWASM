@@ -54,10 +54,7 @@ const toJp = {
   quirky: 'きまぐれ',
 } as const satisfies Record<Nature, string>
 
-const fromJp = Object.fromEntries(Object.entries(toJp).map(([k, v]) => [v, k])) as Record<
-  NatureJp,
-  Nature
->
+const fromJp = Object.fromEntries(Object.entries(toJp).map(([k, v]) => [v, k])) as Record<NatureJp, Nature>
 
 export type Nature = (typeof natures)[number]
 export type NatureJp = (typeof toJp)[Nature]

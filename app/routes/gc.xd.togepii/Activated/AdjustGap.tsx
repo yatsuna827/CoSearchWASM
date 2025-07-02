@@ -4,7 +4,7 @@ import { LabeledInput } from '@/components/LabeledInput'
 import type { IVs } from '@/domain/gc/generators'
 import { useSeedInput } from '@/hooks/useSeedInput'
 
-import { LCG, next, prev } from '@/domain/gc/lcg'
+import { next, prev } from '@/domain/gc/lcg'
 import { Ref } from '@/utilities/ref'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { generateTogepii } from '../domain/generateTogepii'
@@ -101,12 +101,7 @@ export const AdjustGapSection = () => {
           <span>F</span>
         </div>
 
-        <LabeledInput
-          ref={gapTargetFramesInputRef}
-          className="px-2 mb-4"
-          label="不定消費 待機時間"
-          type="number"
-        />
+        <LabeledInput ref={gapTargetFramesInputRef} className="px-2 mb-4" label="不定消費 待機時間" type="number" />
 
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <input type="number" {...register('h', { valueAsNumber: true })} />
@@ -125,11 +120,7 @@ export const AdjustGapSection = () => {
         </button>
       </form>
 
-      <textarea
-        className="min-w-full min-h-64 block px-4 py-2"
-        readOnly
-        value={formatResult(gapResult)}
-      />
+      <textarea className="min-w-full min-h-64 block px-4 py-2" readOnly value={formatResult(gapResult)} />
     </section>
   )
 }

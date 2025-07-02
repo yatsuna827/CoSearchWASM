@@ -2,11 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 
 import { LabeledInput } from '@/components/LabeledInput'
 import { LCG } from '@/domain/gc/lcg'
-import {
-  advanceInNamingScreen,
-  backInNamingScreen,
-  isValidSeed,
-} from '@/domain/gc/starter/namingScreen'
+import { advanceInNamingScreen, backInNamingScreen, isValidSeed } from '@/domain/gc/starter/namingScreen'
 import { type GenerateStarterResult, generateStarter } from '@/domain/gc/starter/starterGenerator'
 import { natures, toJapanese } from '@/domain/nature'
 import { type SeedInputController, useSeedInput } from '@/hooks/useSeedInput'
@@ -109,11 +105,7 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
             <>
               <div className="mb-6" />
 
-              <DistanceBlock
-                seed={currentSeed}
-                controller={currentSeedController}
-                seedNamingStart={namingStart}
-              />
+              <DistanceBlock seed={currentSeed} controller={currentSeedController} seedNamingStart={namingStart} />
 
               <div className="mb-6" />
 
@@ -130,11 +122,7 @@ export const PageActivated: React.FC<{ targetSeed: LCG }> = ({ targetSeed }) => 
         <div className="w-40 h-full bg-[#f9f9f9]">
           <div className="relative flex items-center px-4 h-10 border-b">
             <h1 className="text-lg font-semibold">設定</h1>
-            <button
-              type="button"
-              className="absolute right-3 outline-none"
-              onClick={handleDialogClose}
-            >
+            <button type="button" className="absolute right-3 outline-none" onClick={handleDialogClose}>
               <Hamburger className="h-6 w-6 stroke-gray-600" />
             </button>
           </div>
@@ -183,9 +171,7 @@ const ResultBlock: React.FC<ResultBlockProps> = ({ seed }) => {
       </div>
       <div>
         <span className="mr-2">{toJapanese(natures[eevee.pid % 25])}</span>
-        <span className="mr-2">
-          {eevee.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}
-        </span>
+        <span className="mr-2">{eevee.ivs.map((_) => _.toString().padStart(2, '0')).join('-')}</span>
         <span>{isShiny && '☆'}</span>
       </div>
       {!isValid && <span className="text-red-600 font-semibold">到達不可能なseedです</span>}

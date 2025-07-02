@@ -7,23 +7,23 @@ const worker = new LazyLoadableWorker()
 
 // Register Service Worker for WASM API
 if ('serviceWorker' in navigator) {
-  const path = import.meta.env.MODE === "production" ? "/CoSearchWASM/sw.js" : "/CoSearchWASM/dev-sw.js?dev-sw"
+  const path = import.meta.env.MODE === 'production' ? '/CoSearchWASM/sw.js' : '/CoSearchWASM/dev-sw.js?dev-sw'
   console.log(path)
-  navigator.serviceWorker.register(
-  path,
-  {
-    type: import.meta.env.MODE === "production" ? "classic" : "module",
-    updateViaCache: "none"
-  }).then(
-    (registration) => {
-      console.log('Service Worker registered successfully:', registration.scope)
-      // Force update to get latest version
-      registration.update()
-    },
-    (error) => {
-      console.log('Service Worker registration failed:', error)
-    }
-  )
+  navigator.serviceWorker
+    .register(path, {
+      type: import.meta.env.MODE === 'production' ? 'classic' : 'module',
+      updateViaCache: 'none',
+    })
+    .then(
+      (registration) => {
+        console.log('Service Worker registered successfully:', registration.scope)
+        // Force update to get latest version
+        registration.update()
+      },
+      (error) => {
+        console.log('Service Worker registration failed:', error)
+      },
+    )
 
   // Service Workerからのメッセージを受信
   navigator.serviceWorker.addEventListener('message', (event) => {

@@ -37,31 +37,20 @@ const Index: React.FC = () => {
       if (seed == null) return
 
       // Service Worker経由でfindSeedByBlinkを呼び出し
-      const results = await findSeedByBlink(
-        seed,
-        [searchMin, searchMax],
-        { cooltime, tolerance },
-        history,
-      )
-      const candidates = results.map(item => item.seed)
+      const results = await findSeedByBlink(seed, [searchMin, searchMax], { cooltime, tolerance }, history)
+      const candidates = results.map((item) => item.seed)
       setResult({ seed, candidates, history, timestamp })
     },
     [seed, getValues],
   )
 
-  const { isFull, progress, onRecord, onReset, onGaugeTransitionEnd } =
-    useBlinkRecorder(handleSearch)
+  const { isFull, progress, onRecord, onReset, onGaugeTransitionEnd } = useBlinkRecorder(handleSearch)
 
   return (
     <Container>
       <div className="font-[system-ui,sans-serif] leading-8 h-full">
         <div>
-          <LabeledInput
-            className="px-2 mb-4"
-            label="seed"
-            placeholder="1234ABCD"
-            {...seedInputController}
-          />
+          <LabeledInput className="px-2 mb-4" label="seed" placeholder="1234ABCD" {...seedInputController} />
           <div className="flex gap-4 mb-4 max-sm:flex-col">
             <LabeledInput
               className="px-2"
@@ -117,11 +106,7 @@ const Index: React.FC = () => {
           />
         </div>
 
-        <button
-          type="button"
-          className="border border-black px-4 py-1 rounded mb-8"
-          onClick={onReset}
-        >
+        <button type="button" className="border border-black px-4 py-1 rounded mb-8" onClick={onReset}>
           Reset
         </button>
 
@@ -132,9 +117,7 @@ const Index: React.FC = () => {
               <div>たいむすたんぷ: {result.timestamp}</div>
               <div>結果: {result.candidates.length} 件</div>
               <div>
-                {result.candidates
-                  .map((s) => `${LCG.stringify(s)} (${LCG.getIndex(s, result.seed)}[F])`)
-                  .join('\n')}
+                {result.candidates.map((s) => `${LCG.stringify(s)} (${LCG.getIndex(s, result.seed)}[F])`).join('\n')}
               </div>
             </>
           )}
@@ -149,6 +132,7 @@ const Index: React.FC = () => {
   )
 }
 
+// eslint-disable-next-line react/display-name
 export default () => (
   <WASMProvider>
     <Suspense

@@ -151,11 +151,7 @@ const Page: React.FC = () => {
           </div>
         </div>
 
-        <button
-          type="button"
-          className="border border-black px-4 py-1 rounded mb-8"
-          onClick={handleResetGauge}
-        >
+        <button type="button" className="border border-black px-4 py-1 rounded mb-8" onClick={handleResetGauge}>
           Reset
         </button>
       </div>

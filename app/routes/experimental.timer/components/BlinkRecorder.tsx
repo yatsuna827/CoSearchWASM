@@ -6,12 +6,7 @@ type BlinkRecorderProps = {
   onRecord: () => void
   onGaugeTransitionEnd: () => void
 }
-export const BlinkRecorder: React.FC<BlinkRecorderProps> = ({
-  isFull,
-  progress,
-  onRecord,
-  onGaugeTransitionEnd,
-}) => {
+export const BlinkRecorder: React.FC<BlinkRecorderProps> = ({ isFull, progress, onRecord, onGaugeTransitionEnd }) => {
   return (
     <div className="size-52 relative">
       <PokeBall onFire={onRecord} />
