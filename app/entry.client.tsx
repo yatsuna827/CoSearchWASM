@@ -8,7 +8,7 @@ const worker = new LazyLoadableWorker()
 // Register Service Worker for WASM API
 if ('serviceWorker' in navigator) {
   const path = import.meta.env.MODE === 'production' ? '/CoSearchWASM/sw.js' : '/CoSearchWASM/dev-sw.js?dev-sw'
-  console.log(path)
+
   navigator.serviceWorker
     .register(path, {
       type: import.meta.env.MODE === 'production' ? 'classic' : 'module',
