@@ -6,10 +6,10 @@ import { useSeedInput } from '@/hooks/useSeedInput'
 
 import { LCG } from '@/domain/gc/lcg'
 import { toJapanese } from '@/domain/nature'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { IndividualPreview } from '../components/IndividualPreview'
 import { generateTogepii } from '../domain/generateTogepii'
-import { useWASM } from '../wasm/Context'
+import { findSeed } from '@/lib/wasmApi'
 
 type Input = {
   hMin: number
@@ -33,42 +33,35 @@ export const PageDefault: React.FC = () => {
 
   const { register, handleSubmit } = useForm<Input>()
 
-  const wasmReturn = useWASM()
-  const [result, setResult] = useState<
-    { seed: LCG; individual: ReturnType<typeof generateTogepii> }[]
-  >([])
-  const handleSearch: SubmitHandler<Input> = useCallback(
-    async (data) => {
-      const { findSeed } = await wasmReturn
+  const [result, setResult] = useState<{ seed: LCG; individual: ReturnType<typeof generateTogepii> }[]>([])
+  const handleSearch: SubmitHandler<Input> = useCallback(async (data) => {
+    const ivsMin = [data.hMin, data.aMin, data.bMin, data.cMin, data.dMin, data.sMin]
+    const ivsMax = [data.hMax, data.aMax, data.bMax, data.cMax, data.dMax, data.sMax]
 
-      const ivsMin = [data.hMin, data.aMin, data.bMin, data.cMin, data.dMin, data.sMin]
-      const ivsMax = [data.hMax, data.aMax, data.bMax, data.cMax, data.dMax, data.sMax]
+    const res: LCG[] = []
 
-      const res: LCG[] = []
-
-      for (let h = ivsMin[0]; h <= ivsMax[0]; h++) {
-        for (let a = ivsMin[1]; a <= ivsMax[1]; a++) {
-          for (let b = ivsMin[2]; b <= ivsMax[2]; b++) {
-            for (let c = ivsMin[3]; c <= ivsMax[3]; c++) {
-              for (let d = ivsMin[4]; d <= ivsMax[4]; d++) {
-                for (let s = ivsMin[5]; s <= ivsMax[5]; s++) {
-                  res.push(...findSeed([h, a, b, c, d, s]))
-                }
+    for (let h = ivsMin[0]; h <= ivsMax[0]; h++) {
+      for (let a = ivsMin[1]; a <= ivsMax[1]; a++) {
+        for (let b = ivsMin[2]; b <= ivsMax[2]; b++) {
+          for (let c = ivsMin[3]; c <= ivsMax[3]; c++) {
+            for (let d = ivsMin[4]; d <= ivsMax[4]; d++) {
+              for (let s = ivsMin[5]; s <= ivsMax[5]; s++) {
+                const seeds = await findSeed(h, a, b, c, d, s)
+                res.push(...seeds.map((item) => item.seed))
               }
             }
           }
         }
       }
+    }
 
-      setResult(
-        res.map((seed) => ({
-          seed,
-          individual: generateTogepii(seed),
-        })),
-      )
-    },
-    [wasmReturn],
-  )
+    setResult(
+      res.map((seed) => ({
+        seed,
+        individual: generateTogepii(seed),
+      })),
+    )
+  }, [])
 
   return (
     <>
@@ -112,111 +105,39 @@ export const PageDefault: React.FC = () => {
         </button>
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <span>H</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('hMin', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('hMin', { min: 0, max: 31 })} />
           <span>～</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('hMax', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('hMax', { min: 0, max: 31 })} />
         </div>
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <span>A</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('aMin', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('aMin', { min: 0, max: 31 })} />
           <span>～</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('aMax', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('aMax', { min: 0, max: 31 })} />
         </div>
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <span>B</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('bMin', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('bMin', { min: 0, max: 31 })} />
           <span>～</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('bMax', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('bMax', { min: 0, max: 31 })} />
         </div>
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <span>C</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('cMin', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('cMin', { min: 0, max: 31 })} />
           <span>～</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('cMax', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('cMax', { min: 0, max: 31 })} />
         </div>
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <span>D</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('dMin', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('dMin', { min: 0, max: 31 })} />
           <span>～</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('dMax', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('dMax', { min: 0, max: 31 })} />
         </div>
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <span>S</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('sMin', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('sMin', { min: 0, max: 31 })} />
           <span>～</span>
-          <input
-            defaultValue={31}
-            type="number"
-            min={0}
-            max={31}
-            {...register('sMax', { min: 0, max: 31 })}
-          />
+          <input defaultValue={31} type="number" min={0} max={31} {...register('sMax', { min: 0, max: 31 })} />
         </div>
       </form>
 

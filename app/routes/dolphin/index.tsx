@@ -42,22 +42,11 @@ const Index: React.FC = () => {
   return (
     <div className="font-[system-ui,sans-serif] leading-8 h-full">
       <div className="max-w-[900px] h-full mx-auto px-1 py-2 bg-[#f9f9f9]">
-        <textarea
-          className="h-[100px] whitespace-pre bg-white w-full px-2 text-sm"
-          ref={inputRef}
-        />
-        <button
-          type="button"
-          className="my-2 w-20 h-8 text-sm border font-semibold bg-white"
-          onClick={handleConvert}
-        >
+        <textarea className="h-[100px] whitespace-pre bg-white w-full px-2 text-sm" ref={inputRef} />
+        <button type="button" className="my-2 w-20 h-8 text-sm border font-semibold bg-white" onClick={handleConvert}>
           Convert
         </button>
-        <button
-          type="button"
-          className="my-2 w-20 h-8 text-sm border font-semibold bg-white"
-          onClick={handleImport}
-        >
+        <button type="button" className="my-2 w-20 h-8 text-sm border font-semibold bg-white" onClick={handleImport}>
           Import
         </button>
         <div className="text-sm font-[Consolas] w-full h-[500px] overflow-scroll bg-white whitespace-pre">
@@ -100,11 +89,7 @@ const isBreakLogRow = (line: unknown): line is BreakLogRow => {
   if (typeof line !== 'object' || !line) return false
 
   if (!('address' in line) || typeof line.address !== 'string') return false
-  if (
-    !('registers' in line) ||
-    !Array.isArray(line.registers) ||
-    line.registers.some((x) => typeof x !== 'string')
-  )
+  if (!('registers' in line) || !Array.isArray(line.registers) || line.registers.some((x) => typeof x !== 'string'))
     return false
   if (!('trigger' in line) || typeof line.trigger !== 'string') return false
 

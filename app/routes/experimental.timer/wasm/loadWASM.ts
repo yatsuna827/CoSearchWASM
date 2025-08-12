@@ -101,14 +101,7 @@ export const loadWASM = async (): LoadWASMReturn => {
       results.push((seed >>> 0) as LCG)
     }
 
-    find_seed_by_blink(
-      seed,
-      framesRange[0],
-      framesRange[1],
-      blink.cooltime,
-      blink.tolerance,
-      builder,
-    )
+    find_seed_by_blink(seed, framesRange[0], framesRange[1], blink.cooltime, blink.tolerance, builder)
 
     return results
   }

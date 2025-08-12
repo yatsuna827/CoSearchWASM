@@ -30,18 +30,11 @@ export const IndividualPreview: React.FC<Props> = ({ individual }) => {
       </div>
 
       <div className="[grid-area:pid] h-12">
-        <LabeledText
-          label="性格値"
-          text={individual.pid.toString(16).padStart(8, '0').toUpperCase()}
-        />
+        <LabeledText label="性格値" text={individual.pid.toString(16).padStart(8, '0').toUpperCase()} />
       </div>
 
       <div className="[grid-area:other] h-12 flex gap-4 max-sm:gap-3">
-        <LabeledText
-          className="w-8"
-          label="性別"
-          text={(individual.pid & 0xff) < 0x1f ? '♀' : '♂'}
-        />
+        <LabeledText className="w-8" label="性別" text={(individual.pid & 0xff) < 0x1f ? '♀' : '♂'} />
         <LabeledText label="性格" text={toJapanese(individual.nature)} />
         <LabeledText label="特性" text={['はりきり', 'てんのめぐみ'][individual.pid % 2]} />
         <LabeledText label="XD特性" text={['はりきり', 'てんのめぐみ'][individual.gcAbility]} />

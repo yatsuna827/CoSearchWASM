@@ -59,7 +59,7 @@ const Page: React.FC = () => {
       return (s: number, r: number, i: number, c: unknown) => {
         try {
           return !!fn(s, r, i, c)
-        } catch (e) {
+        } catch {
           return false
         }
       }
@@ -83,12 +83,7 @@ const Page: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <input
-            className="px-2 w-32"
-            type="number"
-            value={n}
-            onChange={(e) => setN(e.target.value)}
-          />
+          <input className="px-2 w-32" type="number" value={n} onChange={(e) => setN(e.target.value)} />
         </div>
 
         <div className="font-mono mb-4">

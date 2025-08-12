@@ -15,12 +15,12 @@ const REV_ADD_CONST : UInt = 0xA170F641
 
 ///|
 pub fn Lcg32::next(self : Lcg32) -> Lcg32 {
-  self._ * MUL_CONST + ADD_CONST
+  self.inner() * MUL_CONST + ADD_CONST
 }
 
 ///|
 pub fn Lcg32::prev(self : Lcg32) -> Lcg32 {
-  self._ * REV_MUL_CONST + REV_ADD_CONST
+  self.inner() * REV_MUL_CONST + REV_ADD_CONST
 }
 
 ///|
@@ -58,7 +58,7 @@ fn setup() -> Booster {
 
 ///|
 pub fn Lcg32::jump(self : Lcg32, n : UInt) -> Lcg32 {
-  let mut seed = self._
+  let mut seed = self.inner()
   let { a_t, b_t, .. } = cache.val.or_else(setup)
   let mut i = 0
   let mut n = n
@@ -74,7 +74,7 @@ pub fn Lcg32::jump(self : Lcg32, n : UInt) -> Lcg32 {
 
 ///|
 pub fn Lcg32::jump_back(self : Lcg32, n : UInt) -> Lcg32 {
-  let mut seed = self._
+  let mut seed = self.inner()
   let { ar_t, br_t, .. } = cache.val.or_else(setup)
   let mut i = 0
   let mut n = n
@@ -90,7 +90,7 @@ pub fn Lcg32::jump_back(self : Lcg32, n : UInt) -> Lcg32 {
 
 ///|
 pub fn Lcg32::to_string(self : Lcg32) -> String {
-  @fmt.to_hex(self._).pad_start(8, '0')
+  @fmt.to_hex(self.inner()).pad_start(8, '0')
 }
 
 ///|
@@ -136,22 +136,22 @@ fn get_index_from_base(seed : UInt, from : UInt) -> UInt {
 ///|
 pub fn Lcg32::get_index(self : Lcg32, from~ : UInt = 0) -> UInt {
   if from == 0 {
-    get_index_from_zero(self._)
+    get_index_from_zero(self.inner())
   } else {
-    get_index_from_base(self._, from)
+    get_index_from_base(self.inner(), from)
   }
 }
 
 ///|
 test "jump" {
   let lcg = Lcg32(0x08270827)
-  assert_eq!(lcg.next().next().next()._, lcg.jump(3)._)
-  assert_eq!(lcg.prev().prev().prev()._, lcg.jump_back(3)._)
+  assert_eq(lcg.next().next().next().inner(), lcg.jump(3).inner())
+  assert_eq(lcg.prev().prev().prev().inner(), lcg.jump_back(3).inner())
 }
 
 ///|
 test "prev" {
   let lcg = Lcg32(0xBEEFFACE)
-  assert_eq!(lcg.next().prev()._, lcg._)
-  assert_eq!(lcg.prev().next()._, lcg._)
+  assert_eq(lcg.next().prev().inner(), lcg.inner())
+  assert_eq(lcg.prev().next().inner(), lcg.inner())
 }

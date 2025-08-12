@@ -108,12 +108,7 @@ const ListTab: React.FC = () => {
       </div>
 
       <div className="mb-4">
-        <input
-          className="px-2 w-32"
-          type="number"
-          value={n}
-          onChange={(e) => setN(e.target.value)}
-        />
+        <input className="px-2 w-32" type="number" value={n} onChange={(e) => setN(e.target.value)} />
       </div>
 
       <Table>
@@ -134,9 +129,7 @@ const ListTab: React.FC = () => {
                 <TableCell>{LCG.stringify(s)}</TableCell>
                 <TableCell>{r.kind}</TableCell>
 
-                <TableCell>
-                  {r.kind === 'Appear' ? r.slot.species : r.kind === 'Event' ? evToJp[r.type] : ''}
-                </TableCell>
+                <TableCell>{r.kind === 'Appear' ? r.slot.species : r.kind === 'Event' ? evToJp[r.type] : ''}</TableCell>
                 <TableCell>{r.kind === 'Appear' ? toJapanese(natures[r.pid % 25]) : ''}</TableCell>
               </TableRow>
             )
@@ -211,7 +204,7 @@ const FindPathTab: React.FC = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {result.map(([s, fidgets], i) => {
+          {result.map(([s, fidgets]) => {
             return (
               <TableRow key={s}>
                 <TableCell>{LCG.stringify(s)}</TableCell>
@@ -265,12 +258,7 @@ const ListTab2: React.FC = () => {
       </div>
 
       <div className="mb-4">
-        <input
-          className="px-2 w-32"
-          type="number"
-          value={n}
-          onChange={(e) => setN(e.target.value)}
-        />
+        <input className="px-2 w-32" type="number" value={n} onChange={(e) => setN(e.target.value)} />
       </div>
 
       <Table>

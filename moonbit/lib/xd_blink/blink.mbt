@@ -69,6 +69,6 @@ test {
     let _ = obj.count_up(lcg)
 
   }
-  assert_eq!(lcg.to_string(), "1e7a40bb")
-  assert_eq!(obj.counter, 116)
+  assert_eq(lcg.to_string(), "1e7a40bb")
+  assert_eq(obj.counter, 116)
 }

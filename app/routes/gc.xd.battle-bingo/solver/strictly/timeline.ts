@@ -1,4 +1,4 @@
-import type { BingoPanel, PokemonPanel } from '../../bingo'
+import type { BingoPanel } from '../../bingo'
 
 const GRID_SIZE = 4
 

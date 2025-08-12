@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { MetaFunction } from 'react-router'
 
 import { cn } from '@/cn'
@@ -83,9 +83,7 @@ const Page: React.FC = () => {
 
             <div className="mb-4">
               <label>
-                <span className="block text-sm text-[#333]/80 mb-1 select-none">
-                  シートを開いた回数
-                </span>
+                <span className="block text-sm text-[#333]/80 mb-1 select-none">シートを開いた回数</span>
                 <input
                   className="px-2"
                   type="number"
@@ -146,10 +144,7 @@ const Page: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                   {result.map((row, i) => (
-                    <TableRow
-                      key={row.pos}
-                      className={cn(selectedPanels.has(row.pos) && 'bg-gray-300 text-gray-400')}
-                    >
+                    <TableRow key={row.pos} className={cn(selectedPanels.has(row.pos) && 'bg-gray-300 text-gray-400')}>
                       <TableHead>{i + 1}.</TableHead>
                       <TableHead>
                         <div className="flex justify-start items-center gap-2">
@@ -174,11 +169,7 @@ const Page: React.FC = () => {
 }
 
 const BingoSheetContainer: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return (
-    <div className="grid grid-cols-[repeat(4,96px)] grid-rows-[repeat(4,96px)] gap-2">
-      {children}
-    </div>
-  )
+  return <div className="grid grid-cols-[repeat(4,96px)] grid-rows-[repeat(4,96px)] gap-2">{children}</div>
 }
 
 const bonusName = {

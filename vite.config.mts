@@ -2,6 +2,7 @@
 import { reactRouter } from '@react-router/dev/vite'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   base: '/CoSearchWASM/',
@@ -12,10 +13,27 @@ export default defineConfig({
     format: 'es',
   },
   server: {
-    open: true,
+    // open: true,
     port: 8080,
   },
-  plugins: [reactRouter(), tsconfigPaths()],
+  plugins: [
+    reactRouter(), 
+    tsconfigPaths(),
+    VitePWA({
+      srcDir: 'app',
+      filename: 'sw.ts',
+      strategies: 'injectManifest',
+      injectRegister: false,
+      manifest: false,
+      injectManifest: {
+        injectionPoint: undefined
+      },
+      devOptions: {
+        enabled: true,
+        type: "module",
+      }
+    }),
+  ],
   test: {
     globals: true,
     watch: false,

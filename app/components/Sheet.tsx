@@ -45,15 +45,8 @@ const sheetVariants = cva(
   },
 )
 
-type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> &
-  VariantProps<typeof sheetVariants>
-const SheetContent: React.FC<SheetContentProps> = ({
-  side = 'right',
-  className,
-  children,
-  ref,
-  ...props
-}) => (
+type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> & VariantProps<typeof sheetVariants>
+const SheetContent: React.FC<SheetContentProps> = ({ side = 'right', className, children, ref, ...props }) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
@@ -71,35 +64,18 @@ const SheetHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className
 )
 
 const SheetFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => (
-  <div
-    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
-    {...props}
-  />
+  <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} {...props} />
 )
 
-const SheetTitle: React.FC<React.ComponentProps<typeof SheetPrimitive.Title>> = ({
-  className,
-  ref,
-  ...props
-}) => (
-  <SheetPrimitive.Title
-    ref={ref}
-    className={cn('text-lg font-semibold text-foreground', className)}
-    {...props}
-  />
+const SheetTitle: React.FC<React.ComponentProps<typeof SheetPrimitive.Title>> = ({ className, ref, ...props }) => (
+  <SheetPrimitive.Title ref={ref} className={cn('text-lg font-semibold text-foreground', className)} {...props} />
 )
 
 const SheetDescription: React.FC<React.ComponentProps<typeof SheetPrimitive.Description>> = ({
   className,
   ref,
   ...props
-}) => (
-  <SheetPrimitive.Description
-    ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
-    {...props}
-  />
-)
+}) => <SheetPrimitive.Description ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
 
 export {
   Sheet,

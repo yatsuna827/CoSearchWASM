@@ -1,4 +1,4 @@
-import { LCG, lcg } from '@/domain/lcg'
+import { lcg } from '@/domain/lcg'
 import { useCallback, useRef, useState } from 'react'
 
 const createOscilattorNode = (frequency: number) => {
@@ -58,11 +58,7 @@ const Page: React.FC = () => {
           seed:
           <span>0x{seed.toString(16).padStart(8, '0')}</span>
         </div>
-        <button
-          className="border border-black rounded px-4 py-1.5"
-          type="button"
-          onClick={handlePlay}
-        >
+        <button className="border border-black rounded px-4 py-1.5" type="button" onClick={handlePlay}>
           しばく
         </button>
         {history.map((rand, i) => {

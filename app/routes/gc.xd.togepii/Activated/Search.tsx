@@ -3,15 +3,12 @@ import { useRef, useState } from 'react'
 import { LabeledInput } from '@/components/LabeledInput'
 import { LCG } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
-
-import { useWASM } from '../wasm/Context'
+import { searchTogepii } from '@/lib/wasmApi'
 
 type Props = {
   targetSeed: LCG
 }
 export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
-  const wasmReturn = useWASM()
-
   const [currentSeed, currentSeedController] = useSeedInput('')
   const blinkMinInputRef = useRef<HTMLInputElement>(null)
   const blinkMaxInputRef = useRef<HTMLInputElement>(null)
@@ -27,40 +24,38 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
     if (!smokeMinInputRef.current) return
     if (!smokeMaxInputRef.current) return
 
-    const blinkFrames = [
-      Number(blinkMinInputRef.current.value),
-      Number(blinkMaxInputRef.current.value),
-    ] satisfies [number, number]
-    const smokeFrames = [
-      Number(smokeMinInputRef.current.value),
-      Number(smokeMaxInputRef.current.value),
-    ] satisfies [number, number]
+    const blinkFrames = [Number(blinkMinInputRef.current.value), Number(blinkMaxInputRef.current.value)] satisfies [
+      number,
+      number,
+    ]
+    const smokeFrames = [Number(smokeMinInputRef.current.value), Number(smokeMaxInputRef.current.value)] satisfies [
+      number,
+      number,
+    ]
     if ([...blinkFrames, ...smokeFrames].some((_) => !Number.isInteger(_))) return
 
-    const { searchTogepii } = await wasmReturn
-    const res = searchTogepii(currentSeed, targetSeed, {
-      blink: {
-        cooltime: 4,
-        framesRange: blinkFrames,
-        intervalRange: [0, 183],
-      },
-      smoke: {
-        framesRange: smokeFrames,
-      },
-    })
+    const res = await searchTogepii(
+      currentSeed,
+      targetSeed,
+      { cooltime: 4 },
+      0,
+      183,
+      blinkFrames[0],
+      blinkFrames[1],
+      smokeFrames[0],
+      smokeFrames[1],
+    )
 
-    setResult(res)
+    const formatted = res.map(
+      (item) => [item.f_blink, item.seed_blink, item.f_smoke, item.seed_smoke] satisfies [number, LCG, number, LCG],
+    )
+    setResult(formatted)
   }
 
   return (
     <section className="my-4">
       <form onSubmit={handleSearch}>
-        <LabeledInput
-          className="px-2 mb-4"
-          label="現在のseed"
-          placeholder="1234ABCD"
-          {...currentSeedController}
-        />
+        <LabeledInput className="px-2 mb-4" label="現在のseed" placeholder="1234ABCD" {...currentSeedController} />
         <div className="flex gap-4 mb-4 max-sm:flex-col">
           <LabeledInput
             ref={blinkMinInputRef}
@@ -107,20 +102,13 @@ export const SearchSection: React.FC<Props> = ({ targetSeed }) => {
         {result && (result.length ? `${result.length}件見つかりました` : '見つかりませんでした…')}
       </div>
 
-      <textarea
-        className="min-w-full min-h-64 block px-4 py-2"
-        readOnly
-        value={result ? formatResult(result) : ''}
-      />
+      <textarea className="min-w-full min-h-64 block px-4 py-2" readOnly value={result ? formatResult(result) : ''} />
     </section>
   )
 }
 
 const formatResult = (results: [number, LCG, number, LCG][]) => {
   return results
-    .map(
-      ([f_b, s_b, f_s, s_s]) =>
-        `瞬き: ${f_b}F (${LCG.stringify(s_b)}) → 不定消費: ${f_s}F (${LCG.stringify(s_s)})`,
-    )
+    .map(([f_b, s_b, f_s, s_s]) => `瞬き: ${f_b}F (${LCG.stringify(s_b)}) → 不定消費: ${f_s}F (${LCG.stringify(s_s)})`)
     .join('\n')
 }

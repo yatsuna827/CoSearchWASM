@@ -6,7 +6,6 @@ import { LCG } from '@/domain/gc/lcg'
 
 import { PageActivated } from './Activated'
 import { PageDefault } from './Default'
-import { WASMProvider } from './wasm/Context'
 
 export const meta: MetaFunction = () => {
   return [
@@ -36,11 +35,7 @@ const Page: React.FC = () => {
         <h1 className="text-lg font-semibold">PokemonXD トゲピー</h1>
       </div>
 
-      <Container>
-        <WASMProvider>
-          {targetSeed == null ? <PageDefault /> : <PageActivated targetSeed={targetSeed} />}
-        </WASMProvider>
-      </Container>
+      <Container>{targetSeed == null ? <PageDefault /> : <PageActivated targetSeed={targetSeed} />}</Container>
     </>
   )
 }

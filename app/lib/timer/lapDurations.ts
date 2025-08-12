@@ -1,8 +1,5 @@
 // FIXME: いいかんじの名前がきまらないし戻り値の型もキモい
-export const slice = (
-  durations: number[],
-  elapsed: number,
-): [lapIndex: number, lapRemain: number] => {
+export const slice = (durations: number[], elapsed: number): [lapIndex: number, lapRemain: number] => {
   let sum = 0
   for (let i = 0; i < durations.length; i++) {
     sum += durations[i]

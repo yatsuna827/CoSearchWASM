@@ -40,10 +40,7 @@ export const PokeBall: React.FC<Props> = ({ onFire }) => {
 
   return (
     <div className="w-full h-full flex justify-center items-center relative">
-      <div
-        className="flex justify-center items-center size-40 rounded-full bg-gradient-poke-ball"
-        onClick={handleFire}
-      >
+      <div className="flex justify-center items-center size-40 rounded-full bg-gradient-poke-ball" onClick={handleFire}>
         <div className="rounded-full border-[7px] border-black size-10 box-content bg-[#F5F5F5] flex items-center justify-center relative">
           <div className="rounded-full size-5 shadow-lg bg-white" />
           <div

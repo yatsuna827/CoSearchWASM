@@ -1,0 +1,25 @@
+# Build outputs
+dist/
+build/
+target/
+node_modules/
+
+# WASM files
+*.wasm
+app/wasm/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Logs
+*.log
+
+# Environment files
+.env*
+
+# Cache directories
+.cache/
+.vite/

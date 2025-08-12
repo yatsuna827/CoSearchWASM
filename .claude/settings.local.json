@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright__browser_navigate",
+      "Bash(npm run dev:*)",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_tab_new",
+      "mcp__playwright__browser_network_requests",
+      "mcp__playwright__browser_tab_select",
+      "Bash(ls:*)",
+      "mcp__lsmcp__lsmcp_*",
+      "mcp__typescript__lsmcp_*"
+    ],
+    "deny": []
+  }
+}

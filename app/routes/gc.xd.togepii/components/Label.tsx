@@ -15,10 +15,7 @@ export const Label: React.FC<React.ComponentProps<'div'> & { variant?: Variant }
   ...props
 }) => {
   return (
-    <div
-      className={cn('leading-none text-[#333]/80 select-none', variants[variant], className)}
-      {...props}
-    >
+    <div className={cn('leading-none text-[#333]/80 select-none', variants[variant], className)} {...props}>
       {children}
     </div>
   )

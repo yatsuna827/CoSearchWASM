@@ -4,11 +4,11 @@ import { LabeledInput } from '@/components/LabeledInput'
 import type { IVs } from '@/domain/gc/generators'
 import { useSeedInput } from '@/hooks/useSeedInput'
 
-import { LCG, next, prev } from '@/domain/gc/lcg'
+import { next, prev } from '@/domain/gc/lcg'
 import { Ref } from '@/utilities/ref'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { generateTogepii } from '../domain/generateTogepii'
-import { useWASM } from '../wasm/Context'
+import { iterSmoke } from '@/lib/wasmApi'
 
 type Stats = [number, number, number, number, number, number]
 type SearchGapResult = {
@@ -30,8 +30,6 @@ type Input = {
 }
 
 export const AdjustGapSection = () => {
-  const wasmReturn = useWASM()
-
   const { register, handleSubmit } = useForm<Input>()
 
   const [searchGapSeed, searchGapSeedController] = useSeedInput('')
@@ -44,14 +42,13 @@ export const AdjustGapSection = () => {
     const targetFrame = Number(gapTargetFramesInputRef.current.value)
     if (!Number.isInteger(targetFrame) || targetFrame <= 0) return
 
-    const { iterSmoke } = await wasmReturn
-
     const lcg = Ref.from(searchGapSeed)
     lcg.update((s) => prev(s, data.blinkErrorRange))
 
     const result: SearchGapResult[] = []
     for (let gap = -data.blinkErrorRange; gap <= data.blinkErrorRange; gap++) {
-      const res = iterSmoke(lcg.unwrap(), targetFrame + 51)
+      const smokeResults = await iterSmoke(lcg.unwrap(), targetFrame + 51)
+      const res = smokeResults
         .slice(Math.max(0, targetFrame - 50))
         .map(({ i, seed }) => {
           const { stats, ivs } = generateTogepii(seed)
@@ -104,12 +101,7 @@ export const AdjustGapSection = () => {
           <span>F</span>
         </div>
 
-        <LabeledInput
-          ref={gapTargetFramesInputRef}
-          className="px-2 mb-4"
-          label="不定消費 待機時間"
-          type="number"
-        />
+        <LabeledInput ref={gapTargetFramesInputRef} className="px-2 mb-4" label="不定消費 待機時間" type="number" />
 
         <div className="flex [&_input]:w-16 [&_input]:pl-2 gap-4 items-end">
           <input type="number" {...register('h', { valueAsNumber: true })} />
@@ -128,11 +120,7 @@ export const AdjustGapSection = () => {
         </button>
       </form>
 
-      <textarea
-        className="min-w-full min-h-64 block px-4 py-2"
-        readOnly
-        value={formatResult(gapResult)}
-      />
+      <textarea className="min-w-full min-h-64 block px-4 py-2" readOnly value={formatResult(gapResult)} />
     </section>
   )
 }
