@@ -8,7 +8,7 @@ pub fn find_seed_by_blink(
   max : UInt,
   cool_time : Int,
   tolerance : Int,
-  input : IntArrayBuilder
+  input : IntArrayBuilder,
 ) -> Unit {
   let arr = input.build().unwrap()
   for

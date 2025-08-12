@@ -5,7 +5,7 @@ pub fn find(
   max : UInt,
   cool_time : Int,
   input_blank : FixedArray[Int],
-  tolerance : Int
+  tolerance : Int,
 ) -> Array[@lcg.Lcg32] {
   let modosu = (1400 + input_blank.length() * 180).reinterpret_as_uint()
   let s = if min > modosu { current.jump(min - modosu) } else { current }

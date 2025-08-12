@@ -1,7 +1,7 @@
 ///|
 pub fn iter_blink(
   seed : @lcg.Lcg32,
-  new_blink : () -> BlinkObject
+  new_blink : () -> BlinkObject,
 ) -> Iter[(@lcg.Lcg32, Int, Int)] {
   Iter::new(fn(yield_) {
     let b = new_blink()
