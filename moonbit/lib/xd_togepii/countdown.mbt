@@ -13,7 +13,7 @@ pub fn OutskirtStand::new() -> OutskirtStand {
 ///|
 pub fn OutskirtStand::count_up(
   self : OutskirtStand,
-  lcg : @lcg.Lcg32Ref
+  lcg : @lcg.Lcg32Ref,
 ) -> Unit {
   // 遅延発生するカウンタの処理
   for _ in self.lazy_queue.filter(fn(x) { x == 0 }) {

@@ -33,7 +33,7 @@ pub fn Queue::to_array(self : Queue) -> Array[Int] {
 pub fn Queue::approx_eq(
   self : Queue,
   array : FixedArray[Int],
-  tolerance : Int
+  tolerance : Int,
 ) -> Bool {
   for i in 0..<self.array.length() {
     if (self.at(i) - array[i]).abs() > tolerance {

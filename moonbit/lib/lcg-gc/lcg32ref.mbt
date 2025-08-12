@@ -1,5 +1,5 @@
 ///|
-pub(all) type Lcg32Ref Ref[Lcg32]
+pub(all) struct Lcg32Ref(Ref[Lcg32])
 
 ///|
 pub fn Lcg32::to_ref(self : Lcg32) -> Lcg32Ref {

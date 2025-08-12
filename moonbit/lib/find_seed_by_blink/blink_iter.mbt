@@ -9,7 +9,7 @@ pub struct BlinkIterator {
 ///|
 pub fn BlinkIterator::new(
   blinker : @blink.BlinkObject,
-  lcg : @lcg.Lcg32
+  lcg : @lcg.Lcg32,
 ) -> BlinkIterator {
   { blinker, lcg: lcg.to_ref(), f_cur: 0, cur: (lcg, 0) }
 }

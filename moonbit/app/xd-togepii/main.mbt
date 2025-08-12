@@ -3,7 +3,7 @@ fn cb_search_togepii(
   f_blink : Int,
   seed_blink : UInt,
   f_smoke : Int,
-  seed_smoke : UInt
+  seed_smoke : UInt,
 ) = "callback" "search_togepii"
 
 ///|
@@ -22,7 +22,7 @@ pub fn search_togepii(
   minBlinkFrames : Int,
   maxBlinkFrames : Int,
   minFrames : Int,
-  maxFrames : Int
+  maxFrames : Int,
 ) -> Unit {
   let _ = _iter_blink(Lcg32(seed), fn() { obj })
     .drop_while(fn(p) { minBlinkFrames <= p.1 })
@@ -59,7 +59,7 @@ pub fn iter_smoke(seed : UInt, take : Int) -> Unit {
 ///|
 fn _iter_blink(
   seed : @pk_rng.Lcg32,
-  new_blink : () -> @blink.BlinkObject
+  new_blink : () -> @blink.BlinkObject,
 ) -> Iter[(@pk_rng.Lcg32, Int, Int)] {
   Iter::new(fn(yield_) {
     let b = new_blink()
@@ -83,7 +83,7 @@ fn _iter_blink(
 ///|
 fn _iter_smoke(
   seed : @pk_rng.Lcg32,
-  new_obj : () -> @togepii.OutskirtStand
+  new_obj : () -> @togepii.OutskirtStand,
 ) -> Iter2[Int, @pk_rng.Lcg32] {
   Iter2::new(fn(yield_) {
     let obj = new_obj()
@@ -117,7 +117,7 @@ pub fn find_seed(
   b : UInt,
   c : UInt,
   d : UInt,
-  s : UInt
+  s : UInt,
 ) -> Unit {
   for seed in @finder.find_seed(h, a, b, c, d, s, offset=3) {
     cb_find_seed(seed.inner())
