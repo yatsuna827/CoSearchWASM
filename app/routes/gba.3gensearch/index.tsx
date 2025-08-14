@@ -120,13 +120,13 @@ const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
         {result.map((result, i) => {
           return (
             <tr key={i}>
-              <td>{`0x${result.initialSeed.toString(16).padStart(4, '0')}`}</td>
+              <td>{`0x${result.initialSeed.toString(16).toUpperCase().padStart(4, '0')}`}</td>
               <td>{result.frame}</td>
               <td>{result.gap}</td>
               <td>{LCG.stringify(result.seed)}</td>
               <td>{result.name}</td>
               <td>{result.level}</td>
-              <td>{result.pid.toString(16).padStart(8, '4')}</td>
+              <td>{result.pid.toString(16).toUpperCase().padStart(8, '4')}</td>
               <td>{toJapanese(natures[result.pid % 25])}</td>
               <td>{result.ivs[0]}</td>
               <td>{result.ivs[1]}</td>
