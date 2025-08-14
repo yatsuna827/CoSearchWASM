@@ -55,8 +55,8 @@ const Page: React.FC = () => {
   )
 
   return (
-    <div>
-      <div className="h-80">
+    <div className="mx-4">
+      <div className="h-80 flex overflow-y-auto justify-start items-start">
         <ResultTable result={result} />
       </div>
 
@@ -120,7 +120,7 @@ const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
         {result.map((result, i) => {
           return (
             <tr key={i}>
-              <td>{`0x${result.initialSeed.toString(16).toUpperCase().padStart(4, '0')}`}</td>
+              <td>{result.initialSeed.toString(16).toUpperCase().padStart(4, '0')}</td>
               <td>{result.frame}</td>
               <td>{result.gap}</td>
               <td>{LCG.stringify(result.seed)}</td>
