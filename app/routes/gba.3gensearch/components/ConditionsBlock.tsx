@@ -192,7 +192,7 @@ const FrameInput: React.FC = () => {
     if (!Number.isInteger(range)) return
 
     const min = Math.max(0, t - range)
-    const max = target + range
+    const max = t + range
     setFrameMin(`${min}`)
     setFrameMax(`${max}`)
   }
@@ -233,7 +233,7 @@ const FrameInput: React.FC = () => {
         />
         <span>F</span>
         <span>±</span>
-        <input ref={rangeInputRef} type="number" className="border w-24" />
+        <input ref={rangeInputRef} type="number" defaultValue={100} className="border w-24" />
         <span>F</span>
         <button type="button" className="border px-2" onClick={handleSetFramesFromRange}>
           ↑
