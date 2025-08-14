@@ -1,4 +1,4 @@
-import { Ref } from '@util/ref'
+import { Ref } from '@/utilities/ref'
 import { getRand, type LCG } from '../lcg'
 
 type Options = {

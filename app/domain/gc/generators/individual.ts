@@ -1,6 +1,6 @@
-import { Ref } from '@util/ref'
-import { type LCG, getRand, next } from '../lcg'
-import { type IVs, generateIVs } from './ivs'
+import { Ref } from '@/utilities/ref'
+import { getRand, next, type LCG } from '../lcg'
+import { generateIVs, type IVs } from './ivs'
 import { generatePID } from './pid'
 
 export type Individual = {

@@ -1,5 +1,5 @@
 import type { Attributes } from '@/domain/type'
-import { Ref } from '@util/ref'
+import { Ref } from '@/utilities/ref'
 import { getRand, LCG, next } from '../lcg'
 
 export type IVs = Attributes
