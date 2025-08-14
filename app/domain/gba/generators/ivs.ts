@@ -27,8 +27,8 @@ const interruptedMiddle = (seed: LCG): [IVs, LCG] => {
 // Method2
 const interruptedPrior = (seed: LCG): [IVs, LCG] => {
   const lcg = Ref.from(seed)
-  const hab = lcg.apply(getRand)
   lcg.update(next)
+  const hab = lcg.apply(getRand)
   const scd = lcg.apply(getRand)
 
   return [toIVs(hab, scd), lcg.unwrap()]
