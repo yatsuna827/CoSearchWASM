@@ -1,28 +1,91 @@
+import { generateStaticSymbol } from '@/domain/gba/generators/individual'
+import { IVs, SchemeName } from '@/domain/gba/generators/ivs'
+import { LCG, next } from '@/domain/gba/lcg'
 import { natures, toJapanese } from '@/domain/nature'
-import React, { useState } from 'react'
+import { Attributes } from '@/domain/type'
+import { Ref } from '@/utilities/ref'
+import { useAtomCallback } from 'jotai/utils'
+import { useCallback, useState } from 'react'
 import type { MetaFunction } from 'react-router'
+import { ConditionsBlock } from './components'
+import { conditionStateAtom } from './components/ConditionsBlock'
 
 export const meta: MetaFunction = () => {
   return [{ title: '3genSearch' }, { name: 'description', content: '' }]
 }
 
 const Page: React.FC = () => {
+  const [result, setResult] = useState<ResultRecord[]>([])
+  const handleClick = useAtomCallback(
+    useCallback((get) => {
+      const condition = get(conditionStateAtom)
+      if (!condition) return
+
+      const { initialSeed, frame, ivsScheme } = condition
+      if (initialSeed.mode !== 'fixed') return // TODO: impl
+
+      const g = generateStaticSymbol(ivsScheme)
+
+      const lcg = Ref.from(next(initialSeed.value, frame.range[0]))
+      const result: ResultRecord[] = []
+      for (let f = frame.range[0]; f <= frame.range[1]; f++) {
+        const [individual] = lcg.map(g)
+        result.push({
+          initialSeed: initialSeed.value,
+          seed: lcg.unwrap(),
+          frame: f,
+          gap: f - frame.target,
+          pid: individual.pid,
+          ivs: individual.ivs,
+          ivsScheme,
+
+          name: 'ヌオー',
+          level: 50,
+          stats: [0, 0, 0, 0, 0, 0],
+          ability: 'しめりけ',
+          gender: '-',
+          hiddenPower: '氷70',
+        })
+
+        lcg.update(next)
+      }
+
+      setResult(result)
+    }, []),
+  )
+
   return (
     <div>
       <div className="h-80">
-        <ResultTable />
+        <ResultTable result={result} />
       </div>
 
       <div className="grid grid-cols-3">
         <ConditionsBlock />
         <FilterBlock />
-        <ExecuteBlock />
+        <ExecuteBlock onExecude={handleClick} />
       </div>
     </div>
   )
 }
 
-const ResultTable: React.FC = () => {
+type ResultRecord = {
+  initialSeed: LCG
+  frame: number
+  gap: number
+  seed: LCG
+  name: string
+  level: number
+  pid: number
+  ivs: IVs
+  ivsScheme: SchemeName
+  gender: string
+  ability: string
+  stats: Attributes
+  hiddenPower: string
+}
+
+const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
   return (
     <table>
       <thead>
@@ -54,220 +117,38 @@ const ResultTable: React.FC = () => {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>0x0000</td>
-          <td>123456</td>
-          <td>-1024</td>
-          <td>0xBEEFFACE</td>
-          <td>ヌオー</td>
-          <td>30</td>
-          <td>ABCD1234</td>
-          <td>いじっぱり</td>
-          <td>31</td>
-          <td>31</td>
-          <td>31</td>
-          <td>0</td>
-          <td>31</td>
-          <td>31</td>
-          <td>メソッド1</td>
-          <td>♂</td>
-          <td>しめりけ</td>
-          <td>999</td>
-          <td>999</td>
-          <td>999</td>
-          <td>99</td>
-          <td>999</td>
-          <td>99</td>
-          <td>氷70</td>
-        </tr>
+        {result.map((result, i) => {
+          return (
+            <tr key={i}>
+              <td>{`0x${result.initialSeed.toString(16).padStart(4, '0')}`}</td>
+              <td>{result.frame}</td>
+              <td>{result.gap}</td>
+              <td>{LCG.stringify(result.seed)}</td>
+              <td>{result.name}</td>
+              <td>{result.level}</td>
+              <td>{result.pid.toString(16).padStart(8, '4')}</td>
+              <td>{toJapanese(natures[result.pid % 25])}</td>
+              <td>{result.ivs[0]}</td>
+              <td>{result.ivs[1]}</td>
+              <td>{result.ivs[2]}</td>
+              <td>{result.ivs[3]}</td>
+              <td>{result.ivs[4]}</td>
+              <td>{result.ivs[5]}</td>
+              <td>{result.ivsScheme}</td>
+              <td>{result.gender}</td>
+              <td>{result.ability}</td>
+              <td>{result.stats[0]}</td>
+              <td>{result.stats[1]}</td>
+              <td>{result.stats[2]}</td>
+              <td>{result.stats[3]}</td>
+              <td>{result.stats[4]}</td>
+              <td>{result.stats[5]}</td>
+              <td>{result.hiddenPower}</td>
+            </tr>
+          )
+        })}
       </tbody>
     </table>
-  )
-}
-
-// ---
-
-const ConditionsBlock: React.FC = () => {
-  return (
-    <div className="flex size-full border p-2 flex-col gap-2">
-      <div>検索範囲</div>
-
-      <InitialSeedBlock />
-
-      <FrameInput />
-      <IVsMethod />
-    </div>
-  )
-}
-const InitialSeedBlock: React.FC = () => {
-  // 入力値の生のままの値
-  // 不正値を弾いたり変換したりはここでは行わない
-  type InitialSeedState = {
-    fixed: string
-    rtc: [number, number]
-    painting: [number, number]
-  }
-
-  const [mode, setMode] = useState<'fixed' | 'rtc' | 'painting'>('fixed')
-  const [state, setState] = useState<InitialSeedState>({
-    fixed: '0',
-    rtc: [0, 3],
-    painting: [1200, 1500],
-  })
-  const handleChangeMode = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const v = e.target.value
-    if (v !== 'fixed' && v !== 'rtc' && v !== 'painting') return
-
-    setMode(v)
-  }
-
-  return (
-    <div>
-      <select value={mode} onChange={handleChangeMode}>
-        <option value="fixed">固定</option>
-        <option value="rtc">電池あり</option>
-        <option value="painting">絵画</option>
-      </select>
-
-      {mode === 'fixed' && (
-        <div>
-          <span className="mr-2">初期seed 0x</span>
-          <input
-            className="border w-24"
-            value={state.fixed}
-            onChange={(e) => {
-              setState((prev) => ({ ...prev, fixed: e.target.value }))
-            }}
-          />
-        </div>
-      )}
-      {mode === 'rtc' && (
-        <div>
-          電池待機
-          <input
-            type="number"
-            className="border w-24"
-            value={state.rtc[0]}
-            onChange={(e) => {
-              setState((prev) => ({ ...prev, rtc: [Number(e.target.value), prev.rtc[1]] }))
-            }}
-          />
-          <span>分</span>
-          <span>～</span>
-          <input
-            type="number"
-            className="border w-24"
-            value={state.rtc[1]}
-            onChange={(e) => {
-              setState((prev) => ({ ...prev, rtc: [prev.rtc[0], Number(e.target.value)] }))
-            }}
-          />
-          <span>分</span>
-        </div>
-      )}
-      {mode === 'painting' && (
-        <div>
-          絵画
-          <input
-            type="number"
-            className="border w-24"
-            value={state.painting[0]}
-            onChange={(e) => {
-              setState((prev) => ({ ...prev, painting: [Number(e.target.value), prev.painting[1]] }))
-            }}
-          />
-          <span>F</span>
-          <span>～</span>
-          <input
-            type="number"
-            className="border w-24"
-            value={state.painting[1]}
-            onChange={(e) => {
-              setState((prev) => ({ ...prev, painting: [prev.painting[0], Number(e.target.value)] }))
-            }}
-          />
-          <span>F</span>
-        </div>
-      )}
-    </div>
-  )
-}
-
-const FrameInput: React.FC = () => {
-  const [frameMin, setFrameMin] = useState(1949)
-  const [frameMax, setFrameMax] = useState(2149)
-  const [target, setTarget] = useState(2049)
-  const [range, setRange] = useState(100)
-
-  const handleSetFramesFromRange = () => {
-    const min = Math.max(0, target - range)
-    const max = target + range
-    setFrameMin(min)
-    setFrameMax(max)
-  }
-
-  return (
-    <div>
-      <div>
-        <input
-          type="number"
-          className="border w-24"
-          value={frameMin}
-          onChange={(e) => {
-            setFrameMin(Number(e.target.value))
-          }}
-        />
-        <span>F</span>
-        <span>～</span>
-        <input
-          type="number"
-          className="border w-24"
-          value={frameMax}
-          onChange={(e) => {
-            setFrameMax(Number(e.target.value))
-          }}
-        />
-        <span>F</span>
-      </div>
-
-      <div>
-        <span>目標フレーム</span>
-        <input
-          type="number"
-          className="border w-24"
-          value={target}
-          onChange={(e) => {
-            setTarget(Number(e.target.value))
-          }}
-        />
-        <span>F</span>
-        <span>±</span>
-        <input
-          type="number"
-          className="border w-24"
-          value={range}
-          onChange={(e) => {
-            setRange(Number(e.target.value))
-          }}
-        />
-        <span>F</span>
-        <button type="button" className="border px-2" onClick={handleSetFramesFromRange}>
-          ↑
-        </button>
-      </div>
-    </div>
-  )
-}
-
-const IVsMethod: React.FC = () => {
-  return (
-    <div>
-      <select defaultValue="method1">
-        <option value="method1">Method1</option>
-        <option value="method2">Method2</option>
-        <option value="method4">Method4</option>
-      </select>
-    </div>
   )
 }
 
@@ -416,13 +297,15 @@ const ShinyInput: React.FC = () => {
 
 // ---
 
-const ExecuteBlock: React.FC = () => {
+const ExecuteBlock: React.FC<{ onExecude: () => void }> = ({ onExecude }) => {
   return (
     <div className="flex size-full border p-2">
       <div className="grid size-full">
         <VersionSelect />
 
-        <button>検索</button>
+        <button type="button" onClick={onExecude} className="border w-16 h-8">
+          検索
+        </button>
       </div>
     </div>
   )
