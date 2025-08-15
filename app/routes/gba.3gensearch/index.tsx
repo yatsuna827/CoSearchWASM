@@ -1,3 +1,4 @@
+import { cn } from '@/cn'
 import { generateStaticSymbol } from '@/domain/gba/generators/individual'
 import { IVs, SchemeName } from '@/domain/gba/generators/ivs'
 import { LCG, next } from '@/domain/gba/lcg'
@@ -55,12 +56,16 @@ const Page: React.FC = () => {
   )
 
   return (
-    <div className="mx-4">
-      <div className="h-80 flex overflow-y-auto justify-start items-start">
+    <div className="px-4 pb-4 grid size-full overflow-hidden grid-rows-[32px_minmax(0,1fr)_fit-content(100%)] gap-2">
+      <div>
+        <h1>3genSearch</h1>
+      </div>
+
+      <div className="flex size-full justify-start items-start overflow-y-auto">
         <ResultTable result={result} />
       </div>
 
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-3 size-full">
         <ConditionsBlock />
         <FilterBlock />
         <ExecuteBlock onExecude={handleClick} />
@@ -87,8 +92,27 @@ type ResultRecord = {
 
 const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
   return (
-    <table>
-      <thead>
+    <table
+      className={cn(
+        'grid size-full',
+        'grid-cols-[repeat(3,minmax(0,1fr))_90px_80px_40px_90px_80px_repeat(6,32px)_repeat(3,minmax(0,1fr))_repeat(6,32px)_minmax(0,1fr)]',
+        'grid-rows-[24px_minmax(0,1fr)]',
+        'border-x',
+        '[&:not(:first-child)]:[&_tr]:border-t',
+        '[&:not(:first-child)]:[&_th]:border-l',
+        '[&:not(:first-child)]:[&_td]:border-l',
+        // reset default table styles
+        'border-collapse',
+        'border-spacing-0',
+        ['[&_tr]:grid', '[&_tr]:grid-cols-subgrid', '[&_tr]:col-span-full'],
+        ['[&_thead]:grid', '[&_thead]:grid-cols-subgrid', '[&_thead]:col-span-full'],
+        ['[&_tbody]:grid', '[&_tbody]:grid-cols-subgrid', '[&_tbody]:col-span-full'],
+        ['[&_tfoot]:grid', '[&_tfoot]:grid-cols-subgrid', '[&_tfoot]:col-span-full'],
+        ['[&_th]:block', '[&_th]:px-1', '[&_th]:py-0', '[&_th]:align-top', '[&_th]:text-left'],
+        ['[&_td]:block', '[&_td]:px-1', '[&_td]:py-0', '[&_td]:align-top', '[&_td]:text-left'],
+      )}
+    >
+      <thead className="border-b border-t bg-white h-6">
         <tr>
           <th>初期seed</th>
           <th>F</th>
@@ -116,10 +140,10 @@ const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
           <th>めざパ</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody className="border-b bg-gray-300 overflow-auto">
         {result.map((result, i) => {
           return (
-            <tr key={i}>
+            <tr key={i} className="bg-white [&:nth-child(odd)]:bg-yellow-100">
               <td>{result.initialSeed.toString(16).toUpperCase().padStart(4, '0')}</td>
               <td>{result.frame}</td>
               <td>{result.gap}</td>
