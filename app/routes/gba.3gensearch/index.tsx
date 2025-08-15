@@ -1,6 +1,6 @@
 import { cn } from '@/cn'
 import { generateStaticSymbol } from '@/domain/gba/generators/individual'
-import { IVs, SchemeName } from '@/domain/gba/generators/ivs'
+import { IVs, SchemeName, popularName } from '@/domain/gba/generators/ivs'
 import { LCG, next } from '@/domain/gba/lcg'
 import { natures, toJapanese } from '@/domain/nature'
 import { Attributes } from '@/domain/type'
@@ -158,7 +158,7 @@ const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
               <td>{result.ivs[3]}</td>
               <td>{result.ivs[4]}</td>
               <td>{result.ivs[5]}</td>
-              <td>{result.ivsScheme}</td>
+              <td>{popularName[result.ivsScheme]}</td>
               <td>{result.gender}</td>
               <td>{result.ability}</td>
               <td>{result.stats[0]}</td>

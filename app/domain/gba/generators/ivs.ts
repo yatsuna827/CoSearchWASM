@@ -4,6 +4,12 @@ import { getRand, LCG, next } from '../lcg'
 
 export type IVs = Attributes
 export type SchemeName = keyof typeof SCHEME
+export const popularName = {
+  standard: 'method1',
+  roamingBug: '-',
+  interruptedPrior: 'method2',
+  interruptedMiddle: 'method4',
+} satisfies Record<SchemeName, string>
 
 export const generateIVs = (scheme: SchemeName) => SCHEME[scheme]
 
