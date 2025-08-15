@@ -10,6 +10,7 @@ import { useCallback, useState } from 'react'
 import type { MetaFunction } from 'react-router'
 import { ConditionsBlock } from './components'
 import { conditionStateAtom } from './components/ConditionsBlock'
+import { FilterBlock, filterConditionAtom } from './components/FilterBlock'
 
 export const meta: MetaFunction = () => {
   return [{ title: '3genSearch' }, { name: 'description', content: '' }]
@@ -22,6 +23,8 @@ const Page: React.FC = () => {
       const condition = get(conditionStateAtom)
       if (!condition) return
 
+      const filter = get(filterConditionAtom)
+
       const { initialSeed, frame, ivsScheme } = condition
       if (initialSeed.mode !== 'fixed') return // TODO: impl
 
@@ -29,8 +32,10 @@ const Page: React.FC = () => {
 
       const lcg = Ref.from(next(initialSeed.value, frame.range[0]))
       const result: ResultRecord[] = []
-      for (let f = frame.range[0]; f <= frame.range[1]; f++) {
+      for (let f = frame.range[0]; f <= frame.range[1]; f++, lcg.update(next)) {
         const [individual] = lcg.map(g)
+        if (filter && !filter.ivs(individual.ivs)) continue
+
         result.push({
           initialSeed: initialSeed.value,
           seed: lcg.unwrap(),
@@ -47,8 +52,6 @@ const Page: React.FC = () => {
           gender: '-',
           hiddenPower: '氷70',
         })
-
-        lcg.update(next)
       }
 
       setResult(result)
@@ -106,7 +109,7 @@ const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
         'border-spacing-0',
         ['[&_tr]:grid', '[&_tr]:grid-cols-subgrid', '[&_tr]:col-span-full'],
         ['[&_thead]:grid', '[&_thead]:grid-cols-subgrid', '[&_thead]:col-span-full'],
-        ['[&_tbody]:grid', '[&_tbody]:grid-cols-subgrid', '[&_tbody]:col-span-full'],
+        ['[&_tbody]:grid', '[&_tbody]:grid-cols-subgrid', '[&_tbody]:col-span-full', '[&_tbody]:auto-rows-min'],
         ['[&_tfoot]:grid', '[&_tfoot]:grid-cols-subgrid', '[&_tfoot]:col-span-full'],
         ['[&_th]:block', '[&_th]:px-1', '[&_th]:py-0', '[&_th]:align-top', '[&_th]:text-left'],
         ['[&_td]:block', '[&_td]:px-1', '[&_td]:py-0', '[&_td]:align-top', '[&_td]:text-left'],
@@ -140,10 +143,10 @@ const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
           <th>めざパ</th>
         </tr>
       </thead>
-      <tbody className="border-b bg-gray-300 overflow-auto">
+      <tbody className="bg-gray-300 overflow-auto">
         {result.map((result, i) => {
           return (
-            <tr key={i} className="bg-white [&:nth-child(odd)]:bg-yellow-100">
+            <tr key={i} className="bg-white [&:nth-child(odd)]:bg-yellow-100 h-6">
               <td>{result.initialSeed.toString(16).toUpperCase().padStart(4, '0')}</td>
               <td>{result.frame}</td>
               <td>{result.gap}</td>
@@ -173,149 +176,6 @@ const ResultTable: React.FC<{ result: ResultRecord[] }> = ({ result }) => {
         })}
       </tbody>
     </table>
-  )
-}
-
-// ---
-
-const FilterBlock: React.FC = () => {
-  return (
-    <div className="flex size-full border p-2">
-      <div className="grid size-full">
-        <SpeciesSelect />
-        <LevelInput />
-        <IVsInput />
-        <NatureSelect />
-        <AbilitySelect />
-        <GenderSelect />
-        <HiddenPowerInput />
-        <ShinyInput />
-      </div>
-    </div>
-  )
-}
-
-const SpeciesSelect: React.FC = () => {
-  return (
-    <div>
-      <input className="border" />
-    </div>
-  )
-}
-const LevelInput: React.FC = () => {
-  return (
-    <div>
-      <span>Lv.</span>
-      <input type="number" className="border w-16 pl-1" />
-    </div>
-  )
-}
-const IVsInput: React.FC = () => {
-  return (
-    <div>
-      <div>
-        <span>H</span>
-        <input type="number" className="border w-16 pl-1" />
-        <span>～</span>
-        <input type="number" className="border w-16 pl-1" />
-      </div>
-
-      <div>
-        <span>A</span>
-        <input type="number" className="border w-16 pl-1" />
-        <span>～</span>
-        <input type="number" className="border w-16 pl-1" />
-      </div>
-
-      <div>
-        <span>B</span>
-        <input type="number" className="border w-16 pl-1" />
-        <span>～</span>
-        <input type="number" className="border w-16 pl-1" />
-      </div>
-
-      <div>
-        <span>C</span>
-        <input type="number" className="border w-16 pl-1" />
-        <span>～</span>
-        <input type="number" className="border w-16 pl-1" />
-      </div>
-
-      <div>
-        <span>D</span>
-        <input type="number" className="border w-16 pl-1" />
-        <span>～</span>
-        <input type="number" className="border w-16 pl-1" />
-      </div>
-
-      <div>
-        <span>S</span>
-        <input type="number" className="border w-16 pl-1" />
-        <span>～</span>
-        <input type="number" className="border w-16 pl-1" />
-      </div>
-    </div>
-  )
-}
-const NatureSelect: React.FC = () => {
-  return (
-    <div>
-      <select defaultValue={natures[0]}>
-        {natures.map((nature) => (
-          <option key={nature} value={nature}>
-            {toJapanese(nature)}
-          </option>
-        ))}
-      </select>
-    </div>
-  )
-}
-const AbilitySelect: React.FC = () => {
-  return (
-    <div>
-      <select>
-        <option>しんりょく</option>
-      </select>
-    </div>
-  )
-}
-const GenderSelect: React.FC = () => {
-  return (
-    <div>
-      <select>
-        <option>♂</option>
-        <option>♀</option>
-      </select>
-    </div>
-  )
-}
-const HiddenPowerInput: React.FC = () => {
-  return (
-    <div>
-      <span>めざパ</span>
-      <select>
-        <option>こおり</option>
-        <option>ほのお</option>
-        <option>くさ</option>
-        <option>かくとう</option>
-        <option>ゴースト</option>
-      </select>
-      <input type="number" defaultValue={30} className="border w-16 pl-1" />
-      <span>～</span>
-    </div>
-  )
-}
-const ShinyInput: React.FC = () => {
-  return (
-    <div>
-      <span>色違いのみ</span>
-      <input type="checkbox" />
-
-      <span>表ID</span>
-      <input className="border w-24 pl-1" />
-      <span>裏ID</span>
-      <input className="border w-24 pl-1" />
-    </div>
   )
 }
 
