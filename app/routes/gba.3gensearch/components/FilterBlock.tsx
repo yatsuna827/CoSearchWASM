@@ -1,28 +1,26 @@
 import { IVs } from '@/domain/gba/generators/ivs'
-import { natures, toJapanese } from '@/domain/nature'
+import { Nature, natures, toJapanese } from '@/domain/nature'
 import { PrimitiveAtom, atom, useAtom } from 'jotai'
 import React from 'react'
 import z from 'zod'
 
 export const FilterBlock: React.FC = () => {
   return (
-    <div className="flex size-full border p-2">
-      <div className="grid size-full grid-cols-2">
-        <div className="grid size-full gap-x-2 gap-y-1 grid-cols-[16px_64px_16px_64px] auto-rows-auto items-start">
-          <SpeciesSelect />
-          <LevelInput />
+    <div className="flex size-full border p-2 gap-4">
+      <div className="grid gap-x-2 gap-y-1 grid-cols-[16px_64px_16px_64px] auto-rows-auto items-start">
+        <SpeciesSelect />
 
-          {Object.keys(ivsAtoms).map((key) => (
-            <IVInput key={key} label={key.toUpperCase()} ivAtom={ivsAtoms[key as keyof typeof ivsAtoms]} />
-          ))}
-        </div>
-        <div>
-          <NatureSelect />
-          <AbilitySelect />
-          <GenderSelect />
-          <HiddenPowerInput />
-          <ShinyInput />
-        </div>
+        {Object.keys(ivsAtoms).map((key) => (
+          <IVInput key={key} label={key.toUpperCase()} ivAtom={ivsAtoms[key as keyof typeof ivsAtoms]} />
+        ))}
+      </div>
+      <div>
+        <LevelInput />
+        <NatureSelect />
+        <AbilitySelect />
+        <GenderSelect />
+        <HiddenPowerInput />
+        <ShinyInput />
       </div>
     </div>
   )
@@ -32,6 +30,8 @@ export const filterConditionAtom = atom((get) => {
     Object.fromEntries(Object.entries(ivsAtoms).map(([key, atm]) => [key, get(atm)])),
   )
   if (!ivsResult.success) return null
+
+  const nature = get(selectedNatureAtom)
 
   return {
     ivs: (ivs: IVs) => {
@@ -50,6 +50,11 @@ export const filterConditionAtom = atom((get) => {
         s[0] <= ivs[5] &&
         ivs[5] <= s[1]
       )
+    },
+    pid: (pid: number) => {
+      if (nature != null && natures[(pid >>> 0) % 25] !== nature) return false
+
+      return true
     },
   }
 })
@@ -117,10 +122,25 @@ const IVInput: React.FC<{ label: string; ivAtom: PrimitiveAtom<[string, string]>
   )
 }
 
+const selectedNatureAtom = atom<Nature | null>(null)
 const NatureSelect: React.FC = () => {
+  const [value, setValue] = useAtom(selectedNatureAtom)
+
   return (
-    <div>
-      <select defaultValue={natures[0]}>
+    <div className="flex gap-2">
+      <span>性格</span>
+      <select
+        value={value ?? 'unselected'}
+        onChange={(e) => {
+          const value = e.target.value
+          if (value === 'unselected') {
+            setValue(null)
+          } else {
+            setValue(value as Nature)
+          }
+        }}
+      >
+        <option value="unselected">{'(選択なし)'}</option>
         {natures.map((nature) => (
           <option key={nature} value={nature}>
             {toJapanese(nature)}
@@ -132,16 +152,19 @@ const NatureSelect: React.FC = () => {
 }
 const AbilitySelect: React.FC = () => {
   return (
-    <div>
+    <div className="flex gap-2">
+      <span className="text-gray-300">特性</span>
       <select>
-        <option>しんりょく</option>
+        <option>しめりけ</option>
+        <option>ちょすい</option>
       </select>
     </div>
   )
 }
 const GenderSelect: React.FC = () => {
   return (
-    <div>
+    <div className="flex gap-2">
+      <span className="text-gray-300">性別</span>
       <select>
         <option>♂</option>
         <option>♀</option>
@@ -151,8 +174,8 @@ const GenderSelect: React.FC = () => {
 }
 const HiddenPowerInput: React.FC = () => {
   return (
-    <div>
-      <span>めざパ</span>
+    <div className="flex gap-2">
+      <span className="text-gray-300">めざパ</span>
       <select>
         <option>こおり</option>
         <option>ほのお</option>
@@ -167,8 +190,8 @@ const HiddenPowerInput: React.FC = () => {
 }
 const ShinyInput: React.FC = () => {
   return (
-    <div>
-      <span>色違いのみ</span>
+    <div className="flex gap-2">
+      <span className="text-gray-300">色違いのみ</span>
       <input type="checkbox" />
 
       <span>表ID</span>

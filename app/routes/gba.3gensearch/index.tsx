@@ -34,7 +34,7 @@ const Page: React.FC = () => {
       const result: ResultRecord[] = []
       for (let f = frame.range[0]; f <= frame.range[1]; f++, lcg.update(next)) {
         const [individual] = lcg.map(g)
-        if (filter && !filter.ivs(individual.ivs)) continue
+        if (filter && (!filter.ivs(individual.ivs) || !filter.pid(individual.pid))) continue
 
         result.push({
           initialSeed: initialSeed.value,
@@ -68,7 +68,7 @@ const Page: React.FC = () => {
         <ResultTable result={result} />
       </div>
 
-      <div className="grid grid-cols-3 size-full">
+      <div className="grid grid-cols-[400px_minmax(500px,1fr)_300px] size-full">
         <ConditionsBlock />
         <FilterBlock />
         <ExecuteBlock onExecude={handleClick} />
