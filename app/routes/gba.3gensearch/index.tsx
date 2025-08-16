@@ -2,6 +2,7 @@ import { cn } from '@/cn'
 import { generateStaticSymbol } from '@/domain/gba/generators/individual'
 import { IVs, SchemeName, popularName } from '@/domain/gba/generators/ivs'
 import { LCG, next } from '@/domain/gba/lcg'
+import { minutesToSeed } from '@/domain/gba/rtc'
 import { toHiddenPower } from '@/domain/hiddenPower'
 import { natures, toJapanese } from '@/domain/nature'
 import { POKE_TYPE_KANJI } from '@/domain/pokeType'
@@ -28,34 +29,56 @@ const Page: React.FC = () => {
       const filter = get(filterConditionAtom)
 
       const { initialSeed, frame, ivsScheme } = condition
-      if (initialSeed.mode !== 'fixed') return // TODO: impl
+      const initialSeeds = (() => {
+        switch (initialSeed.mode) {
+          case 'fixed':
+            return [initialSeed.value]
+          case 'rtc': {
+            const a: LCG[] = []
+            for (let m = initialSeed.value[0]; m <= initialSeed.value[1]; m++) {
+              a.push(minutesToSeed(m))
+            }
+            return a
+          }
+          case 'painting': {
+            const a: LCG[] = []
+            for (let f = initialSeed.value[0]; f <= initialSeed.value[1]; f++) {
+              a.push(LCG.from(f))
+            }
+            return a
+          }
+        }
+      })()
 
       const g = generateStaticSymbol(ivsScheme)
 
-      const lcg = Ref.from(next(initialSeed.value, frame.range[0]))
       const result: ResultRecord[] = []
-      for (let f = frame.range[0]; f <= frame.range[1]; f++, lcg.update(next)) {
-        const [individual] = lcg.map(g)
-        if (filter && (!filter.ivs(individual.ivs) || !filter.pid(individual.pid))) continue
 
-        const [hpt, hpp] = toHiddenPower(individual.ivs)
+      for (const initialSeed of initialSeeds) {
+        const lcg = Ref.from(next(initialSeed, frame.range[0]))
+        for (let f = frame.range[0]; f <= frame.range[1]; f++, lcg.update(next)) {
+          const [individual] = lcg.map(g)
+          if (filter && (!filter.ivs(individual.ivs) || !filter.pid(individual.pid))) continue
 
-        result.push({
-          initialSeed: initialSeed.value,
-          seed: lcg.unwrap(),
-          frame: f,
-          gap: f - frame.target,
-          pid: individual.pid,
-          ivs: individual.ivs,
-          ivsScheme,
+          const [hpt, hpp] = toHiddenPower(individual.ivs)
 
-          name: 'ヌオー',
-          level: 50,
-          stats: [0, 0, 0, 0, 0, 0],
-          ability: 'しめりけ',
-          gender: '-',
-          hiddenPower: `${POKE_TYPE_KANJI[hpt]}${hpp}`,
-        })
+          result.push({
+            initialSeed,
+            seed: lcg.unwrap(),
+            frame: f,
+            gap: f - frame.target,
+            pid: individual.pid,
+            ivs: individual.ivs,
+            ivsScheme,
+
+            name: 'ヌオー',
+            level: 50,
+            stats: [0, 0, 0, 0, 0, 0],
+            ability: 'しめりけ',
+            gender: '-',
+            hiddenPower: `${POKE_TYPE_KANJI[hpt]}${hpp}`,
+          })
+        }
       }
 
       setResult(result)

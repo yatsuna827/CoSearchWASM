@@ -45,14 +45,14 @@ const initialSeedStateAtom = atom((get) => {
       const [min, max] = [Number(raw[0] || undefined), Number(raw[1] || undefined)]
       if (!Number.isInteger(min) || !Number.isInteger(max) || max < min) return null
 
-      return { mode, value: [min, max] }
+      return { mode, value: [min, max] as const }
     }
     case 'painting': {
       const raw = get(paintingFrameRangeAtom)
       const [min, max] = [Number(raw[0] || undefined), Number(raw[1] || undefined)]
       if (!Number.isInteger(min) || !Number.isInteger(max) || max < min) return null
 
-      return { mode, value: [min, max] }
+      return { mode, value: [min, max] as const }
     }
     default:
       throw new Error(`unexpected mode: ${mode satisfies never}`)
