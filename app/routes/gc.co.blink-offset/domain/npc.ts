@@ -1,5 +1,5 @@
-import { type LCG, getRand } from '@/domain/gc/lcg'
-import { Ref } from '@util/ref'
+import { getRand, type LCG } from '@/domain/gc/lcg'
+import { Ref } from '@/utilities/ref'
 
 export const generateDirection = (seed: LCG): [number, LCG] => {
   const lcg = Ref.from(seed)

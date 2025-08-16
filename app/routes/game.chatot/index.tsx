@@ -1,4 +1,4 @@
-import { lcg } from '@/domain/lcg'
+import { LCG, next } from '@/domain/gba/lcg'
 import { useCallback, useRef, useState } from 'react'
 
 const createOscilattorNode = (frequency: number) => {
@@ -19,9 +19,9 @@ const useLCG = () => {
   const [history, setHistory] = useState<number[]>([])
 
   const getRand = useCallback(() => {
-    const next = lcg(seed)
-    const rand = next >>> 16
-    setSeed(next)
+    const s = next(LCG.from(seed))
+    const rand = s >>> 16
+    setSeed(s)
     setRand(rand)
     setHistory((prev) => (prev.length < 4 ? [rand, ...prev] : [rand, ...prev.slice(0, 3)]))
 

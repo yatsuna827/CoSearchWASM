@@ -15,7 +15,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./app/*"],
-      "@util/*": ["./app/utilities/*"],
       "@dotnet/*": ["./modules/dotnet/*"]
     },
     "types": ["@react-router/node", "vite/client", "vitest/globals", "vitest/importMeta"],

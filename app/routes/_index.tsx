@@ -16,6 +16,9 @@ const Page: React.FC = () => {
               <Link to="/gc/lcg-list">GC LCG リスト</Link>
             </li>
             <li>
+              <Link to="/gba/3gensearch">3genSearch</Link>
+            </li>
+            <li>
               <Link to="/gc/co/blink-offset">Co 瞬きオフセット特定</Link>
             </li>
             <li>
