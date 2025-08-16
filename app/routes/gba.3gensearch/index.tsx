@@ -2,7 +2,9 @@ import { cn } from '@/cn'
 import { generateStaticSymbol } from '@/domain/gba/generators/individual'
 import { IVs, SchemeName, popularName } from '@/domain/gba/generators/ivs'
 import { LCG, next } from '@/domain/gba/lcg'
+import { toHiddenPower } from '@/domain/hiddenPower'
 import { natures, toJapanese } from '@/domain/nature'
+import { POKE_TYPE_KANJI } from '@/domain/pokeType'
 import { Attributes } from '@/domain/type'
 import { Ref } from '@/utilities/ref'
 import { useAtomCallback } from 'jotai/utils'
@@ -36,6 +38,8 @@ const Page: React.FC = () => {
         const [individual] = lcg.map(g)
         if (filter && (!filter.ivs(individual.ivs) || !filter.pid(individual.pid))) continue
 
+        const [hpt, hpp] = toHiddenPower(individual.ivs)
+
         result.push({
           initialSeed: initialSeed.value,
           seed: lcg.unwrap(),
@@ -50,7 +54,7 @@ const Page: React.FC = () => {
           stats: [0, 0, 0, 0, 0, 0],
           ability: 'しめりけ',
           gender: '-',
-          hiddenPower: '氷70',
+          hiddenPower: `${POKE_TYPE_KANJI[hpt]}${hpp}`,
         })
       }
 

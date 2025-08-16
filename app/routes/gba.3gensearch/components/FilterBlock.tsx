@@ -1,7 +1,8 @@
 import { IVs } from '@/domain/gba/generators/ivs'
+import { toHiddenPower } from '@/domain/hiddenPower'
 import { Nature, natures, toJapanese } from '@/domain/nature'
+import { POKE_TYPES, POKE_TYPE_JP, PokeType } from '@/domain/pokeType'
 import { PrimitiveAtom, atom, useAtom } from 'jotai'
-import React from 'react'
 import z from 'zod'
 
 export const FilterBlock: React.FC = () => {
@@ -30,11 +31,20 @@ export const filterConditionAtom = atom((get) => {
     Object.fromEntries(Object.entries(ivsAtoms).map(([key, atm]) => [key, get(atm)])),
   )
   if (!ivsResult.success) return null
+  const hpMinResult = hiddenPowerPowerSchema.safeParse(get(hiddenPowerMinAtom))
+  if (!hpMinResult.success) return null
+
+  const hpMin = hpMinResult.data
+  const hpType = get(selectedHiddenPowerTypeAtom)
 
   const nature = get(selectedNatureAtom)
 
   return {
     ivs: (ivs: IVs) => {
+      const [type, power] = toHiddenPower(ivs)
+      if (hpType != null && type !== hpType) return false
+      if (power < hpMin) return false
+
       const { h, a, b, c, d, s } = ivsResult.data
       return (
         h[0] <= ivs[0] &&
@@ -130,17 +140,17 @@ const NatureSelect: React.FC = () => {
     <div className="flex gap-2">
       <span>性格</span>
       <select
-        value={value ?? 'unselected'}
+        value={value ?? 'default'}
         onChange={(e) => {
           const value = e.target.value
-          if (value === 'unselected') {
+          if (value === 'default') {
             setValue(null)
           } else {
             setValue(value as Nature)
           }
         }}
       >
-        <option value="unselected">{'(選択なし)'}</option>
+        <option value="default">{'(指定なし)'}</option>
         {natures.map((nature) => (
           <option key={nature} value={nature}>
             {toJapanese(nature)}
@@ -172,18 +182,42 @@ const GenderSelect: React.FC = () => {
     </div>
   )
 }
+const selectedHiddenPowerTypeAtom = atom<PokeType | null>(null)
+const hiddenPowerMinAtom = atom('30')
+const hiddenPowerPowerSchema = z.string().regex(/^\d+$/).transform(Number).pipe(z.number().min(30).max(70).int())
 const HiddenPowerInput: React.FC = () => {
+  const [value, setValue] = useAtom(selectedHiddenPowerTypeAtom)
+  const [min, setMin] = useAtom(hiddenPowerMinAtom)
+
   return (
     <div className="flex gap-2">
-      <span className="text-gray-300">めざパ</span>
-      <select>
-        <option>こおり</option>
-        <option>ほのお</option>
-        <option>くさ</option>
-        <option>かくとう</option>
-        <option>ゴースト</option>
+      <span>めざパ</span>
+      <select
+        value={value ?? 'default'}
+        onChange={(e) => {
+          const value = e.target.value
+          if (value === 'default') {
+            setValue(null)
+          } else {
+            setValue(value as PokeType)
+          }
+        }}
+      >
+        <option value="default">{'(指定なし)'}</option>
+        {POKE_TYPES.slice(1).map((t) => (
+          <option key={t} value={t}>
+            {POKE_TYPE_JP[t]}
+          </option>
+        ))}
       </select>
-      <input type="number" defaultValue={30} className="border w-16 pl-1" />
+      <input
+        type="number"
+        value={min}
+        min={30}
+        max={70}
+        className="border w-16 pl-1"
+        onChange={(e) => setMin(e.target.value)}
+      />
       <span>～</span>
     </div>
   )
