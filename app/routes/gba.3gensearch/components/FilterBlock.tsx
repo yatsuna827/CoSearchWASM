@@ -1,8 +1,8 @@
-import { IVs } from '@/domain/gba/generators/ivs'
+import type { IVs } from '@/domain/gba/generators/ivs'
 import { toHiddenPower } from '@/domain/hiddenPower'
-import { Nature, natures, toJapanese } from '@/domain/nature'
-import { POKE_TYPES, POKE_TYPE_JP, PokeType } from '@/domain/pokeType'
-import { PrimitiveAtom, atom, useAtom } from 'jotai'
+import { type Nature, natures, toJapanese } from '@/domain/nature'
+import { POKE_TYPES, POKE_TYPE_JP, type PokeType } from '@/domain/pokeType'
+import { type PrimitiveAtom, atom, useAtom } from 'jotai'
 import z from 'zod'
 
 export const FilterBlock: React.FC = () => {

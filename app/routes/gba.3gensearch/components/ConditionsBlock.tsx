@@ -1,4 +1,4 @@
-import { SchemeName } from '@/domain/gba/generators/ivs'
+import type { SchemeName } from '@/domain/gba/generators/ivs'
 import { LCG } from '@/domain/gba/lcg'
 import { atom, useAtom } from 'jotai'
 import { useRef } from 'react'
