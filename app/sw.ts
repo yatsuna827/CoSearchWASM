@@ -1,8 +1,8 @@
 /// <reference lib="WebWorker" />
 
+import type { MiddlewareHandler } from 'hono'
 import { Hono } from 'hono'
 import { fire } from 'hono/service-worker'
-import type { MiddlewareHandler } from 'hono'
 
 // see: https://github.com/microsoft/TypeScript/issues/14877
 declare var self: ServiceWorkerGlobalScope

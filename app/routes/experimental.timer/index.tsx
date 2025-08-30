@@ -7,10 +7,10 @@ import { LCG } from '@/domain/gc/lcg'
 import { useSeedInput } from '@/hooks/useSeedInput'
 
 import { LoadingCircle } from '@/components/LoadingCircle'
+import { findSeedByBlink } from '@/lib/wasmApi'
 import { BlinkRecorder } from './components/BlinkRecorder'
 import { useBlinkRecorder } from './components/BlinkRecorder.hook'
 import { TimerSection } from './components/TimerSection'
-import { findSeedByBlink } from '@/lib/wasmApi'
 import { WASMProvider } from './wasm/Context'
 
 type Input = {
@@ -132,7 +132,6 @@ const Index: React.FC = () => {
   )
 }
 
-// eslint-disable-next-line react/display-name
 export default () => (
   <WASMProvider>
     <Suspense

@@ -6,10 +6,10 @@ import { useSeedInput } from '@/hooks/useSeedInput'
 
 import { LCG } from '@/domain/gc/lcg'
 import { toJapanese } from '@/domain/nature'
+import { findSeed } from '@/lib/wasmApi'
 import { useCallback, useState } from 'react'
 import { IndividualPreview } from '../components/IndividualPreview'
 import { generateTogepii } from '../domain/generateTogepii'
-import { findSeed } from '@/lib/wasmApi'
 
 type Input = {
   hMin: number
