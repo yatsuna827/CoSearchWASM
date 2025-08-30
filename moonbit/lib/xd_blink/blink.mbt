@@ -31,8 +31,8 @@ let thresh : Array[UInt] = [
 ///|
 pub fn BlinkObject::new(
   cool_time : Int,
-  init_cnt~ : Int = 0,
-  delay_at_maturity~ : Int = 0,
+  init_cnt? : Int = 0,
+  delay_at_maturity? : Int = 0,
 ) -> BlinkObject {
   { cool_time, delay_at_maturity, remain_cool_time: 0, counter: init_cnt }
 }

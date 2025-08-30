@@ -44,7 +44,7 @@ pub fn search_togepii(
 }
 
 ///|
-pub fn new_blink(cooltime : Int, delay~ : Int = 0) -> @blink.BlinkObject {
+pub fn new_blink(cooltime : Int, delay? : Int = 0) -> @blink.BlinkObject {
   @blink.BlinkObject::new(cooltime, delay_at_maturity=delay)
 }
 

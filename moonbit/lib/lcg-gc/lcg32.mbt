@@ -134,7 +134,7 @@ fn get_index_from_base(seed : UInt, from : UInt) -> UInt {
 }
 
 ///|
-pub fn Lcg32::get_index(self : Lcg32, from~ : UInt = 0) -> UInt {
+pub fn Lcg32::get_index(self : Lcg32, from? : UInt = 0) -> UInt {
   if from == 0 {
     get_index_from_zero(self.inner())
   } else {

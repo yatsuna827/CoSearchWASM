@@ -7,7 +7,7 @@ pub fn Lcg32::to_ref(self : Lcg32) -> Lcg32Ref {
 }
 
 ///|
-pub fn Lcg32Ref::advance(self : Lcg32Ref, n~ : UInt = 1) -> Unit {
+pub fn Lcg32Ref::advance(self : Lcg32Ref, n? : UInt = 1) -> Unit {
   match n {
     0 => Unit::default()
     1 => self.inner().update(Lcg32::next)
@@ -16,7 +16,7 @@ pub fn Lcg32Ref::advance(self : Lcg32Ref, n~ : UInt = 1) -> Unit {
 }
 
 ///|
-pub fn Lcg32Ref::back(self : Lcg32Ref, n~ : UInt = 1) -> Unit {
+pub fn Lcg32Ref::back(self : Lcg32Ref, n? : UInt = 1) -> Unit {
   match n {
     0 => Unit::default()
     1 => self.inner().update(Lcg32::prev)
@@ -48,6 +48,6 @@ pub fn Lcg32Ref::get_rand_f(self : Lcg32Ref) -> Float {
 }
 
 ///|
-pub fn Lcg32Ref::get_index(self : Lcg32Ref, from~ : UInt = 0) -> UInt {
+pub fn Lcg32Ref::get_index(self : Lcg32Ref, from? : UInt = 0) -> UInt {
   self.inner().val.get_index(from~)
 }

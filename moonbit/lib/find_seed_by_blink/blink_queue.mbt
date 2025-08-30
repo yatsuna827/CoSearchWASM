@@ -1,4 +1,5 @@
-///| 固定長キュー。pushするたびに先頭の要素が押し出されて消える。
+///|
+/// 固定長キュー。pushするたびに先頭の要素が押し出されて消える。
 struct Queue {
   array : FixedArray[Int]
   mut start : Int

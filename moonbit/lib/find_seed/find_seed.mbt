@@ -37,7 +37,7 @@ pub fn find_seed(
   c : UInt,
   d : UInt,
   s : UInt,
-  offset~ : UInt = 5,
+  offset? : UInt = 5,
 ) -> Array[@lcg.Lcg32] {
   let hab = h | (a << 5) | (b << 10)
   let scd = s | (c << 5) | (d << 10)
