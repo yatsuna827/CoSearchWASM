@@ -1,11 +1,13 @@
 /// <reference lib="WebWorker" />
 
-import { Hono } from 'hono'
-import { app as pokedexApp } from './routes/pokedex'
-import { app as wasmApp } from './routes/wasm'
-
 // see: https://github.com/microsoft/TypeScript/issues/14877
 declare var self: ServiceWorkerGlobalScope
+
+import { Hono } from 'hono'
+import { app as encounterTableApp } from './routes/encounter-table/route'
+import { handleError } from './routes/error'
+import { app as pokedexApp } from './routes/pokedex/route'
+import { app as wasmApp } from './routes/wasm'
 
 console.log('API Worker v0.1 loaded')
 
@@ -18,25 +20,15 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
 })
 
-const app = new Hono().basePath('/CoSearchWASM/api')
+const BASE_PATH = '/CoSearchWASM/api'
+const API_ROUTE = new URL(BASE_PATH, self.location.origin).href
 
-app.use('*', async (c, next) => {
-  try {
-    await next()
-  } catch (error: unknown) {
-    const res = {
-      name: error instanceof Error ? error.name : 'Error',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-    }
-    return c.json(res, 500)
-  }
-})
-
+const app = new Hono().basePath(BASE_PATH)
+app.use('*', handleError)
 app.route('/pokedex', pokedexApp)
 app.route('/wasm', wasmApp)
+app.route('/encounter-tables', encounterTableApp)
 
-const API_ROUTE = new URL('/CoSearchWASM/api', self.location.origin).href
 self.addEventListener('fetch', async (evt: FetchEvent) => {
   // このservice worker自体は/CoSearchWASMがscopeになっていて、/api以外へのリクエストにも反応してしまうため、
   // /api/*以外へのリクエストだった場合は処理しないようにする必要がある

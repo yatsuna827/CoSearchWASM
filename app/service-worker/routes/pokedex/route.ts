@@ -1,8 +1,9 @@
 import { Hono } from 'hono'
-import { DEX_DATA } from './dex-data'
+import { DEX_DATA } from './data'
 
 const app = new Hono()
 
+// TODO: :dexNoを:keyにして、数値なら図鑑番号、それ以外の文字列なら名前として解釈して検索するようにしたい
 app.get('/pokemons/:dexNo', async (c) => {
   const param = c.req.param()
   const targetDexNo = Number(param.dexNo)
