@@ -1,3 +1,6 @@
+import blinkWASM from '@/wasm/xd-blink.wasm?url'
+import togepiiWASM from '@/wasm/xd-togepii.wasm?url'
+
 import { Hono } from 'hono'
 
 type WasmExternRef = unknown
@@ -223,16 +226,19 @@ app.post('/blink-iterator-get-state', async (c) => {
   return c.json({ seed: seed >>> 0, interval })
 })
 
-// BlinkIteratorのセッション管理
 const iteratorStore = new Map<string, BlinkIteratorRef>()
 
 const loadTogepiiWasmModule = async (): Promise<TogepiiWasmModule> => {
-  const wasmUrl = '/CoSearchWASM/app/wasm/xd-togepii.wasm'
-
   const delegates: TogepiiWasmDelegates = {
-    iter_smoke: () => {},
-    find_seed: () => {},
-    search_togepii: () => {},
+    iter_smoke: () => {
+      console.log('default')
+    },
+    find_seed: () => {
+      console.log('default')
+    },
+    search_togepii: () => {
+      console.log('default')
+    },
   }
 
   const importObject = {
@@ -252,7 +258,7 @@ const loadTogepiiWasmModule = async (): Promise<TogepiiWasmModule> => {
     },
   }
 
-  const response = await fetch(wasmUrl)
+  const response = await fetch(togepiiWASM)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch WASM: ${response.status} ${response.statusText}`)
@@ -281,10 +287,10 @@ const loadTogepiiWasmModule = async (): Promise<TogepiiWasmModule> => {
 }
 
 const loadBlinkWasmModule = async (): Promise<BlinkWasmModule> => {
-  const wasmUrl = '/CoSearchWASM/app/wasm/xd-blink.wasm'
-
   const delegates: BlinkWasmDelegates = {
-    find_seed: () => {},
+    find_seed: () => {
+      console.log('default')
+    },
   }
 
   const importObject = {
@@ -298,7 +304,7 @@ const loadBlinkWasmModule = async (): Promise<BlinkWasmModule> => {
     },
   }
 
-  const response = await fetch(wasmUrl)
+  const response = await fetch(blinkWASM)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch WASM: ${response.status} ${response.statusText}`)

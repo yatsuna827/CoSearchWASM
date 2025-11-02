@@ -42,4 +42,9 @@ export default defineConfig({
   define: {
     'import.meta.vitest': 'undefined',
   },
+  resolve: {
+    alias: {
+      '@': '/app',
+    },
+  },
 })
