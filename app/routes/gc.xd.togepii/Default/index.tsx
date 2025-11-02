@@ -98,7 +98,7 @@ export const PageDefault: React.FC = () => {
       <div className="mt-6 border-t">こたいちからけんさく</div>
       <form onSubmit={handleSubmit(handleSearch)}>
         <button
-          type="button"
+          type="submit"
           className="w-24 h-8 text-sm border font-semibold text-[#333] bg-white disabled:bg-gray-200 disabled:text-gray-400"
         >
           けんさく
