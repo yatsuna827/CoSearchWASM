@@ -33,12 +33,12 @@ pub fn search_togepii(
       .iter()
       .drop(minFrames)
       .take(maxFrames - minFrames + 1)
-      .filter(fn(p) { p.1.inner() == target })
+      .filter(fn(p) { p.1.0 == target })
       .map(fn(q) { ((p.1, p.0), q) })
     })
     .each(fn(p) {
       let (blink, smoke) = p
-      cb_search_togepii(blink.0, blink.1.inner(), smoke.0, smoke.1.inner())
+      cb_search_togepii(blink.0, blink.1.0, smoke.0, smoke.1.0)
     })
 
 }
@@ -53,7 +53,7 @@ pub fn iter_smoke(seed : UInt, take : Int) -> Unit {
   _iter_smoke(Lcg32(seed), @togepii.OutskirtStand::new)
   .iter()
   .take(take)
-  .each(fn(p) { cb_iter_smoke(p.0, p.1.inner()) })
+  .each(fn(p) { cb_iter_smoke(p.0, p.1.0) })
 }
 
 ///|
@@ -120,6 +120,6 @@ pub fn find_seed(
   s : UInt,
 ) -> Unit {
   for seed in @finder.find_seed(h, a, b, c, d, s, offset=3) {
-    cb_find_seed(seed.inner())
+    cb_find_seed(seed.0)
   }
 }
