@@ -17,7 +17,7 @@ type SearchTogepiiResult = {
 }
 
 export const iterSmoke = async (seed: number, take: number): Promise<IterSmokeResult[]> => {
-  const response = await fetch('/CoSearchWASM/wasm-api/iter-smoke', {
+  const response = await fetch('/CoSearchWASM/api/wasm/iter-smoke', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ seed, take }),
@@ -45,7 +45,7 @@ export const findSeed = async (
   d: number,
   s: number,
 ): Promise<FindSeedResult[]> => {
-  const response = await fetch('/CoSearchWASM/wasm-api/find-seed', {
+  const response = await fetch('/CoSearchWASM/api/wasm/find-seed', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ h, a, b, c, d, s }),
@@ -75,7 +75,7 @@ export const searchTogepii = async (
   minFrames: number,
   maxFrames: number,
 ): Promise<SearchTogepiiResult[]> => {
-  const response = await fetch('/CoSearchWASM/wasm-api/search-togepii', {
+  const response = await fetch('/CoSearchWASM/api/wasm/search-togepii', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -118,7 +118,7 @@ export const findSeedByBlink = async (
   blink: { cooltime: number; tolerance: number },
   input: number[],
 ): Promise<FindSeedByBlinkResult[]> => {
-  const response = await fetch('/CoSearchWASM/wasm-api/find-seed-by-blink', {
+  const response = await fetch('/CoSearchWASM/api/wasm/find-seed-by-blink', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ seed, framesRange, blink, input }),

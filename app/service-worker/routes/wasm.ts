@@ -1,11 +1,4 @@
-/// <reference lib="WebWorker" />
-
-import type { MiddlewareHandler } from 'hono'
 import { Hono } from 'hono'
-import { fire } from 'hono/service-worker'
-
-// see: https://github.com/microsoft/TypeScript/issues/14877
-declare var self: ServiceWorkerGlobalScope
 
 type WasmExternRef = unknown
 type ArrayBuilder = WasmExternRef
@@ -77,55 +70,10 @@ type FindSeedByBlinkResult = {
   seed: number
 }
 
-console.log('Service Worker v3.0 loaded')
-
 let togepiiWasmModule: TogepiiWasmModule | null = null
 let blinkWasmModule: BlinkWasmModule | null = null
 
-self.addEventListener('install', () => {
-  console.log('Service Worker installing...')
-  self.skipWaiting()
-})
-
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker activating...')
-  event.waitUntil(self.clients.claim())
-})
-
-const app = new Hono().basePath('/CoSearchWASM/wasm-api')
-
-// エラーハンドリングミドルウェア
-const errorHandler: MiddlewareHandler = async (c, next) => {
-  try {
-    await next()
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    const errorStack = error instanceof Error ? error.stack : undefined
-    const errorName = error instanceof Error ? error.name : 'Error'
-
-    const errorResponse = {
-      error: errorMessage,
-      stack: errorStack,
-      name: errorName,
-    }
-
-    // クライアントにエラー通知
-    self.clients.matchAll().then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({
-          type: 'WASM_API_ERROR',
-          error: errorMessage,
-          stack: errorStack,
-          path: c.req.path,
-        })
-      })
-    })
-
-    return c.json(errorResponse, 500)
-  }
-}
-
-app.use('*', errorHandler)
+const app = new Hono()
 
 app.post('/iter-smoke', async (c) => {
   const { seed, take }: { seed: number; take: number } = await c.req.json()
@@ -275,8 +223,6 @@ app.post('/blink-iterator-get-state', async (c) => {
   return c.json({ seed: seed >>> 0, interval })
 })
 
-fire(app)
-
 // BlinkIteratorのセッション管理
 const iteratorStore = new Map<string, BlinkIteratorRef>()
 
@@ -306,48 +252,32 @@ const loadTogepiiWasmModule = async (): Promise<TogepiiWasmModule> => {
     },
   }
 
-  try {
-    const response = await fetch(wasmUrl)
+  const response = await fetch(wasmUrl)
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch WASM: ${response.status} ${response.statusText}`)
-    }
-
-    const { instance } = await WebAssembly.instantiateStreaming(response, importObject)
-
-    const { iter_smoke, find_seed, search_togepii, new_blink } = instance.exports as {
-      iter_smoke: (seed: number, take: number) => void
-      find_seed: (h: number, a: number, b: number, c: number, d: number, s: number) => void
-      search_togepii: (
-        seed: number,
-        target: number,
-        obj: unknown,
-        minInterval: number,
-        maxInterval: number,
-        minBlinkFrames: number,
-        maxBlinkFrames: number,
-        minFrames: number,
-        maxFrames: number,
-      ) => void
-      new_blink: (cooltime: number, delay?: number) => unknown
-    }
-
-    return { iter_smoke, find_seed, search_togepii, new_blink, delegates }
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    const errorStack = error instanceof Error ? error.stack : undefined
-
-    self.clients.matchAll().then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({
-          type: 'TOGEPII_WASM_ERROR',
-          error: errorMessage,
-          stack: errorStack,
-        })
-      })
-    })
-    throw error
+  if (!response.ok) {
+    throw new Error(`Failed to fetch WASM: ${response.status} ${response.statusText}`)
   }
+
+  const { instance } = await WebAssembly.instantiateStreaming(response, importObject)
+
+  const { iter_smoke, find_seed, search_togepii, new_blink } = instance.exports as {
+    iter_smoke: (seed: number, take: number) => void
+    find_seed: (h: number, a: number, b: number, c: number, d: number, s: number) => void
+    search_togepii: (
+      seed: number,
+      target: number,
+      obj: unknown,
+      minInterval: number,
+      maxInterval: number,
+      minBlinkFrames: number,
+      maxBlinkFrames: number,
+      minFrames: number,
+      maxFrames: number,
+    ) => void
+    new_blink: (cooltime: number, delay?: number) => unknown
+  }
+
+  return { iter_smoke, find_seed, search_togepii, new_blink, delegates }
 }
 
 const loadBlinkWasmModule = async (): Promise<BlinkWasmModule> => {
@@ -368,64 +298,48 @@ const loadBlinkWasmModule = async (): Promise<BlinkWasmModule> => {
     },
   }
 
-  try {
-    const response = await fetch(wasmUrl)
+  const response = await fetch(wasmUrl)
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch WASM: ${response.status} ${response.statusText}`)
-    }
+  if (!response.ok) {
+    throw new Error(`Failed to fetch WASM: ${response.status} ${response.statusText}`)
+  }
 
-    const { instance } = await WebAssembly.instantiateStreaming(response, importObject)
+  const { instance } = await WebAssembly.instantiateStreaming(response, importObject)
 
-    const {
-      find_seed_by_blink,
-      new_array_builder,
-      add_value,
-      blink_iter_new,
-      blink_iter_next,
-      blink_iter_get_interval,
-      blink_iter_get_seed,
-    } = instance.exports as {
-      find_seed_by_blink: (
-        current: number,
-        min: number,
-        max: number,
-        coolTime: number,
-        tolerance: number,
-        input: ArrayBuilder,
-      ) => void
-      new_array_builder: (length: number) => ArrayBuilder
-      add_value: (builder: ArrayBuilder, value: number) => void
-      blink_iter_new: (current: number, cooltime: number) => BlinkIteratorRef
-      blink_iter_next: (iter: BlinkIteratorRef) => void
-      blink_iter_get_interval: (iter: BlinkIteratorRef) => number
-      blink_iter_get_seed: (iter: BlinkIteratorRef) => number
-    }
+  const {
+    find_seed_by_blink,
+    new_array_builder,
+    add_value,
+    blink_iter_new,
+    blink_iter_next,
+    blink_iter_get_interval,
+    blink_iter_get_seed,
+  } = instance.exports as {
+    find_seed_by_blink: (
+      current: number,
+      min: number,
+      max: number,
+      coolTime: number,
+      tolerance: number,
+      input: ArrayBuilder,
+    ) => void
+    new_array_builder: (length: number) => ArrayBuilder
+    add_value: (builder: ArrayBuilder, value: number) => void
+    blink_iter_new: (current: number, cooltime: number) => BlinkIteratorRef
+    blink_iter_next: (iter: BlinkIteratorRef) => void
+    blink_iter_get_interval: (iter: BlinkIteratorRef) => number
+    blink_iter_get_seed: (iter: BlinkIteratorRef) => number
+  }
 
-    return {
-      find_seed_by_blink,
-      new_array_builder,
-      add_value,
-      blink_iter_new,
-      blink_iter_next,
-      blink_iter_get_interval,
-      blink_iter_get_seed,
-      delegates,
-    }
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    const errorStack = error instanceof Error ? error.stack : undefined
-
-    self.clients.matchAll().then((clients) => {
-      clients.forEach((client) => {
-        client.postMessage({
-          type: 'BLINK_WASM_ERROR',
-          error: errorMessage,
-          stack: errorStack,
-        })
-      })
-    })
-    throw error
+  return {
+    find_seed_by_blink,
+    new_array_builder,
+    add_value,
+    blink_iter_new,
+    blink_iter_next,
+    blink_iter_get_interval,
+    blink_iter_get_seed,
+    delegates,
   }
 }
 
@@ -539,3 +453,5 @@ const executeFindSeedByBlink = async (
     resolve(results)
   })
 }
+
+export { app }

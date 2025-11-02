@@ -1,5 +1,5 @@
-import { IVs } from './gba/generators/ivs'
-import { PokeType } from './pokeType'
+import type { IVs } from './gba/generators/ivs'
+import type { PokeType } from './pokeType'
 
 const typeIndex = [
   'fighting',

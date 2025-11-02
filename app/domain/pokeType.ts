@@ -1,4 +1,6 @@
 export type PokeType = (typeof POKE_TYPES)[number]
+export type PokeTypeJp = (typeof POKE_TYPE_JP)[PokeType]
+export type PokeTypeKanji = (typeof POKE_TYPE_KANJI)[PokeType]
 
 export const POKE_TYPES = [
   'normal',
@@ -38,7 +40,7 @@ export const POKE_TYPE_JP = {
   dragon: 'ドラゴン',
   dark: 'あく',
   steel: 'はがね',
-} satisfies Record<PokeType, string>
+} as const satisfies Record<PokeType, string>
 export const POKE_TYPE_KANJI = {
   normal: '普',
   fire: '炎',
@@ -57,4 +59,4 @@ export const POKE_TYPE_KANJI = {
   dragon: '龍',
   dark: '悪',
   steel: '鋼',
-} satisfies Record<PokeType, string>
+} as const satisfies Record<PokeType, string>

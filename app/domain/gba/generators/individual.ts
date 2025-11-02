@@ -1,6 +1,6 @@
 import { Ref } from '@/utilities/ref'
 import { type LCG } from '../lcg'
-import { IVs, SchemeName, generateIVs } from './ivs'
+import { type IVs, type SchemeName, generateIVs } from './ivs'
 import { generatePID } from './pid'
 
 export type IndividualBase = {
