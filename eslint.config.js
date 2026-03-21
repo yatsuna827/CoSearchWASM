@@ -19,7 +19,7 @@ export default defineConfig(
   },
   // React
   {
-    files: ['**/*.ts', '**.*.tsx'],
+    files: ['**/*.ts', '**/*.tsx'],
     settings: {
       react: {
         version: 'detect',
