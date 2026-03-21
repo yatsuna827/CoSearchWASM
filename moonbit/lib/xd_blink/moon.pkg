@@ -1,0 +1,3 @@
+import {
+  "cosearch-wasm/lib/lcg-gc" @lcg,
+}

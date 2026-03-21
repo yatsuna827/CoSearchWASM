@@ -1,0 +1,4 @@
+import {
+  "cosearch-wasm/lib/lcg-gc" @lcg,
+  "cosearch-wasm/lib/xd_blink" @blink,
+}

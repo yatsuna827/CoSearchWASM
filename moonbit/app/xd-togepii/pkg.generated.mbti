@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "cosearch-wasm/app/xd-togepii"
+
+import {
+  "cosearch-wasm/lib/xd_blink",
+}
+
+// Values
+pub fn find_seed(UInt, UInt, UInt, UInt, UInt, UInt) -> Unit
+
+pub fn iter_smoke(UInt, Int) -> Unit
+
+pub fn new_blink(Int, delay? : Int) -> @xd_blink.BlinkObject
+
+pub fn search_togepii(UInt, UInt, @xd_blink.BlinkObject, Int, Int, Int, Int, Int, Int) -> Unit
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

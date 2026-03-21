@@ -28,7 +28,6 @@ pub fn blink_iter_new(current : UInt, cool_time : Int) -> @finder.BlinkIterator 
 ///|
 pub fn blink_iter_next(iter : @finder.BlinkIterator) -> Unit {
   let _ = iter.next()
-
 }
 
 ///|

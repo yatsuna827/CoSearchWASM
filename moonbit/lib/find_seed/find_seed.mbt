@@ -4,7 +4,7 @@ priv struct Pack(Array[Array[UInt]])
 ///|
 fn make_pack() -> Pack {
   let pack : Array[Array[UInt]] = Array::new(capacity=0x8000)
-  for i in 0..<0x8000 {
+  for _ in 0..<0x8000 {
     pack.push([])
   }
   for lower in 0U..<0x10000 {

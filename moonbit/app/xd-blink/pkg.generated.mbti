@@ -1,0 +1,31 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "cosearch-wasm/app/xd-blink"
+
+import {
+  "cosearch-wasm/lib/find_seed_by_blink",
+}
+
+// Values
+pub fn add_value(IntArrayBuilder, Int) -> Unit
+
+pub fn blink_iter_get_interval(@find_seed_by_blink.BlinkIterator) -> UInt
+
+pub fn blink_iter_get_seed(@find_seed_by_blink.BlinkIterator) -> UInt
+
+pub fn blink_iter_new(UInt, Int) -> @find_seed_by_blink.BlinkIterator
+
+pub fn blink_iter_next(@find_seed_by_blink.BlinkIterator) -> Unit
+
+pub fn find_seed_by_blink(UInt, UInt, UInt, Int, Int, IntArrayBuilder) -> Unit
+
+pub fn new_array_builder(Int) -> IntArrayBuilder
+
+// Errors
+
+// Types and methods
+type IntArrayBuilder
+
+// Type aliases
+
+// Traits
+

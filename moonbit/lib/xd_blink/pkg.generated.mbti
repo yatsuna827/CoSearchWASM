@@ -1,0 +1,26 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "cosearch-wasm/lib/xd_blink"
+
+import {
+  "cosearch-wasm/lib/lcg-gc",
+}
+
+// Values
+pub fn iter_blink(@lcg-gc.Lcg32, () -> BlinkObject) -> Iter[(@lcg-gc.Lcg32, Int, Int)]
+
+// Errors
+
+// Types and methods
+pub(all) struct BlinkObject {
+  cool_time : Int
+  delay_at_maturity : Int
+  mut remain_cool_time : Int
+  mut counter : Int
+}
+pub fn BlinkObject::count_up(Self, @lcg-gc.Lcg32Ref) -> Bool
+pub fn BlinkObject::new(Int, init_cnt? : Int, delay_at_maturity? : Int) -> Self
+
+// Type aliases
+
+// Traits
+

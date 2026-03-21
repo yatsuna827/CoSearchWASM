@@ -38,11 +38,11 @@ pub fn Lcg32Ref::to_string(self : Lcg32Ref) -> String {
 pub fn Lcg32Ref::get_rand(self : Lcg32Ref, m? : UInt) -> UInt {
   match m {
     None => {
-      self..advance()
+      self.advance()
       self.0.val.0 >> 16
     }
     Some(n) => {
-      self..advance()
+      self.advance()
       (self.0.val.0 >> 16) % n
     }
   }
@@ -50,7 +50,7 @@ pub fn Lcg32Ref::get_rand(self : Lcg32Ref, m? : UInt) -> UInt {
 
 ///|
 pub fn Lcg32Ref::get_rand_f(self : Lcg32Ref) -> Float {
-  self.get_rand().to_float() / 65536.0
+  Float::from_uint(self.get_rand()) / 65536.0
 }
 
 ///|

@@ -160,5 +160,5 @@ test "remove_dead_children" {
   node3.lifetime = 0
   node3.object_lifetime = 0
   node1.remove_dead_nodes()
-  assert_eq(node1.next.is_empty(), true)
+  assert_eq(node1.next is None, true)
 }

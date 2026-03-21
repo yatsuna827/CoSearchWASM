@@ -1,0 +1,34 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "cosearch-wasm/lib/find_seed_by_blink"
+
+import {
+  "cosearch-wasm/lib/lcg-gc",
+  "cosearch-wasm/lib/xd_blink",
+}
+
+// Values
+pub fn find(@lcg-gc.Lcg32, UInt, UInt, Int, FixedArray[Int], Int) -> Array[@lcg-gc.Lcg32]
+
+// Errors
+
+// Types and methods
+pub struct BlinkIterator {
+  blinker : @xd_blink.BlinkObject
+  lcg : @lcg-gc.Lcg32Ref
+  mut f_cur : Int
+  mut cur : (@lcg-gc.Lcg32, Int)
+}
+pub fn BlinkIterator::new(@xd_blink.BlinkObject, @lcg-gc.Lcg32) -> Self
+pub fn BlinkIterator::next(Self) -> (@lcg-gc.Lcg32, Int)
+
+type Queue
+pub fn Queue::approx_eq(Self, FixedArray[Int], Int) -> Bool
+pub fn Queue::at(Self, Int) -> Int
+pub fn Queue::new(FixedArray[Int]) -> Self
+pub fn Queue::push(Self, Int) -> Unit
+pub fn Queue::to_array(Self) -> Array[Int]
+
+// Type aliases
+
+// Traits
+

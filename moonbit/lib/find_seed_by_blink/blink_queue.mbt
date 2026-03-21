@@ -40,7 +40,7 @@ pub fn Queue::approx_eq(
     if (self.at(i) - array[i]).abs() > tolerance {
       return false
     }
-  } else {
+  } nobreak {
     true
   }
 }

@@ -1,0 +1,18 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "cosearch-wasm/lib/find_seed"
+
+import {
+  "cosearch-wasm/lib/lcg-gc",
+}
+
+// Values
+pub fn find_seed(UInt, UInt, UInt, UInt, UInt, UInt, offset? : UInt) -> Array[@lcg-gc.Lcg32]
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

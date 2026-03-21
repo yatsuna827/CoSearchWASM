@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "cosearch-wasm/lib/xd_togepii"
+
+import {
+  "cosearch-wasm/lib/lcg-gc",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+type MainCounter
+pub fn MainCounter::to_string(Self) -> String
+
+pub struct OutskirtStand {
+  left : MainCounter
+  right : MainCounter
+  mut lazy_queue : Array[Int]
+}
+pub fn OutskirtStand::count_up(Self, @lcg-gc.Lcg32Ref) -> Unit
+pub fn OutskirtStand::new() -> Self
+pub fn OutskirtStand::to_string(Self) -> String
+
+// Type aliases
+
+// Traits
+

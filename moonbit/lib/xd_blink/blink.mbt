@@ -67,7 +67,6 @@ test {
   let obj = BlinkObject::new(4)
   for i = 0; i < 300; i = i + 1 {
     let _ = obj.count_up(lcg)
-
   }
   assert_eq(lcg.to_string(), "1e7a40bb")
   assert_eq(obj.counter, 116)

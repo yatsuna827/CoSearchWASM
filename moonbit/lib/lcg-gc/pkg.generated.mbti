@@ -1,0 +1,38 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "cosearch-wasm/lib/lcg-gc"
+
+import {
+  "moonbitlang/core/ref",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Lcg32(UInt)
+pub fn Lcg32::get_index(Self, from? : UInt) -> UInt
+#deprecated
+pub fn Lcg32::inner(Self) -> UInt
+pub fn Lcg32::jump(Self, UInt) -> Self
+pub fn Lcg32::jump_back(Self, UInt) -> Self
+pub fn Lcg32::next(Self) -> Self
+pub fn Lcg32::prev(Self) -> Self
+pub fn Lcg32::to_ref(Self) -> Lcg32Ref
+pub fn Lcg32::to_string(Self) -> String
+
+pub(all) struct Lcg32Ref(@ref.Ref[Lcg32])
+pub fn Lcg32Ref::advance(Self, n? : UInt) -> Unit
+pub fn Lcg32Ref::back(Self, n? : UInt) -> Unit
+pub fn Lcg32Ref::get_index(Self, from? : UInt) -> UInt
+pub fn Lcg32Ref::get_rand(Self, m? : UInt) -> UInt
+pub fn Lcg32Ref::get_rand_f(Self) -> Float
+#deprecated
+pub fn Lcg32Ref::inner(Self) -> @ref.Ref[Lcg32]
+pub fn Lcg32Ref::seed(Self) -> UInt
+pub fn Lcg32Ref::to_string(Self) -> String
+
+// Type aliases
+
+// Traits
+

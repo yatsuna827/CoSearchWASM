@@ -40,7 +40,6 @@ pub fn search_togepii(
       let (blink, smoke) = p
       cb_search_togepii(blink.0, blink.1.0, smoke.0, smoke.1.0)
     })
-
 }
 
 ///|
@@ -61,21 +60,20 @@ fn _iter_blink(
   seed : @pk_rng.Lcg32,
   new_blink : () -> @blink.BlinkObject,
 ) -> Iter[(@pk_rng.Lcg32, Int, Int)] {
-  Iter::new(fn(yield_) {
-    let b = new_blink()
-    let lcg = seed.to_ref()
-    let mut f_cur = 0
-    let mut f_last_blinked = 0
+  let b = new_blink()
+  let lcg = seed.to_ref()
+  let mut f_cur = 0
+  let mut f_last_blinked = 0
+  Iter::new(fn() {
     while true {
       f_cur = f_cur + 1
       if b.count_up(lcg) {
-        if yield_((lcg.seed(), f_cur, f_cur - f_last_blinked)) == IterEnd {
-          break IterEnd
-        }
+        let elapsed = f_cur - f_last_blinked
         f_last_blinked = f_cur
+        break Some((lcg.val, f_cur, elapsed))
       }
-    } else {
-      IterContinue
+    } nobreak {
+      None
     }
   })
 }
@@ -85,28 +83,24 @@ fn _iter_smoke(
   seed : @pk_rng.Lcg32,
   new_obj : () -> @togepii.OutskirtStand,
 ) -> Iter2[Int, @pk_rng.Lcg32] {
-  Iter2::new(fn(yield_) {
-    let obj = new_obj()
-    let lcg = seed.to_ref()
-    let mut i = 0
-    while true {
-      if yield_(i, lcg.seed()) == IterEnd {
-        break IterEnd
-      }
+  let obj = new_obj()
+  let lcg = seed.to_ref()
+  let mut i = 0
+  Iter2::new(fn() {
+    let ret = Some((i, lcg.val))
 
-      // マップロード消費が決まったタイミングで割り込む
-      if i < 6 {
-        if i == 2 {
-          lcg.advance(n=2)
-        } else if i == 5 {
-          lcg.advance(n=8)
-        }
+    // マップロード消費が決まったタイミングで割り込む
+    if i < 6 {
+      if i == 2 {
+        lcg.advance(n=2)
+      } else if i == 5 {
+        lcg.advance(n=8)
       }
-      i = i + 1
-      obj.count_up(lcg)
-    } else {
-      IterContinue
     }
+    i = i + 1
+    obj.count_up(lcg)
+
+    ret
   })
 }
 

@@ -1,0 +1,14 @@
+import {
+  "cosearch-wasm/lib/lcg-gc" @pk_rng,
+  "cosearch-wasm/lib/xd_blink" @blink,
+  "cosearch-wasm/lib/xd_togepii" @togepii,
+  "cosearch-wasm/lib/find_seed" @finder,
+}
+
+options(
+  link: {
+    "wasm-gc": {
+      "exports": [ "search_togepii", "new_blink", "iter_smoke", "find_seed" ],
+    },
+  },
+)
