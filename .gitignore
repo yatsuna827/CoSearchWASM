@@ -8,3 +8,5 @@ _build
 /.react-router
 .mooncakes
 /target
+
+.claude/settings.local.json
