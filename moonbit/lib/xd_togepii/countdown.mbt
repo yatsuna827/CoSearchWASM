@@ -79,9 +79,11 @@ fn MainCounter::append(self : MainCounter, next : SubCounter) -> Unit {
 
 ///|
 fn MainCounter::remove_dead_nodes(self : MainCounter) -> Unit {
-  self.next = loop self.next {
-    Some(x) => if x.is_living() { break Some(x) } else { continue x.next }
-    None => break None
+  self.next = for state = self.next {
+    match state {
+      Some(x) => if x.is_living() { break Some(x) } else { continue x.next }
+      None => break None
+    }
   }
 }
 
@@ -132,9 +134,11 @@ fn SubCounter::is_living(self : SubCounter) -> Bool {
 
 ///|
 fn SubCounter::remove_dead_nodes(self : SubCounter) -> Unit {
-  self.next = loop self.next {
-    Some(x) => if x.is_living() { break Some(x) } else { continue x.next }
-    None => break None
+  self.next = for state = self.next {
+    match state {
+      Some(x) => if x.is_living() { break Some(x) } else { continue x.next }
+      None => break None
+    }
   }
 }
 
